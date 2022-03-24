@@ -960,8 +960,8 @@ select {
 .col-span-6 {
   grid-column: span 6 / span 6;
 }
-.float-right {
-  float: right;
+.float-left {
+  float: left;
 }
 .mx-auto {
   margin-left: auto;
@@ -1138,6 +1138,9 @@ select {
 }
 .w-20 {
   width: 5rem;
+}
+.w-1\/4 {
+  width: 25%;
 }
 .min-w-0 {
   min-width: 0px;
@@ -1436,6 +1439,9 @@ select {
 }
 .fill-current {
   fill: currentColor;
+}
+.fill-red-700 {
+  fill: #b91c1c;
 }
 .object-cover {
   -o-object-fit: cover;

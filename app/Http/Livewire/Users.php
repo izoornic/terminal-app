@@ -3,9 +3,12 @@
 namespace App\Http\Livewire;
 
 use App\Models\User;
+use App\Models\UserHistory;
 use App\Models\PozicijaTip;
 use App\Models\KorisnikRadniStatus;
 use App\Models\KorisnikRadniStatusHistory;
+use App\Models\KorisnikRadniOdnos;
+use App\Models\KorisnikRadniOdnosHistory;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -37,8 +40,16 @@ class Users extends Component
     //lokacija
     public $lokacijaId;
 
+    //radni odnos
+    public $radniOdnosId;
+    public $oldRadniOdnosId;
+
     //new user
     public $newUser;
+    //poruka koja se prikazuje posle akcije
+    public $actionMessage;
+    //pretraga po imenu
+    public $searchName;
 
     /**
      * Put your custom public properties here!
@@ -60,27 +71,42 @@ class Users extends Component
      */
     public function rules()
     {
+        $retval = [  
+            'name' => 'required',
+            'pozicijaId' => 'required',
+            'lokacijaId' => 'required',
+            'telegramId' => ['digits_between:4,20', 'nullable'],
+            'tel' => ['digits_between:9,11', 'nullable'],
+            'radniOdnosId' => 'required',
+        ];
+
         if($this->newUser){
-            return [
-                'name' => ['required', 'string', 'max:255'],
-                'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-                'password' => ['required', Password::min(8)
-                        ->letters(),
-                ],
-                'pozicijaId' => 'required',
-                'lokacijaId' => 'required',
-                'telegramId' => ['digits_between:4,20', 'nullable'],
-                'tel' => ['digits_between:9,11', 'nullable'],
-            ];
-        }else{
-            return [  
-                'name' => 'required',
-                'pozicijaId' => 'required',
-                'lokacijaId' => 'required',
-                'telegramId' => ['digits_between:4,20', 'nullable'],
-                'tel' => ['digits_between:9,11', 'nullable'],
-            ];
+            $retval['email'] = ['required', 'string', 'email', 'max:255', 'unique:users'];
+            $retval['password'] = ['required', Password::min(8)
+            ->letters(),
+             ];
         }
+
+        return $retval;
+    }
+
+    /**
+     * The read function.
+     *
+     * @return void
+     */
+    public function read()
+    {
+        return User::leftJoin('pozicija_tips', 'users.pozicija_tipId', '=', 'pozicija_tips.id')
+            ->leftJoin('korisnik_radni_statuses', 'users.id', '=', 'korisnik_radni_statuses.korisnikId')
+            ->leftJoin('radni_status_tips', 'korisnik_radni_statuses.radni_statusId', '=', 'radni_status_tips.id')
+            ->leftJoin('lokacijas', 'users.lokacijaId', '=', 'lokacijas.id')
+            ->leftJoin('regions', 'lokacijas.regionId', '=', 'regions.id')
+            ->leftJoin('korisnik_radni_odnos', 'users.id', '=', 'korisnik_radni_odnos.korisnikId')
+            ->leftJoin('radni_odnos_tips', 'korisnik_radni_odnos.radni_odnosId', '=', 'radni_odnos_tips.id')
+            ->select('users.*', 'pozicija_tips.id as ptid', 'pozicija_tips.naziv as naziv','radni_status_tips.id as rstid', 'radni_status_tips.rs_naziv as rs_naziv', 'lokacijas.l_naziv', 'lokacijas.mesto', 'regions.r_naziv', 'radni_odnos_tips.id as rot_id', 'radni_odnos_tips.ro_naziv')
+            ->where('name', 'like', '%'.$this->searchName.'%')
+            ->paginate(5);
     }
 
     /**
@@ -123,13 +149,17 @@ class Users extends Component
     {
         $data = User::find($this->modelId);
         // Assign the variables here
-        $this->name       = $data->name;
+        $this->name         = $data->name;
         //$this->email      = $data->email;
-        $this->pozicijaId = $data->pozicija_tipId;
-        $this->lokacijaId = $data->lokacijaId;
-        $this->email      = $data->email;
-        $this->telegramId = ($data->telegramId > 0) ? $data->telegramId : "";
-        $this->tel        = ($data->tel) ? trim($data->tel, '+381') : '';
+        $this->pozicijaId   = $data->pozicija_tipId;
+        $this->lokacijaId   = $data->lokacijaId;
+        $this->email        = $data->email;
+        $this->telegramId   = ($data->telegramId > 0) ? $data->telegramId : "";
+        $this->tel          = ($data->tel) ? trim($data->tel, '+381') : '';
+
+        $radniOdnos = KorisnikRadniOdnos::where('korisnikId', $this->modelId)->first();
+        $this->radniOdnosId = $radniOdnos->radni_odnosId;
+        $this->oldRadniOdnosId = $this->radniOdnosId;
     }
 
     /**
@@ -164,29 +194,19 @@ class Users extends Component
     public function create()
     {
         $this->validate();
-        $nUser = User::create($this->modelData());
-        KorisnikRadniStatus :: create([
-            'korisnikId' => $nUser->id,
-            'radni_statusId' => 1,
-        ]);
+        DB::transaction(function(){
+            $nUser = User::create($this->modelData());
+            KorisnikRadniStatus::create([
+                'korisnikId' => $nUser->id,
+                'radni_statusId' => 1,
+            ]);
+            KorisnikRadniOdnos::create([
+                'korisnikId' => $nUser->id,
+                'radni_odnosId' => $this->radniOdnosId,
+            ]);
+        });
         $this->modalFormVisible = false;
         $this->reset();
-    }
-
-    /**
-     * The read function.
-     *
-     * @return void
-     */
-    public function read()
-    {
-        return User::leftJoin('pozicija_tips', 'users.pozicija_tipId', '=', 'pozicija_tips.id')
-            ->leftJoin('korisnik_radni_statuses', 'users.id', '=', 'korisnik_radni_statuses.korisnikId')
-            ->leftJoin('radni_status_tips', 'korisnik_radni_statuses.radni_statusId', '=', 'radni_status_tips.id')
-            ->leftJoin('lokacijas', 'users.lokacijaId', '=', 'lokacijas.id')
-            ->leftJoin('regions', 'lokacijas.regionId', '=', 'regions.id')
-            ->select('users.*', 'pozicija_tips.id as ptid', 'pozicija_tips.naziv as naziv','radni_status_tips.id as rstid', 'radni_status_tips.rs_naziv as rs_naziv', 'lokacijas.l_naziv', 'lokacijas.mesto', 'regions.r_naziv')
-            ->paginate(5);
     }
 
     /**
@@ -198,7 +218,17 @@ class Users extends Component
     {
         $this->validate();
         User::find($this->modelId)->update($this->modelData());
-       $this->modalFormVisible = false;
+        if($this->oldRadniOdnosId != $this->radniOdnosId){
+            DB::transaction(function(){
+               //prvo trenutna vrednost iz tabele
+               $cuurent = KorisnikRadniOdnos::where('korisnikId', $this->modelId)->first();
+               //zatim upis u history tabelu
+               KorisnikRadniOdnosHistory::create(['korisnik_radni_odnosId' => $cuurent['id'], 'korisnikId' => $cuurent['korisnikId'], 'radni_odnosId' => $cuurent['radni_odnosId']]);
+               //update trenutnog stanja
+               KorisnikRadniOdnos::where('korisnikId', $this->modelId)->update(['radni_odnosId' => $this->radniOdnosId]);
+            });
+        }
+        $this->modalFormVisible = false;
     }
 
     /**
@@ -209,8 +239,32 @@ class Users extends Component
     public function delete()
     {
         //ovde mora transakcija
-
-        //User::destroy($this->modelId);
+        try {
+            DB::transaction(function(){
+                $user = User::find($this->modelId);
+               
+                UserHistory::create([
+                    'korisnikId' => $this->modelId,
+                    'pozicija_tipId' => $user->pozicija_tipId,
+                    'lokacijaId'  => $user->lokacijaId,
+                    'telegramId'  => $user->telegramId,
+                    'tel'  => $user->tel,
+                    'name'  => $user->name,
+                    'email'  => $user->email,
+                    'email_verified_at'  => $user->email_verified_at,
+                    'password'  => $user->password,
+                    'remember_token'  => $user->remember_token,
+                    'current_team_id'  => $user->current_team_id,
+                    'profile_photo_path'  => $user->profile_photo_path,
+                ]);
+               
+                KorisnikRadniOdnos::where('korisnikId', $this->modelId)->delete();
+                KorisnikRadniStatus::where('korisnikId', $this->modelId)->delete();
+                User::destroy($this->modelId);
+            });
+        } catch (\Throwable $th) {
+            abort(403, 'Unauthorized action.');
+        }
         $this->modalConfirmDeleteVisible = false;
         $this->resetPage();
     }
@@ -226,6 +280,7 @@ class Users extends Component
         $this->newUser = false;
         $this->modelId = $id;
         $this->modalConfirmDeleteVisible = true;
+        $this->name = User::find($this->modelId)->name;
     }    
 
     public function render()

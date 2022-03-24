@@ -1,9 +1,13 @@
 <div class="p-6">
     <div class="flex items-center justify-end px-4 py-3 text-right sm:px-6">
+        <div class="w-1/4">
+            <x-jet-input wire:model="searchName" id="" class="block mt-1 w-full" type="text" placeholder="Pretrazi ime" />
+        </div>
         <x-jet-button wire:click="createShowModal" >
             <!--! CREATE NEW USER -->
-        <svg class="fill-current w-4 h-4 mr-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512"><path d="M224 256c70.7 0 128-57.31 128-128S294.7 0 224 0C153.3 0 96 57.31 96 128S153.3 256 224 256zM274.7 304H173.3C77.61 304 0 381.6 0 477.3C0 496.5 15.52 512 34.66 512h378.7C432.5 512 448 496.5 448 477.3C448 381.6 370.4 304 274.7 304zM616 200h-48v-48C568 138.8 557.3 128 544 128s-24 10.75-24 24v48h-48C458.8 200 448 210.8 448 224s10.75 24 24 24h48v48C520 309.3 530.8 320 544 320s24-10.75 24-24v-48h48C629.3 248 640 237.3 640 224S629.3 200 616 200z"/></svg>
-        </x-jet-button>
+        <svg class="fill-current w-4 h-4 mr-0 ml-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512"><path d="M224 256c70.7 0 128-57.31 128-128S294.7 0 224 0C153.3 0 96 57.31 96 128S153.3 256 224 256zM274.7 304H173.3C77.61 304 0 381.6 0 477.3C0 496.5 15.52 512 34.66 512h378.7C432.5 512 448 496.5 448 477.3C448 381.6 370.4 304 274.7 304zM616 200h-48v-48C568 138.8 557.3 128 544 128s-24 10.75-24 24v48h-48C458.8 200 448 210.8 448 224s10.75 24 24 24h48v48C520 309.3 530.8 320 544 320s24-10.75 24-24v-48h48C629.3 248 640 237.3 640 224S629.3 200 616 200z"/></svg>
+        <span class="ml-4">Novi korisnik</span>    
+    </x-jet-button>
     </div>
 
     {{-- The data table --}}
@@ -17,6 +21,7 @@
                                 <th class="px-6 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase"></th>
                                 <th class="px-6 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Ime</th>
                                 <th class="px-6 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Lokacija</th>
+                                <th class="px-6 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Radni odnos</th>
                                 <th class="px-6 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Pozicija</th>
                                 
                                 <th class="px-6 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Radni status</th>
@@ -34,6 +39,7 @@
                                         </td> 
                                         <td class="px-6 py-2">{{ $item->name }}</td>
                                         <td class="px-6 py-2">{{ $item->l_naziv }} - {{ $item->mesto }}</td> 
+                                        <td class="px-6 py-2">{{ $item->ro_naziv }}</td>
                                         <td class="px-6 py-2">{{ $item->naziv }}</td>  
                                         
                                         <td class="px-6 py-2"> 
@@ -107,11 +113,11 @@
                   @error('tel') <span class="error">{{ $message }}</span>@enderror
                </div>
             </div> 
-           
+                 
             <div class="mt-4">
                 <x-jet-label for="pozicijaId" value="{{ __('Pozicija') }}" />
-                <select wire:model="pozicijaId" id="" class="block appearance-none w-full bg-gray-100 border border-gray-200 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
-                        <option value="">-- Select a Role -- </option>
+                <select wire:model="pozicijaId" id="pozicija" class="block appearance-none w-full bg-gray-100 border border-gray-200 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+                        <option value="">-- Odaberi poziciju -- </option>
                     @foreach (App\Models\PozicijaTip::userRoleList() as $key => $value)    
                         <option value="{{ $key }}">{{ $value }}</option>
                     @endforeach
@@ -121,14 +127,25 @@
             <br />
             <div class="mt-4">
                 <x-jet-label for="lokacijaId" value="{{ __('Lokacija') }}" />
-                <select wire:model="lokacijaId" id="" class="block appearance-none w-full bg-gray-100 border border-gray-200 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
-                        <option value="">-- Select a Role -- </option>
+                <select wire:model="lokacijaId" id="lokacija" class="block appearance-none w-full bg-gray-100 border border-gray-200 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+                        <option value="">-- Odaberi lokaciju -- </option>
                     @foreach (App\Models\Lokacija::userLokacijeList() as $key => $value)    
                         <option value="{{ $key }}">{{ $value }}</option>
                     @endforeach
                 </select>
                 @error('lokacijaId') <span class="error">{{ $message }}</span> @enderror
-            </div>      
+            </div>
+            <br />
+            <div class="mt-4">
+                <x-jet-label for="radniOdnosId" value="{{ __('Radni odnos') }}" />
+                <select wire:model="radniOdnosId" id="radniodnos" class="block appearance-none w-full bg-gray-100 border border-gray-200 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+                        <option value="">-- Odaberi radni odnos -- {{ $radniOdnosId }}</option>
+                    @foreach (App\Models\RadniOdnosTip::userRadniOdnosList() as $key => $value)    
+                        <option value="{{ $key }}">{{ $value }}</option>
+                    @endforeach
+                </select>
+                @error('radniOdnosId') <span class="error">{{ $message }}</span> @enderror
+            </div>    
         </x-slot>
 
         <x-slot name="footer">
@@ -151,7 +168,9 @@
     {{-- Modal Form Radni Srtatus --}}
     <x-jet-dialog-modal wire:model="modalRadniStatusVisible">
         <x-slot name="title">
-            <svg class="float-right fill-current w-4 h-4 mr-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Pro 6.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M224 256c70.7 0 128-57.31 128-128s-57.3-128-128-128C153.3 0 96 57.31 96 128S153.3 256 224 256zM274.7 304H173.3C77.61 304 0 381.6 0 477.3c0 19.14 15.52 34.67 34.66 34.67h378.7C432.5 512 448 496.5 448 477.3C448 381.6 370.4 304 274.7 304z"/></svg> {{ $name }}
+            <svg class="float-left fill-current w-4 h-4 mr-0 mt-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Pro 6.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M224 256c70.7 0 128-57.31 128-128s-57.3-128-128-128C153.3 0 96 57.31 96 128S153.3 256 224 256zM274.7 304H173.3C77.61 304 0 381.6 0 477.3c0 19.14 15.52 34.67 34.66 34.67h378.7C432.5 512 448 496.5 448 477.3C448 381.6 370.4 304 274.7 304z"/></svg> 
+            <span class="ml-4">{{ $name }}</span>
+            <br />
         </x-slot>
         <x-slot name="content">          
             <div class="mt-4">
@@ -178,20 +197,21 @@
     {{-- The Delete Modal --}}
     <x-jet-dialog-modal wire:model="modalConfirmDeleteVisible">
         <x-slot name="title">
-            {{ __('Delete Modal Title') }}
+        <svg class="float-left fill-red-700 w-4 h-4 mr-2 mt-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><!-- Font Awesome Pro 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) --><path d="M569.517 440.013C587.975 472.007 564.806 512 527.94 512H48.054c-36.937 0-59.999-40.055-41.577-71.987L246.423 23.985c18.467-32.009 64.72-31.951 83.154 0l239.94 416.028zM288 354c-25.405 0-46 20.595-46 46s20.595 46 46 46 46-20.595 46-46-20.595-46-46-46zm-43.673-165.346l7.418 136c.347 6.364 5.609 11.346 11.982 11.346h48.546c6.373 0 11.635-4.982 11.982-11.346l7.418-136c.375-6.874-5.098-12.654-11.982-12.654h-63.383c-6.884 0-12.356 5.78-11.981 12.654z"/></svg>
+            {{ __('Obriši korisnika - ') }}{{ $name }}
         </x-slot>
 
         <x-slot name="content">
-            {{ __('Are you sure you want to delete this item?') }}
+            {{ __('Da li ste sigurni da želite da obrišete ovog korisnika?') }}
         </x-slot>
 
         <x-slot name="footer">
             <x-jet-secondary-button wire:click="$toggle('modalConfirmDeleteVisible')" wire:loading.attr="disabled">
-                {{ __('Nevermind') }}
+                {{ __('Otkaži') }}
             </x-jet-secondary-button>
 
             <x-jet-danger-button class="ml-2" wire:click="delete" wire:loading.attr="disabled">
-                {{ __('Delete Item') }}
+                {{ __('Obriši korisnika') }}
             </x-jet-danger-button>
         </x-slot>
     </x-jet-dialog-modal>
