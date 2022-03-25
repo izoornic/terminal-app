@@ -50,6 +50,8 @@ class Users extends Component
     public $actionMessage;
     //pretraga po imenu
     public $searchName;
+    public $searchLokacija;
+    public $searchRStatus;
 
     /**
      * Put your custom public properties here!
@@ -106,6 +108,8 @@ class Users extends Component
             ->leftJoin('radni_odnos_tips', 'korisnik_radni_odnos.radni_odnosId', '=', 'radni_odnos_tips.id')
             ->select('users.*', 'pozicija_tips.id as ptid', 'pozicija_tips.naziv as naziv','radni_status_tips.id as rstid', 'radni_status_tips.rs_naziv as rs_naziv', 'lokacijas.l_naziv', 'lokacijas.mesto', 'regions.r_naziv', 'radni_odnos_tips.id as rot_id', 'radni_odnos_tips.ro_naziv')
             ->where('name', 'like', '%'.$this->searchName.'%')
+            ->where('lokacijas.id', ($this->searchLokacija > 0) ? '=' : '<>', $this->searchLokacija)
+            ->where('radni_status_tips.id', ($this->searchRStatus > 0) ? '=' : '<>', $this->searchRStatus)
             ->paginate(5);
     }
 

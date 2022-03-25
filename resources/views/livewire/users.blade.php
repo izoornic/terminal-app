@@ -1,8 +1,5 @@
 <div class="p-6">
     <div class="flex items-center justify-end px-4 py-3 text-right sm:px-6">
-        <div class="w-1/4">
-            <x-jet-input wire:model="searchName" id="" class="block mt-1 w-full" type="text" placeholder="Pretrazi ime" />
-        </div>
         <x-jet-button wire:click="createShowModal" >
             <!--! CREATE NEW USER -->
         <svg class="fill-current w-4 h-4 mr-0 ml-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512"><path d="M224 256c70.7 0 128-57.31 128-128S294.7 0 224 0C153.3 0 96 57.31 96 128S153.3 256 224 256zM274.7 304H173.3C77.61 304 0 381.6 0 477.3C0 496.5 15.52 512 34.66 512h378.7C432.5 512 448 496.5 448 477.3C448 381.6 370.4 304 274.7 304zM616 200h-48v-48C568 138.8 557.3 128 544 128s-24 10.75-24 24v48h-48C458.8 200 448 210.8 448 224s10.75 24 24 24h48v48C520 309.3 530.8 320 544 320s24-10.75 24-24v-48h48C629.3 248 640 237.3 640 224S629.3 200 616 200z"/></svg>
@@ -23,12 +20,37 @@
                                 <th class="px-6 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Lokacija</th>
                                 <th class="px-6 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Radni odnos</th>
                                 <th class="px-6 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Pozicija</th>
-                                
                                 <th class="px-6 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Radni status</th>
                                 <th class="px-6 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider"></th>
                             </tr>
                         </thead>
-                        <tbody class="bg-white divide-y divide-gray-200">                           
+                        <tbody class="bg-white divide-y divide-gray-200">  
+                            <tr>
+                                <td></td>
+                                <td>
+                                    <x-jet-input wire:model="searchName" id="" class="block mt-1 w-full" type="text" placeholder="Pretrazi ime" />
+                                </td>
+                                <td>
+                                    <select wire:model="searchLokacija" id="" class="block appearance-none w-full border border-gray-200 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+                                            <option value="">-- Lokacija -- </option>
+                                        @foreach (App\Models\Lokacija::userLokacijeList() as $key => $value)    
+                                            <option value="{{ $key }}">{{ $value }}</option>
+                                        @endforeach
+                                    </select>
+                                </td>
+                                <td></td>
+                                <td></td>
+                                <td>
+                                    <select wire:model="searchRStatus" id="" class="block appearance-none w-full border border-gray-200 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+                                        <option value="">-- Radni status -- </option>
+                                        @foreach (App\Models\RadniStatusTip::userRadniStatusList() as $key => $value)    
+                                            <option value="{{ $key }}">{{ $value }}</option>
+                                        @endforeach
+                                    </select>
+                                </td>
+                                <td></td>
+                            </tr>
+                        
                             @if ($data->count())
                                 @foreach ($data as $item)
                                     <tr>
