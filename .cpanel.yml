@@ -2,7 +2,7 @@
 deployment:
   tasks:
     - export DEPLOYPATH=/home/eposrs/
-    - /bin/cp package-lock.json $DEPLOYPATH
+    - /bin/cp -a * $DEPLOYPATH
     #- /bin/cp -R app $DEPLOYPATH
     #- /bin/cp -R bootstrap  $DEPLOYPATH
     #- /bin/cp -R config  $DEPLOYPATH
