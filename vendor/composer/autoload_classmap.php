@@ -43,6 +43,7 @@ return array(
     'App\\Models\\RadniOdnosTip' => $baseDir . '/app/Models/RadniOdnosTip.php',
     'App\\Models\\RadniStatusTip' => $baseDir . '/app/Models/RadniStatusTip.php',
     'App\\Models\\Region' => $baseDir . '/app/Models/Region.php',
+    'App\\Models\\RegionPrioritetServis' => $baseDir . '/app/Models/RegionPrioritetServis.php',
     'App\\Models\\Stranica' => $baseDir . '/app/Models/Stranica.php',
     'App\\Models\\User' => $baseDir . '/app/Models/User.php',
     'App\\Models\\UserHistory' => $baseDir . '/app/Models/UserHistory.php',

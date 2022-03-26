@@ -602,6 +602,7 @@ class ComposerStaticInite2ba2be2abd18ef0cdf065015a13d775
         'App\\Models\\RadniOdnosTip' => __DIR__ . '/../..' . '/app/Models/RadniOdnosTip.php',
         'App\\Models\\RadniStatusTip' => __DIR__ . '/../..' . '/app/Models/RadniStatusTip.php',
         'App\\Models\\Region' => __DIR__ . '/../..' . '/app/Models/Region.php',
+        'App\\Models\\RegionPrioritetServis' => __DIR__ . '/../..' . '/app/Models/RegionPrioritetServis.php',
         'App\\Models\\Stranica' => __DIR__ . '/../..' . '/app/Models/Stranica.php',
         'App\\Models\\User' => __DIR__ . '/../..' . '/app/Models/User.php',
         'App\\Models\\UserHistory' => __DIR__ . '/../..' . '/app/Models/UserHistory.php',

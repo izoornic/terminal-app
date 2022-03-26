@@ -43,4 +43,8 @@ Route::get('/user-permissions', function(){
     return view('admin.user-permissions');
     })->name('user-permissions');
 
+Route::get('/lokacije', function(){
+    return view('admin.lokacije');
+    })->name('lokacije');
+
 });

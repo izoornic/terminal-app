@@ -13,15 +13,12 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('lokacijas', function (Blueprint $table) {
+        Schema::create('region_prioritet_servis', function (Blueprint $table) {
             $table->id();
-            $table->integer('regionId')->default(1);
-            $table->integer('lokacija_tipId')->default(1);
-            $table->string('l_naziv');
-            $table->string('mesto');
-            $table->string('adresa');
-            $table->decimal('latitude', 9,6)->nullable();
-            $table->decimal('longitude', 9,6)->nullable();
+            $table->integer('regionId');
+            $table->integer('lokacija_p1Id');
+            $table->integer('lokacija_p2Id')->nullable();
+            $table->integer('lokacija_p3Id')->nullable();
             $table->timestamps();
         });
     }
@@ -33,6 +30,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('lokacijas');
+        Schema::dropIfExists('region_prioritet_servis');
     }
 };

@@ -48,10 +48,13 @@ class Users extends Component
     public $newUser;
     //poruka koja se prikazuje posle akcije
     public $actionMessage;
-    //pretraga po imenu
+    //pretraga 
     public $searchName;
     public $searchLokacija;
     public $searchRStatus;
+    public $searchPozicija;
+    //order
+    public $orderBy;
 
     /**
      * Put your custom public properties here!
@@ -99,6 +102,25 @@ class Users extends Component
      */
     public function read()
     {
+        $order = 'id';
+        switch($this->orderBy){
+            case 'uid':
+                $order = 'id';
+            break;
+            case 'name':
+                $order = 'users.name';
+            break;
+            case 'lokacija':
+                $order = 'regions.r_naziv';
+            break;
+            case 'pozicija':
+                $order = 'users.pozicija_tipId';
+            break;
+            case 'status':
+                $order = 'korisnik_radni_statuses.radni_statusId';
+            break;
+        };
+
         return User::leftJoin('pozicija_tips', 'users.pozicija_tipId', '=', 'pozicija_tips.id')
             ->leftJoin('korisnik_radni_statuses', 'users.id', '=', 'korisnik_radni_statuses.korisnikId')
             ->leftJoin('radni_status_tips', 'korisnik_radni_statuses.radni_statusId', '=', 'radni_status_tips.id')
@@ -110,7 +132,13 @@ class Users extends Component
             ->where('name', 'like', '%'.$this->searchName.'%')
             ->where('lokacijas.id', ($this->searchLokacija > 0) ? '=' : '<>', $this->searchLokacija)
             ->where('radni_status_tips.id', ($this->searchRStatus > 0) ? '=' : '<>', $this->searchRStatus)
+            ->where('users.pozicija_tipId', ($this->searchPozicija > 0) ? '=' : '<>', $this->searchPozicija)
+            ->orderBy($order)
             ->paginate(5);
+    }
+
+    public function sortBy($name){
+        dd($name);
     }
 
     /**

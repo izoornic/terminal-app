@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class LokacijaTip extends Model
+class RegionPrioritetServis extends Model
 {
     use HasFactory;
     /**
@@ -14,6 +14,9 @@ class LokacijaTip extends Model
      * @var string[]
      */
     protected $fillable = [
-        'lt_naziv',
+        'regionId',
+        'lokacija_p1Id',
+        'lokacija_p2Id',
+        'lokacija_p3Id',
     ];
 }
