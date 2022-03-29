@@ -966,9 +966,6 @@ select {
 .float-left {
   float: left;
 }
-.m-auto {
-  margin: auto;
-}
 .mx-auto {
   margin-left: auto;
   margin-right: auto;
@@ -1450,14 +1447,17 @@ select {
 .fill-current {
   fill: currentColor;
 }
+.fill-red-600 {
+  fill: #dc2626;
+}
 .fill-orange-600 {
   fill: #ea580c;
 }
-.fill-orange-100 {
-  fill: #ffedd5;
-}
 .fill-red-700 {
   fill: #b91c1c;
+}
+.fill-sky-800 {
+  fill: #075985;
 }
 .object-cover {
   -o-object-fit: cover;
@@ -1623,6 +1623,9 @@ select {
 }
 .leading-4 {
   line-height: 1rem;
+}
+.leading-none {
+  line-height: 1;
 }
 .tracking-widest {
   letter-spacing: 0.1em;
@@ -2255,5 +2258,10 @@ select {
   .lg\:px-8 {
     padding-left: 2rem;
     padding-right: 2rem;
+  }
+
+  .lg\:text-sm {
+    font-size: 0.875rem;
+    line-height: 1.25rem;
   }
 }

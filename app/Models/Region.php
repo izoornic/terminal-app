@@ -9,7 +9,6 @@ class Region extends Model
 {
     use HasFactory;
 
-    use HasFactory;
     /**
      * The attributes that are mass assignable.
      *
@@ -18,4 +17,12 @@ class Region extends Model
     protected $fillable = [
         'r_naziv',
     ];
+
+    public static function regioni()
+    {
+        foreach(Region::all() as $region){
+            $region_list[$region->id] = $region->r_naziv;
+        }
+        return  $region_list;
+    }
 }

@@ -12,4 +12,11 @@
             </div>
         </div>
     </div>
+    <div class="pt-2 bg-white">
+            <div class="flex justify-between">
+                <div></div>
+                <div class="text-xs lg:text-sm leading-none text-gray-700">{{ config('global.siteFooter') }}</div>
+                <div class="pr-4 text-xs lg:text-sm leading-none text-gray-700">{{ config('global.version') }}</div>
+            </div>
+    </div>
 </x-app-layout>

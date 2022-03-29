@@ -16,4 +16,12 @@ class LokacijaTip extends Model
     protected $fillable = [
         'lt_naziv',
     ];
+
+    public static function tipoviList()
+    {
+        foreach(LokacijaTip::all() as $lokacija){
+            $lokacija_list[$lokacija->id] = $lokacija->lt_naziv;
+        }
+        return  $lokacija_list;
+    }
 }

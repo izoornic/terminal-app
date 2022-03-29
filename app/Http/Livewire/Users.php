@@ -137,10 +137,6 @@ class Users extends Component
             ->paginate(5);
     }
 
-    public function sortBy($name){
-        dd($name);
-    }
-
     /**
      * Shows the create NEW USER modal
      *
