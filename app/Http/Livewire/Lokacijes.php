@@ -3,8 +3,13 @@
 namespace App\Http\Livewire;
 
 use App\Models\Lokacija;
+use App\Models\User;
+//use App\Models\Terminal_lokacija;
+//use App\Models\Tiket;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Illuminate\Support\Facades\Config;
+
 
 class Lokacijes extends Component
 {
@@ -23,6 +28,18 @@ class Lokacijes extends Component
     public $regionId;
     public $lokacija_tipId;
 
+    //pretraga
+    public $searchName;
+    public $searchMesto;
+    public $searchTip;
+    public $searchRegion;
+
+    //order
+    public $orderBy;
+
+    //delete check
+    public $deletePosible;
+    public $delName;
 
     /**
      * Put your custom public properties here!
@@ -52,11 +69,34 @@ class Lokacijes extends Component
      */
     public function read()
     {
+        $order = 'id';
+        switch($this->orderBy){
+            case 'uid':
+                $order = 'id';
+            break;
+            case 'name':
+                $order = 'l_naziv';
+            break;
+            case 'mesto':
+                $order = 'mesto';
+            break;
+            case 'region':
+                $order = 'regionId';
+            break;
+            case 'tip':
+                $order = 'lokacija_tipId';
+            break;
+        };
         //return Lokacija::paginate(5);
         return Lokacija::leftJoin('regions', 'lokacijas.regionId', '=', 'regions.id')
         ->leftJoin('lokacija_tips', 'lokacijas.lokacija_tipId', '=', 'lokacija_tips.id')
         ->select('lokacijas.*', 'lokacija_tips.lt_naziv', 'regions.r_naziv')
-        ->paginate(5);
+        ->where('l_naziv', 'like', '%'.$this->searchName.'%')
+        ->where('mesto', 'like', '%'.$this->searchMesto.'%')
+        ->where('regionId', ($this->searchRegion > 0) ? '=' : '<>', $this->searchRegion)
+        ->where('lokacija_tipId', ($this->searchTip > 0) ? '=' : '<>', $this->searchTip)
+        ->orderBy($order)
+        ->paginate(Config::get('global.paginate'));
     }
 
     /**
@@ -171,8 +211,22 @@ class Lokacijes extends Component
      */
     public function deleteShowModal($id)
     {
+        //dd($this->locationUsers($id));
         $this->modelId = $id;
+
+        $ldat = Lokacija::find($this->modelId)->first();
+        $this->delName = $ldat['l_naziv'].', '.$ldat['mesto'];
+
         $this->modalConfirmDeleteVisible = true;
+        $this->deletePosible = false;
+        
+        //check if lokacija zakacena za nekog
+        $data = User::where('lokacijaId', $id)->first();
+        if($data === NULL){
+            $this->deletePosible = true;
+        };//else if($data)
+
+
     }    
 
     public function render()
@@ -181,9 +235,34 @@ class Lokacijes extends Component
             'data' => $this->read(),
         ]);
     }
-
+    
+    /**
+     * Creates Gmap link
+     *
+     * @param  mixed $lat
+     * @param  mixed $log
+     * @return void
+     */
     public static function createGmapLink($lat, $log)
     {
         return 'https://www.google.com/maps/search/?api=1&query='.$lat.','.$log;
+    }
+    
+    /**
+     * Lists all rows in all tables that use particular location
+     *
+     * @param  mixed $id
+     * @return void
+     */
+    public static function locationUsers($id)
+    {
+        $retval = [];
+        $retval['users'] = [];
+        foreach(User::where('lokacijaId', $id)->get() as $row){
+            array_push($retval['users'], $row['name']);
+        };
+        //MORA DA SE UPDATUJE I FUNKCIJA deleteShowModal($id)
+        //dd($retval);
+        return $retval;
     }
 }

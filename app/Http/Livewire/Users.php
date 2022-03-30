@@ -17,6 +17,8 @@ use Illuminate\Support\Collection;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Support\Facades\Hash;
 
+use Illuminate\Support\Facades\Config;
+
 class Users extends Component 
 {
     use WithPagination;
@@ -134,7 +136,7 @@ class Users extends Component
             ->where('radni_status_tips.id', ($this->searchRStatus > 0) ? '=' : '<>', $this->searchRStatus)
             ->where('users.pozicija_tipId', ($this->searchPozicija > 0) ? '=' : '<>', $this->searchPozicija)
             ->orderBy($order)
-            ->paginate(5);
+            ->paginate(Config::get('global.paginate'));
     }
 
     /**
