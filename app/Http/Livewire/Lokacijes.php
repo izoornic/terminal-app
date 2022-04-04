@@ -107,11 +107,11 @@ class Lokacijes extends Component
             break;
         };
         //return Lokacija::paginate(5);
-        return Lokacija::leftJoin('regions', 'regions.id', '=', 'lokacijas.regionId')
+        return Lokacija::select('lokacijas.*', 'lokacija_tips.lt_naziv', 'regions.r_naziv', 'regions.id as rid', 'terminal_lokacijas.lokacijaId as ima_terminala', 'users.lokacijaId as ima_user')
+        ->leftJoin('regions', 'regions.id', '=', 'lokacijas.regionId')
         ->leftJoin('lokacija_tips', 'lokacijas.lokacija_tipId', '=', 'lokacija_tips.id')
         ->leftJoin('terminal_lokacijas', 'lokacijas.id', '=', 'terminal_lokacijas.lokacijaId')
         ->leftJoin('users', 'users.lokacijaId', '=', 'lokacijas.id')
-        ->select('lokacijas.*', 'lokacijas.regionId', 'lokacija_tips.lt_naziv', 'regions.r_naziv', 'regions.id as rid', 'terminal_lokacijas.lokacijaId as ima_terminala', 'users.lokacijaId as ima_user')
         ->groupBy('lokacijas.id')
         ->orderBy($order)
         ->paginate(Config::get('global.paginate'), ['*'], 'lokacije');
