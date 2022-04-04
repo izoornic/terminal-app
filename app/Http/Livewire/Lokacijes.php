@@ -200,8 +200,8 @@ class Lokacijes extends Component
             'l_naziv'   => $this->l_naziv,
             'mesto'     => $this->mesto,
             'adresa'   => $this->adresa,
-            'latitude'   => $this->latitude,
-            'longitude'   => $this->longitude,
+            'latitude'   => ($this->latitude == '') ? NULL : $this->latitude,
+            'longitude'   =>($this->longitude == '') ? NULL : $this->longitude,
             'regionId'   => $this->regionId,
             'lokacija_tipId'   => $this->lokacija_tipId,    
         ];
