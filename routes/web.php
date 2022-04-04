@@ -27,24 +27,24 @@ Route::group(['middleware' => [
     'accessrole'
 ]], function(){
 
-Route::get('/dashboard', function(){
-    return view('dashboard');
-    })->name('dashboard');
+    Route::get('/dashboard', function(){
+        return view('dashboard');
+        })->name('dashboard');
 
-Route::get('/pages', function(){
-     return view('admin.pages');
-    })->name('pages');
+    Route::get('/pages', function(){
+        return view('admin.pages');
+        })->name('pages');
 
-Route::get('/users', function(){
-    return view('admin.users');
-    })->name('users');
+    Route::get('/users', function(){
+        return view('admin.users');
+        })->name('users');
 
-Route::get('/user-permissions', function(){
-    return view('admin.user-permissions');
-    })->name('user-permissions');
+    Route::get('/user-permissions', function(){
+        return view('admin.user-permissions');
+        })->name('user-permissions');
 
-Route::get('/lokacije', function(){
-    return view('admin.lokacije');
-    })->name('lokacije');
+    Route::get('/lokacije', function(){
+        return view('admin.lokacije');
+        })->name('lokacije');
 
 });

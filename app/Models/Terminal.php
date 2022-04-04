@@ -5,19 +5,18 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Stranica extends Model
+class Terminal extends Model
 {
     use HasFactory;
-    
+
     /**
      * fillable
      *
      * @var array
      */
     protected $fillable = [
-        'naziv',
-        'route_name',
-        'menu_order',
-        'sub_menu_order',
+        'sn',
+        'terminal_tipId',
+        'broj_kutije',
     ];
 }

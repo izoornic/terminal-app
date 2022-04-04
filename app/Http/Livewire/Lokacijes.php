@@ -2,13 +2,17 @@
 
 namespace App\Http\Livewire;
 
+use Auth;
 use App\Models\Lokacija;
 use App\Models\User;
-//use App\Models\Terminal_lokacija;
+use App\Models\TerminalLokacija;
+use App\Models\TerminalLokacijaHistory;
+//use App\Models\TerminalStatusTip;
 //use App\Models\Tiket;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\DB;
 
 
 class Lokacijes extends Component
@@ -40,10 +44,25 @@ class Lokacijes extends Component
     //delete check
     public $deletePosible;
     public $delName;
+    public $brTerminala;
 
-    /**
-     * Put your custom public properties here!
-     */
+    //ADD terminal to location
+    public $modalAddTerminalVisible;
+    public $addingType;
+    public $p_lokacija_tipId;
+    public $p_lokacijaId;
+
+    public $searchSN;
+    public $searchBK;
+    public $selsectedTerminals = [];
+    public $t_status;
+
+    public $errAddMsg = '';
+
+    public function addTerminlaListener()
+    {
+        dd($this->modalAddTerminalVisible);
+    }
 
     /**
      * The validation rules
@@ -90,13 +109,16 @@ class Lokacijes extends Component
         //return Lokacija::paginate(5);
         return Lokacija::leftJoin('regions', 'lokacijas.regionId', '=', 'regions.id')
         ->leftJoin('lokacija_tips', 'lokacijas.lokacija_tipId', '=', 'lokacija_tips.id')
-        ->select('lokacijas.*', 'lokacija_tips.lt_naziv', 'regions.r_naziv')
+        ->leftJoin('terminal_lokacijas', 'lokacijas.id', '=', 'terminal_lokacijas.lokacijaId')
+        ->leftJoin('users', 'users.lokacijaId', '=', 'lokacijas.id')
+        ->select('lokacijas.*', 'lokacija_tips.lt_naziv', 'regions.r_naziv', 'terminal_lokacijas.lokacijaId as ima_terminala', 'users.lokacijaId as ima_user')
         ->where('l_naziv', 'like', '%'.$this->searchName.'%')
         ->where('mesto', 'like', '%'.$this->searchMesto.'%')
         ->where('regionId', ($this->searchRegion > 0) ? '=' : '<>', $this->searchRegion)
         ->where('lokacija_tipId', ($this->searchTip > 0) ? '=' : '<>', $this->searchTip)
+        ->groupBy('lokacijas.id')
         ->orderBy($order)
-        ->paginate(Config::get('global.paginate'));
+        ->paginate(Config::get('global.paginate'), ['*'], 'lokacije');
     }
 
     /**
@@ -226,7 +248,11 @@ class Lokacijes extends Component
             $this->deletePosible = true;
         };//else if($data)
 
-
+        //check if lokacija ima terminale 
+        $this->brTerminala = TerminalLokacija::brojTerminalaNalokaciji($id);
+        if($this->brTerminala){
+            $this->deletePosible = false;
+        };
     }    
 
     public function render()
@@ -257,12 +283,94 @@ class Lokacijes extends Component
     public static function locationUsers($id)
     {
         $retval = [];
-        $retval['users'] = [];
         foreach(User::where('lokacijaId', $id)->get() as $row){
+            $retval['users'] = [];
             array_push($retval['users'], $row['name']);
         };
         //MORA DA SE UPDATUJE I FUNKCIJA deleteShowModal($id)
         //dd($retval);
+        if(TerminalLokacija::brojTerminalaNalokaciji($id)){
+            $retval['trminal'] = [];
+            array_push($retval['trminal'], TerminalLokacija::brojTerminalaNalokaciji($id));
+        }  
         return $retval;
+    }
+
+    //ADD TERMINAL MODAL    
+    /**
+     * addTerminalShowModal
+     *
+     * @param  mixed $id
+     * @return void
+     */
+    public function addTerminalShowModal($id)
+    {
+        $this->modelId = $id;
+        $this->errAddMsg = '';
+        $this->t_status = 0;
+
+        $ldat = Lokacija::find($this->modelId);
+        $this->delName = $ldat['l_naziv'].', '.$ldat['mesto'];
+
+        $this->addingType = 'location';
+        $this->modalAddTerminalVisible = true;
+        //dd($this->addingType);
+        $this->selsectedTerminals = [];
+        $this->searchSN = '';
+        $this->p_lokacija_tipId = 0;
+        $this->p_lokacijaId = 0;
+
+
+    }
+    
+    /**
+     * terminaliZaLokaciju
+     *
+     * @param  mixed $id
+     * @param  mixed $sn
+     * @param  mixed $bk
+     * @return void
+     */
+    public static function terminaliZaLokaciju($id, $sn = '', $bk = '')
+    { 
+        return TerminalLokacija::leftJoin('terminals', 'terminal_lokacijas.terminalId', '=', 'terminals.id')
+                                ->leftJoin('terminal_status_tips', 'terminal_lokacijas.terminal_statusId', '=', 'terminal_status_tips.id')
+                                ->select('terminal_lokacijas.*', 'terminals.sn', 'terminals.broj_kutije', 'terminal_status_tips.ts_naziv', 'terminals.id as tid')
+                                ->where('terminal_lokacijas.lokacijaId', $id)
+                                ->where('terminals.sn', 'like', '%'.$sn.'%')
+                                ->where('terminals.broj_kutije', 'like', '%'.$bk.'%')
+                                ->paginate(Config::get('global.paginate'), ['*'], 'terminaliLokacija');
+    }
+    
+    /**
+     * addTerminal
+     *
+     * @return void
+     */
+    public function addTerminal()
+    {
+        //ima li izabranih terminala
+        if($this->t_status){
+            if(count($this->selsectedTerminals)){
+                $this->errAddMsg = '';
+                foreach($this->selsectedTerminals as $tid){
+                    DB::transaction(function() use($tid){
+                        //terminal
+                       $cuurent = TerminalLokacija::where('terminalId', $tid) -> first();
+                        //insert to history table
+                         TerminalLokacijaHistory::create(['terminal_lokacijaId' => $cuurent['id'], 'terminalId' => $cuurent['terminalId'], 'lokacijaId' => $cuurent['lokacijaId'], 'terminal_statusId' => $cuurent['terminal_statusId'], 'korisnikId' => $cuurent['korisnikId'], 'korisnikIme' => $cuurent['korisnikIme']]);
+                        //update current
+                        TerminalLokacija::where('terminalId', $tid)->update(['lokacijaId'=> $this->modelId, 'terminal_statusId'=> $this->t_status, 'korisnikId'=>auth()->user()->id, 'korisnikIme'=>auth()->user()->name ]);
+                    });
+
+                }
+            }else{
+                $this->errAddMsg = 'Niste izabrali terminal';
+            }
+        }else{
+            $this->errAddMsg = 'Niste izabrali status terminal';
+        }
+        $this->modalAddTerminalVisible = false;
+       // dd($this->t_status);
     }
 }
