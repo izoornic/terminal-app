@@ -122,7 +122,7 @@
     {{-- Modal Form --}}
     <x-jet-dialog-modal wire:model="modalFormVisible">
         <x-slot name="title">
-            @if ($modelId) {{ __('Izmeni podatke') }}
+            @if ($isUpdate) {{ __('Izmeni podatke - ') }}{{ $l_naziv }}
             @else {{ __('Nova lokacija') }} @endif
         </x-slot>
 
@@ -179,7 +179,7 @@
                 {{ __('Otkaži') }}
             </x-jet-secondary-button>
 
-            @if ($modelId)
+            @if ($isUpdate)
                 <x-jet-button class="ml-2" wire:click="update" wire:loading.attr="disabled">
                     {{ __('Update') }}
                 </x-jet-danger-button>

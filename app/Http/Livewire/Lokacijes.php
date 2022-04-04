@@ -32,6 +32,8 @@ class Lokacijes extends Component
     public $regionId;
     public $lokacija_tipId;
 
+    public $isUpdate;
+
     //pretraga
     public $searchName;
     public $searchMesto;
@@ -124,6 +126,7 @@ class Lokacijes extends Component
     protected function loc_reset()
     {
         // Assign the variables here
+        $this->modelId = 0;
         $this->l_naziv = '';
         $this->mesto = '';
         $this->adresa = '';
@@ -141,6 +144,7 @@ class Lokacijes extends Component
      */
     public function createShowModal()
     {
+        $this->isUpdate = false;
         $this->resetValidation();
         $this->loc_reset();
         $this->modalFormVisible = true;
@@ -155,11 +159,13 @@ class Lokacijes extends Component
      */
     public function updateShowModal($id)
     {
+        $this->isUpdate = true;
         $this->resetValidation();
         $this->loc_reset();
-        $this->modalFormVisible = true;
         $this->modelId = $id;
         $this->loadModel();
+
+        $this->modalFormVisible = true;
     }
 
     /**
