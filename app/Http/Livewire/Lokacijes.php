@@ -115,6 +115,19 @@ class Lokacijes extends Component
         ->paginate(Config::get('global.paginate'), ['*'], 'lokacije');
     }
 
+    protected function loc_reset()
+    {
+        // Assign the variables here
+        $this->l_naziv = '';
+        $this->mesto = '';
+        $this->adresa = '';
+        $this->latitude = '';
+        $this->longitude = '';
+
+        $this->regionId = 0;
+        $this->lokacija_tipId = 0;
+    }
+
     /**
      * Shows the create New lokacija modal
      *
@@ -123,7 +136,7 @@ class Lokacijes extends Component
     public function createShowModal()
     {
         $this->resetValidation();
-        $this->reset();
+        $this->loc_reset();
         $this->modalFormVisible = true;
     }
 
@@ -137,7 +150,7 @@ class Lokacijes extends Component
     public function updateShowModal($id)
     {
         $this->resetValidation();
-        $this->reset();
+        $this->loc_reset();
         $this->modalFormVisible = true;
         $this->modelId = $id;
         $this->loadModel();
@@ -192,7 +205,7 @@ class Lokacijes extends Component
         $this->validate();
         Lokacija::create($this->modelData());
         $this->modalFormVisible = false;
-        $this->reset();
+        $this->loc_reset();
     }
 
     /**

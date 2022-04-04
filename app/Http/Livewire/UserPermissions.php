@@ -70,8 +70,10 @@ class UserPermissions extends Component
         $this->validate();
         UserPermission::create($this->modelData());
         $this->modalFormVisible = false;
-        $this->reset();
+        //$this->reset();
     }
+
+
 
     /**
      * The read function.
@@ -115,7 +117,7 @@ class UserPermissions extends Component
     public function createShowModal()
     {
         $this->resetValidation();
-        $this->reset();
+        //$this->reset();
         $this->modalFormVisible = true;
     }
 
@@ -129,7 +131,7 @@ class UserPermissions extends Component
     public function updateShowModal($id)
     {
         $this->resetValidation();
-        $this->reset();
+        //$this->reset();
         $this->modalFormVisible = true;
         $this->modelId = $id;
         $this->loadModel();
