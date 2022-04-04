@@ -111,7 +111,7 @@ class Lokacijes extends Component
         ->leftJoin('lokacija_tips', 'lokacijas.lokacija_tipId', '=', 'lokacija_tips.id')
         ->leftJoin('terminal_lokacijas', 'lokacijas.id', '=', 'terminal_lokacijas.lokacijaId')
         ->leftJoin('users', 'users.lokacijaId', '=', 'lokacijas.id')
-        ->select('lokacijas.*', 'lokacija_tips.lt_naziv', 'regions.r_naziv', 'terminal_lokacijas.lokacijaId as ima_terminala', 'users.lokacijaId as ima_user')
+        ->select('lokacijas.*', 'lokacija_tips.lt_naziv', 'regions.r_naziv', 'regions.id', 'terminal_lokacijas.lokacijaId as ima_terminala', 'users.lokacijaId as ima_user')
         ->where('l_naziv', 'like', '%'.$this->searchName.'%')
         ->where('mesto', 'like', '%'.$this->searchMesto.'%')
         ->where('regionId', ($this->searchRegion > 0) ? '=' : '<>', $this->searchRegion)
