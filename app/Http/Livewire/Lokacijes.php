@@ -35,8 +35,8 @@ class Lokacijes extends Component
     //pretraga
     public $searchName;
     public $searchMesto;
-    public $searchTip;
-    public $searchRegion;
+    public $searchTip = 0;
+    public $searchRegion = 0;
 
     //order
     public $orderBy;
