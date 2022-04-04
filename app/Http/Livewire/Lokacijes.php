@@ -112,6 +112,7 @@ class Lokacijes extends Component
         ->leftJoin('lokacija_tips', 'lokacijas.lokacija_tipId', '=', 'lokacija_tips.id')
         ->leftJoin('terminal_lokacijas', 'lokacijas.id', '=', 'terminal_lokacijas.lokacijaId')
         ->leftJoin('users', 'users.lokacijaId', '=', 'lokacijas.id')
+        ->groupBy('id')
         ->orderBy($order)
         ->paginate(Config::get('global.paginate'), ['*'], 'lokacije');
     }
