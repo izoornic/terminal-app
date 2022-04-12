@@ -33,9 +33,11 @@ class Lokacija extends Model
 
     public static function lokacijeTipa($tipId)
     {
+        $lokacija_list = [];
         foreach(Lokacija::where('lokacija_tipId', '=', $tipId)->get() as $lokacija){
             $lokacija_list[$lokacija->id] = $lokacija->l_naziv." - ".$lokacija->mesto;
         }
+        
         return  $lokacija_list;
     }
 

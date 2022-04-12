@@ -2,11 +2,15 @@
 
 return [
 
-	'siteFooter' => '2022. Epos. All Rights Reserved.',
+	'siteFooter' => '© 2021 Copyright: EPOS',
 
-	'version' => 'V 0.0.4.16',
+	'version' => 'V 0.0.6',
 
-	'paginate' => 5
+	'paginate' => 10,
+
+	'terminal_paginate' => 20,
+
+	'modal_search' => 10,
 
 ];
 

@@ -12,4 +12,5 @@
             </div>
         </div>
     </div>
+    @include('admin.footer')
 </x-app-layout>

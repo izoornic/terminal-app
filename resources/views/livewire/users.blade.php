@@ -32,7 +32,7 @@
                                 </td>
                                 <td>
                                     <select wire:model="searchLokacija" id="" class="block appearance-none bg-orange-50 w-full border border-0 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
-                                            <option value="">Lokacija</option>
+                                            <option value="">---</option>
                                         @foreach (App\Models\Lokacija::userLokacijeList() as $key => $value)    
                                             <option value="{{ $key }}">{{ $value }}</option>
                                         @endforeach
@@ -41,7 +41,7 @@
                                 <td></td>
                                 <td>
                                     <select wire:model="searchPozicija" id="" class="block appearance-none bg-orange-50 w-full border border-0 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
-                                            <option value="">Pozicija</option>
+                                            <option value="">---</option>
                                         @foreach (App\Models\PozicijaTip::userRoleList() as $key => $value)    
                                             <option value="{{ $key }}">{{ $value }}</option>
                                         @endforeach
@@ -49,7 +49,7 @@
                                 </td>
                                 <td>
                                     <select wire:model="searchRStatus" id="" class="block appearance-none bg-orange-50 w-full border border-0 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
-                                        <option value="">Radni status</option>
+                                        <option value="">---</option>
                                         @foreach (App\Models\RadniStatusTip::userRadniStatusList() as $key => $value)    
                                             <option value="{{ $key }}">{{ $value }}</option>
                                         @endforeach

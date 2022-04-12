@@ -13,7 +13,7 @@ use Livewire\Component;
 use Livewire\WithPagination;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
-
+use Illuminate\Support\Str;
 
 class Lokacijes extends Component
 {
@@ -57,14 +57,13 @@ class Lokacijes extends Component
     public $searchSN;
     public $searchBK;
     public $selsectedTerminals = [];
+    public $selectAll;
+    public $allInPage = [];
+    public $selectAllValue = 1;
     public $t_status;
 
     public $errAddMsg = '';
 
-    public function addTerminlaListener()
-    {
-        dd($this->modalAddTerminalVisible);
-    }
 
     /**
      * The validation rules
@@ -252,12 +251,12 @@ class Lokacijes extends Component
      */
     public function deleteShowModal($id)
     {
-        //dd($this->locationUsers($id));
+       
         $this->modelId = $id;
 
-        $ldat = Lokacija::find($this->modelId)->first();
+        $ldat = Lokacija::where('id', $this->modelId)->first();
         $this->delName = $ldat['l_naziv'].', '.$ldat['mesto'];
-
+        //dd($ldat);
         $this->modalConfirmDeleteVisible = true;
         $this->deletePosible = false;
         
@@ -350,15 +349,23 @@ class Lokacijes extends Component
      * @param  mixed $bk
      * @return void
      */
-    public static function terminaliZaLokaciju($id, $sn = '', $bk = '')
+    public function terminaliZaLokaciju($id, $sn = '', $bk = '')
     { 
-        return TerminalLokacija::leftJoin('terminals', 'terminal_lokacijas.terminalId', '=', 'terminals.id')
+        $this->allInPage = [];
+        
+        $terms =  TerminalLokacija::leftJoin('terminals', 'terminal_lokacijas.terminalId', '=', 'terminals.id')
+                                ->leftJoin('terminal_tips', 'terminals.terminal_tipId', '=', 'terminal_tips.id')
                                 ->leftJoin('terminal_status_tips', 'terminal_lokacijas.terminal_statusId', '=', 'terminal_status_tips.id')
-                                ->select('terminal_lokacijas.*', 'terminals.sn', 'terminals.broj_kutije', 'terminal_status_tips.ts_naziv', 'terminals.id as tid')
+                                ->select('terminal_lokacijas.*', 'terminals.sn', 'terminals.broj_kutije', 'terminal_status_tips.ts_naziv', 'terminals.id as tid', 'terminal_tips.model')
                                 ->where('terminal_lokacijas.lokacijaId', $id)
                                 ->where('terminals.sn', 'like', '%'.$sn.'%')
                                 ->where('terminals.broj_kutije', 'like', '%'.$bk.'%')
-                                ->paginate(Config::get('global.paginate'), ['*'], 'terminaliLokacija');
+                                ->paginate(Config::get('global.terminal_paginate'), ['*'], 'terminaliLokacija');
+        foreach($terms as $terminal){
+            array_push($this->allInPage,  $terminal->id);
+        }
+        //$this->selectAll[1] = false;
+        return $terms;
     }
     
     /**
@@ -381,7 +388,7 @@ class Lokacijes extends Component
                         //update current
                         TerminalLokacija::where('terminalId', $tid)->update(['lokacijaId'=> $this->modelId, 'terminal_statusId'=> $this->t_status, 'korisnikId'=>auth()->user()->id, 'korisnikIme'=>auth()->user()->name ]);
                     });
-
+                    $this->modalAddTerminalVisible = false;
                 }
             }else{
                 $this->errAddMsg = 'Niste izabrali terminal';
@@ -389,7 +396,35 @@ class Lokacijes extends Component
         }else{
             $this->errAddMsg = 'Niste izabrali status terminal';
         }
-        $this->modalAddTerminalVisible = false;
+       
        // dd($this->t_status);
+    }
+    
+    /**
+     * updated
+     *
+     * @param  mixed $key
+     * @param  mixed $value
+     * @return void
+     */
+    public function updated($key, $value)
+    {
+        
+        $exp = Str::of($key)->explode(delimiter: '.');
+        if($exp[0] === 'selectAll' && is_numeric($value)){
+           foreach($this->allInPage as $termid){
+               if(!in_array($termid, $this->selsectedTerminals)){
+                array_push($this->selsectedTerminals, $termid);
+               }  
+           }
+        }elseif($exp[0] === 'selectAll' && empty($value)){
+            $this->selsectedTerminals = array_diff($this->selsectedTerminals, $this->allInPage);
+            /* foreach($this->allInPage as $termid){   
+                if(in_array($termid, $this->selsectedTerminals)){
+                    $this->selsectedTerminals = array_diff($this->selsectedTerminals, [$termid]);
+                }
+            } */
+        }
+        
     }
 }

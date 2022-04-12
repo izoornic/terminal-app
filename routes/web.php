@@ -46,5 +46,9 @@ Route::group(['middleware' => [
     Route::get('/lokacije', function(){
         return view('admin.lokacije');
         })->name('lokacije');
+    
+    Route::get('/terminal', function(){
+        return view('admin.terminal');
+        })->name('terminal');
 
 });
