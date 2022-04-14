@@ -247,93 +247,163 @@
     {{-- Add Terminal Modal --}}
     <x-jet-dialog-modal wire:model="modalAddTerminalVisible" id="adTer">
         <x-slot name="title">
-           {{ $delName }} - Dodaj / premesti terminal
+          Dodaj / premesti terminal
         </x-slot>
         
         <x-slot name="content">
-        <div>
+            @if($modalAddTerminalVisible)
+                <div>Lokacija na koju se dodaju terminali:</div>
+                <div class="bg-sky-100 border-t-4 border-sky-500 rounded-b text-sky-900 px-4 py-3 shadow-md mb-6" role="alert">
+                    <div class="flex">
+                        <div class="py-1"><svg class="fill-current w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><!--! Font Awesome Pro 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M168.3 499.2C116.1 435 0 279.4 0 192C0 85.96 85.96 0 192 0C298 0 384 85.96 384 192C384 279.4 267 435 215.7 499.2C203.4 514.5 180.6 514.5 168.3 499.2H168.3zM192 256C227.3 256 256 227.3 256 192C256 156.7 227.3 128 192 128C156.7 128 128 156.7 128 192C128 227.3 156.7 256 192 256z"/></svg></div>
+                            <div>
+                                <p class="font-bold">{{ $odabranaLokacija->l_naziv}}, {{ $odabranaLokacija->mesto }}</p>
+                                <p class="text-sm">Region: {{ $odabranaLokacija->r_naziv }}</p>
+                            </div>
+                    </div>
+                </div> 
+            @endif 
+            
+            {{-- RADIO BUTTONS  --}}
             <div  class="flex justify-between mb-6">
                 <div class="form-check mx-4">
-                <input wire:model="addingType" class="form-check-input appearance-none rounded-full h-4 w-4 border border-gray-300 bg-white checked:bg-blue-600 checked:border-blue-600 focus:outline-none transition duration-200 mt-1 align-top bg-no-repeat bg-center bg-contain float-left mr-2 cursor-pointer" type="radio" name="flexRadioDefault" id="flexRadioDefault1" value="location">
-                <label class="form-check-label inline-block text-gray-800" for="flexRadioDefault1">
-                    Premesti sa druge lokacije
-                </label>
+                    <input wire:model="addingType" class="form-check-input appearance-none rounded-full h-4 w-4 border border-gray-300 bg-white checked:bg-blue-600 checked:border-blue-600 focus:outline-none transition duration-200 mt-1 align-top bg-no-repeat bg-center bg-contain float-left mr-2 cursor-pointer" type="radio" name="flexRadioDefault" id="flexRadioDefault1" value="location">
+                    <label class="form-check-label inline-block text-gray-800" for="flexRadioDefault1">
+                        Premesti sa druge lokacije
+                    </label>
                 </div>
                 <div class="form-check mx-4">
-                <input wire:model="addingType" class="form-check-input appearance-none rounded-full h-4 w-4 border border-gray-300 bg-white checked:bg-blue-600 checked:border-blue-600 focus:outline-none transition duration-200 mt-1 align-top bg-no-repeat bg-center bg-contain float-left mr-2 cursor-pointer" type="radio" name="flexRadioDefault" id="flexRadioDefault2" checked>
-                <label class="form-check-label inline-block text-gray-800" for="flexRadioDefault2" value="new">
-                    Dodaj novi terminal
-                </label>
+                    <input wire:model="addingType" class="form-check-input appearance-none rounded-full h-4 w-4 border border-gray-300 bg-white checked:bg-blue-600 checked:border-blue-600 focus:outline-none transition duration-200 mt-1 align-top bg-no-repeat bg-center bg-contain float-left mr-2 cursor-pointer" type="radio" name="flexRadioDefault" id="flexRadioDefault2" checked>
+                    <label class="form-check-label inline-block text-gray-800" for="flexRadioDefault2" value="new">
+                        Dodaj novi terminal
+                    </label>
                 </div>
             </div>
-        </div>
 
-        @if($addingType == 'location') 
-        <div class="mb-6">
-            <select wire:model="p_lokacija_tipId" id="" class="block appearance-none w-full bg-gray-100 border border-gray-200 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
-                <option value="">Izaberi vrstu lokacije</option>
-                @foreach (App\Models\LokacijaTip::tipoviList() as $key => $value)    
-                    <option value="{{ $key }}">{{ $value }}</option>
-                @endforeach
-            </select>
-         </div>
-                @if ($p_lokacija_tipId)
-                <div class="mb-6">
-                    <select wire:model="p_lokacijaId" id="" class="block appearance-none w-full bg-gray-100 border border-gray-200 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
-                        <option value="">Izaberi lokaciju</option>
-                        @foreach (App\Models\Lokacija::lokacijeTipa( $p_lokacija_tipId ) as $key => $value)    
-                            @if($key != $modelId) <option value="{{ $key }}">{{ $value }}</option> @endif
-                        @endforeach
-                    </select>
-                    </div>
-                    {{-- ODABRAO JE LOKACIJU --}}
-                    @if($p_lokacijaId)
-                        @if($this->terminaliZaLokaciju($p_lokacijaId)->count())
-                            <table class="min-w-full divide-y divide-gray-200 mb-6" style="width: 100% !important">
-                                <thead>
-                                    <tr>
-                                        <th class="px-6 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">
-                                        <input type="checkbox" value="{{ $selectAllValue }}" wire:model="selectAll.{{ $this->modelId }}"  class="form-checkbox h-6 w-6 text-blue-500">
-                                        </th>
-                                        <th class="px-6 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Serijski broj
-                                        </th>
-                                        <th class="px-6 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Broj kutije
-                                        </th>
-                                        <th class="px-6 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Model
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tr>
-                                    <td></td>
-                                    <td><x-jet-input wire:model="searchSN" id="" class="block bg-orange-50 w-full" type="text" placeholder="Seriski broj" /></td>
-                                    <td><x-jet-input wire:model="searchBK" id="" class="block bg-orange-50 w-full" type="text" placeholder="Seriski broj" /></td>
-                                    <td></td>
-                                </tr>
-                                <tbody>
-                                    @foreach($this->terminaliZaLokaciju($p_lokacijaId, $searchSN, $searchBK) as $item)
+                @if($addingType == 'location') 
+                {{-- DODAVANJE SA LOKACIJE --}}
+                    @if(!$p_lokacijaId)
+                        <div class="mb-6">
+                            <select wire:model="p_lokacija_tipId" id="" class="block appearance-none w-full bg-gray-100 border border-gray-200 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+                                <option value="">Izaberi vrstu lokacije</option>
+                                @foreach (App\Models\LokacijaTip::tipoviList() as $key => $value)    
+                                    <option value="{{ $key }}">{{ $value }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        @if ($p_lokacija_tipId)
+                            <div>Izaberi lokaciju:</div>
+                            @if($p_lokacija_tipId == 3)
+                                {{-- Korsnik terminala search by name --}}
+                                <table class="min-w-full divide-y divide-gray-200 mt-4" style="width: 100% !important">
+                                    <thead>
                                         <tr>
-                                            <td><input type="checkbox" value="{{ $item->tid }}" wire:model="selsectedTerminals"  class="form-checkbox h-6 w-6 text-blue-500"></td>
-                                            <td> {{ $item->sn }}</td>
-                                            <td> {{ $item->broj_kutije }}</td>
-                                            <td>{{ $item->model }}</td>
+                                            <th class="px-3 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider"></th>
+                                            <th class="px-3 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Naziv</th> 
+                                            <th class="px-3 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Mesto</th> 
+                                            <th class="px-3 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Region</th> 
+                                            <th class="px-3 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider"></th>  
                                         </tr>
+                                        <tr class="bg-orange-50">
+                                            <td><svg class="mx-auto fill-orange-600 w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Pro 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M3.853 54.87C10.47 40.9 24.54 32 40 32H472C487.5 32 501.5 40.9 508.1 54.87C514.8 68.84 512.7 85.37 502.1 97.33L320 320.9V448C320 460.1 313.2 471.2 302.3 476.6C291.5 482 278.5 480.9 268.8 473.6L204.8 425.6C196.7 419.6 192 410.1 192 400V320.9L9.042 97.33C-.745 85.37-2.765 68.84 3.854 54.87L3.853 54.87z"/></svg></td>
+                                            <td><x-jet-input wire:model="searchPLokacijaNaziv" id="" class="block bg-orange-50 w-full" type="text" placeholder="Naziv" /></td>
+                                            <td><x-jet-input wire:model="searchPlokacijaMesto" id="" class="block bg-orange-50 w-full" type="text" placeholder="Mesto" /></td>
+                                            <td>
+                                                <select wire:model="searchPlokacijaRegion" id="" class="block appearance-none bg-orange-50 w-full border border-0 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+                                                            <option value="">---</option>
+                                                        @foreach (App\Models\Region::regioni() as $key => $value)    
+                                                            <option value="{{ $key }}">{{ $value }}</option>
+                                                        @endforeach
+                                                </select>
+                                            </td>
+                                            <td></td>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="bg-white divide-y divide-gray-200"> 
+                                    @foreach ($this->lokacijeTipa($p_lokacija_tipId) as $value)
+                                    <tr class="hover:bg-gray-100" wire:click="$set('p_lokacijaId', {{ $value->id }})" >    
+                                            <td></td>
+                                            <td>{{ $value->l_naziv }}</td>
+                                            <td>{{ $value->mesto}}</td>
+                                            <td>{{ $value->r_naziv}}</td>
+                                            <td></td>
+                                    </tr>
                                     @endforeach
-                                </tbody>
-                            </table>
-                            <div class="mb-6">
-                                {{ $this->terminaliZaLokaciju($p_lokacijaId, $searchSN, $searchBK)->links() }} 
-                            </div>
-                            <div class="mb-6">
-                                <select wire:model="t_status" id="" class="block appearance-none w-full bg-gray-100 border border-gray-200 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
-                                    <option value="">Status terminala</option>
-                                    @foreach ( App\Models\TerminalStatusTip::tipoviList() as $key => $value)    
-                                        <option value="{{ $key }}">{{ $value }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div class="bg-blue-100 border-t border-b border-blue-500 text-blue-700 px-4 py-3" role="alert">
-                                <p class="text-sm">Ukupno terminala: <span class="font-bold"> {{ count($selsectedTerminals) }}</span></p>
-                            </div>
+                                    </tbody>
+                                <table>
+                                <div class="mt-5">
+                                    {{ $this->lokacijeTipa($p_lokacija_tipId)->links() }}
+                                </div>
+                            @else
+                                {{-- MAGACIN ILI SEVIS --}}
+                                <div class="mb-6">
+                                    <select wire:model="p_lokacijaId" id="" class="block appearance-none w-full bg-gray-100 border border-gray-200 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+                                        <option value="">Izaberi lokaciju</option>
+                                        @foreach (App\Models\Lokacija::lokacijeTipa( $p_lokacija_tipId ) as $key => $value)    
+                                            @if($key != $modelId) <option value="{{ $key }}">{{ $value }}</option> @endif
+                                        @endforeach
+                                    </select>
+                                </div>
+
+                            @endif
+                        @endif
+                    @else
+                    {{-- IZABRAO Je LOKACIJU --}}
+                        @if($this->terminaliZaLokaciju($p_lokacijaId)->count())
+                            {{-- IZABRAO dobru LOKACIJU MENJAM PRIKAZ --}}
+                            <div>Lokacija sa koje se uzimaju terminali:</div>
+                            <div class="bg-sky-100 border-t-4 border-sky-500 rounded-b text-sky-900 px-4 py-3 shadow-md mb-6" role="alert">
+                                <div class="flex">
+                                    <div class="py-1"><svg class="fill-current w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><!--! Font Awesome Pro 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M168.3 499.2C116.1 435 0 279.4 0 192C0 85.96 85.96 0 192 0C298 0 384 85.96 384 192C384 279.4 267 435 215.7 499.2C203.4 514.5 180.6 514.5 168.3 499.2H168.3zM192 256C227.3 256 256 227.3 256 192C256 156.7 227.3 128 192 128C156.7 128 128 156.7 128 192C128 227.3 156.7 256 192 256z"/></svg></div>
+                                        <div>
+                                            <p class="font-bold">{{ $lokacijaSaKojeUzima->l_naziv}}, {{ $lokacijaSaKojeUzima->mesto }}</p>
+                                            <p class="text-sm">Region: {{ $lokacijaSaKojeUzima->r_naziv }}</p>
+                                        </div>
+                                </div>
+                            </div> 
+                            
+                            <table class="min-w-full divide-y divide-gray-200 mb-6" style="width: 100% !important">
+                            <thead>
+                                <tr>
+                                    <th class="px-6 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">
+                                        <input type="checkbox" value="{{ $selectAllValue }}" wire:model="selectAll.{{ $this->modelId }}"  class="form-checkbox h-6 w-6 text-blue-500">
+                                    </th>
+                                    <th class="px-6 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Serijski broj</th>
+                                    <th class="px-6 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Broj kutije</th>
+                                    <th class="px-6 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Model</tr>
+                            </thead>
+                            <tr>
+                                <td></td>
+                                <td><x-jet-input wire:model="searchSN" id="" class="block bg-orange-50 w-full" type="text" placeholder="Seriski broj" /></td>
+                                <td><x-jet-input wire:model="searchBK" id="" class="block bg-orange-50 w-full" type="text" placeholder="Seriski broj" /></td>
+                                <td></td>
+                            </tr>
+                            <tbody>
+                                @foreach($this->terminaliZaLokaciju($p_lokacijaId, $searchSN, $searchBK) as $item)
+                                    <tr>
+                                        <td><input type="checkbox" value="{{ $item->tid }}" wire:model="selsectedTerminals"  class="form-checkbox h-6 w-6 text-blue-500"></td>
+                                        <td> {{ $item->sn }}</td>
+                                        <td> {{ $item->broj_kutije }}</td>
+                                        <td>{{ $item->model }}</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                        <div class="mb-6">
+                            {{ $this->terminaliZaLokaciju($p_lokacijaId, $searchSN, $searchBK)->links() }} 
+                        </div>
+                        <div class="mb-6">
+                            <select wire:model="t_status" id="" class="block appearance-none w-full bg-gray-100 border border-gray-200 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+                                <option value="">Status terminala</option>
+                                @foreach ( App\Models\TerminalStatusTip::tipoviList() as $key => $value)    
+                                    <option value="{{ $key }}">{{ $value }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="bg-blue-100 border-t border-b border-blue-500 text-blue-700 px-4 py-3" role="alert">
+                            <p class="text-sm">Ukupno terminala: <span class="font-bold"> {{ count($selsectedTerminals) }}</span></p>
+                        </div>
+
                         @else
                             <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
                                 <strong class="font-bold">Greška!</strong>
@@ -344,34 +414,30 @@
                             </div>
                         @endif
                     @endif
+                @else
+                {{-- DODAVANJE NOVOG TERMINALA NA LOKACIJU --}}
+                        <p>Novi terminal</p>
                 @endif
-            
-
-        @else
-                <p>Novi terminal</p>
-        @endif
-        
-        @if($errAddMsg != '')
-            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative my-4" role="alert">
-                <strong class="font-bold">Greška!</strong>
-                <span class="block sm:inline">{{ $errAddMsg }}</span>
-                <span class="absolute top-0 bottom-0 right-0 px-4 py-3">
-                    <svg class="fill-current h-6 w-6 text-red-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Pro 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M506.3 417l-213.3-364c-16.33-28-57.54-28-73.98 0l-213.2 364C-10.59 444.9 9.849 480 42.74 480h426.6C502.1 480 522.6 445 506.3 417zM232 168c0-13.25 10.75-24 24-24S280 154.8 280 168v128c0 13.25-10.75 24-23.1 24S232 309.3 232 296V168zM256 416c-17.36 0-31.44-14.08-31.44-31.44c0-17.36 14.07-31.44 31.44-31.44s31.44 14.08 31.44 31.44C287.4 401.9 273.4 416 256 416z"/></svg>
-                </span>
-            </div>
-        @endif
+            @if($errAddMsg != '')
+            {{-- PRIKAZ GRESKE --}}
+                <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative my-4" role="alert">
+                    <strong class="font-bold">Greška!</strong>
+                    <span class="block sm:inline">{{ $errAddMsg }}</span>
+                    <span class="absolute top-0 bottom-0 right-0 px-4 py-3">
+                        <svg class="fill-current h-6 w-6 text-red-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Pro 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M506.3 417l-213.3-364c-16.33-28-57.54-28-73.98 0l-213.2 364C-10.59 444.9 9.849 480 42.74 480h426.6C502.1 480 522.6 445 506.3 417zM232 168c0-13.25 10.75-24 24-24S280 154.8 280 168v128c0 13.25-10.75 24-23.1 24S232 309.3 232 296V168zM256 416c-17.36 0-31.44-14.08-31.44-31.44c0-17.36 14.07-31.44 31.44-31.44s31.44 14.08 31.44 31.44C287.4 401.9 273.4 416 256 416z"/></svg>
+                    </span>
+                </div>
+            @endif
         </x-slot>
         
         <x-slot name="footer">
             <x-jet-secondary-button wire:click="$toggle('modalAddTerminalVisible')" wire:loading.attr="disabled">
                     {{ __('Otkaži') }}
-                </x-jet-secondary-button>
-                <x-jet-danger-button class="ml-2" wire:click="addTerminal" wire:loading.attr="disabled">
+            </x-jet-secondary-button>
+            <x-jet-danger-button class="ml-2" wire:click="addTerminal" wire:loading.attr="disabled">
                     {{ __('Dodaj terminal') }}
-                </x-jet-danger-button>
-            </x-slot>
+            </x-jet-danger-button>
+        </x-slot>
     </x-jet-dialog-modal>
-
-
 
 </div>

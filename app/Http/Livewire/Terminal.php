@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Str;
 
-
+use Illuminate\Support\Carbon;
 
 class Terminal extends Component
 {
@@ -52,6 +52,10 @@ class Terminal extends Component
     //multi selected
     public $multiSelected;
     public $multiSelectedInfo;
+
+    //terminal HISTORY
+    public $terminalHistoryVisible;
+    public $historyData;
 
     /**
      * Put your custom public properties here!
@@ -153,7 +157,7 @@ class Terminal extends Component
                     //terminal
                     $cuurent = TerminalLokacija::where('terminalId', $item) -> first();
                     //insert to history table
-                    TerminalLokacijaHistory::create(['terminal_lokacijaId' => $cuurent['id'], 'terminalId' => $cuurent['terminalId'], 'lokacijaId' => $cuurent['lokacijaId'], 'terminal_statusId' => $cuurent['terminal_statusId'], 'korisnikId' => $cuurent['korisnikId'], 'korisnikIme' => $cuurent['korisnikIme']]);
+                    TerminalLokacijaHistory::create(['terminal_lokacijaId' => $cuurent['id'], 'terminalId' => $cuurent['terminalId'], 'lokacijaId' => $cuurent['lokacijaId'], 'terminal_statusId' => $cuurent['terminal_statusId'], 'korisnikId' => $cuurent['korisnikId'], 'korisnikIme' => $cuurent['korisnikIme'], 'created_at' => $cuurent['created_at'], 'updated_at' => $cuurent['updated_at']]);
                     //update current
                     TerminalLokacija::where('terminalId', $item)->update(['terminal_statusId'=> $this->modalStatus, 'korisnikId'=>auth()->user()->id, 'korisnikIme'=>auth()->user()->name ]);
                 });
@@ -164,7 +168,7 @@ class Terminal extends Component
                 //terminal
             $cuurent = TerminalLokacija::where('terminalId', $this->modelId) -> first();
                 //insert to history table
-                TerminalLokacijaHistory::create(['terminal_lokacijaId' => $cuurent['id'], 'terminalId' => $cuurent['terminalId'], 'lokacijaId' => $cuurent['lokacijaId'], 'terminal_statusId' => $cuurent['terminal_statusId'], 'korisnikId' => $cuurent['korisnikId'], 'korisnikIme' => $cuurent['korisnikIme']]);
+                TerminalLokacijaHistory::create(['terminal_lokacijaId' => $cuurent['id'], 'terminalId' => $cuurent['terminalId'], 'lokacijaId' => $cuurent['lokacijaId'], 'terminal_statusId' => $cuurent['terminal_statusId'], 'korisnikId' => $cuurent['korisnikId'], 'korisnikIme' => $cuurent['korisnikIme'], 'created_at' => $cuurent['created_at'], 'updated_at' => $cuurent['updated_at']]);
                 //update current
                 TerminalLokacija::where('terminalId', $this->modelId)->update(['terminal_statusId'=> $this->modalStatus, 'korisnikId'=>auth()->user()->id, 'korisnikIme'=>auth()->user()->name ]);
             });
@@ -218,7 +222,8 @@ class Terminal extends Component
      * @return void
      */
     private function selectedTerminalInfo(){
-        return TerminalLokacija::where('terminalId', $this->modelId)
+        return TerminalLokacija::select('terminal_lokacijas.*', 'terminals.sn', 'terminal_status_tips.ts_naziv', 'lokacijas.l_naziv', 'lokacijas.mesto')
+        ->where('terminalId', $this->modelId)
         ->leftJoin('terminals', 'terminal_lokacijas.terminalId', '=', 'terminals.id')
         ->leftJoin('terminal_status_tips', 'terminal_lokacijas.terminal_statusId', '=', 'terminal_status_tips.id')
         ->leftJoin('lokacijas', 'terminal_lokacijas.lokacijaId', '=', 'lokacijas.id')
@@ -260,7 +265,7 @@ class Terminal extends Component
                 DB::transaction(function()use($item){
                     $cuurent = TerminalLokacija::where('terminalId', $item) -> first();
                     //insert to history table
-                    TerminalLokacijaHistory::create(['terminal_lokacijaId' => $cuurent['id'], 'terminalId' => $cuurent['terminalId'], 'lokacijaId' => $cuurent['lokacijaId'], 'terminal_statusId' => $cuurent['terminal_statusId'], 'korisnikId' => $cuurent['korisnikId'], 'korisnikIme' => $cuurent['korisnikIme']]);
+                    TerminalLokacijaHistory::create(['terminal_lokacijaId' => $cuurent['id'], 'terminalId' => $cuurent['terminalId'], 'lokacijaId' => $cuurent['lokacijaId'], 'terminal_statusId' => $cuurent['terminal_statusId'], 'korisnikId' => $cuurent['korisnikId'], 'korisnikIme' => $cuurent['korisnikIme'], 'created_at' => $cuurent['created_at'], 'updated_at' => $cuurent['updated_at']]);
                     //update current
                     TerminalLokacija::where('terminalId', $item)->update(['terminal_statusId'=> $this->modalStatusPremesti, 'lokacijaId' => $this->plokacija, 'korisnikId'=>auth()->user()->id, 'korisnikIme'=>auth()->user()->name ]);
                 });
@@ -271,7 +276,7 @@ class Terminal extends Component
                 //terminal
                 $cuurent = TerminalLokacija::where('terminalId', $this->modelId) -> first();
                 //insert to history table
-                TerminalLokacijaHistory::create(['terminal_lokacijaId' => $cuurent['id'], 'terminalId' => $cuurent['terminalId'], 'lokacijaId' => $cuurent['lokacijaId'], 'terminal_statusId' => $cuurent['terminal_statusId'], 'korisnikId' => $cuurent['korisnikId'], 'korisnikIme' => $cuurent['korisnikIme']]);
+                TerminalLokacijaHistory::create(['terminal_lokacijaId' => $cuurent['id'], 'terminalId' => $cuurent['terminalId'], 'lokacijaId' => $cuurent['lokacijaId'], 'terminal_statusId' => $cuurent['terminal_statusId'], 'korisnikId' => $cuurent['korisnikId'], 'korisnikIme' => $cuurent['korisnikIme'], 'created_at' => $cuurent['created_at'], 'updated_at' => $cuurent['updated_at']]);
                 //update current
                 TerminalLokacija::where('terminalId', $this->modelId)->update(['terminal_statusId'=> $this->modalStatusPremesti, 'lokacijaId' => $this->plokacija, 'korisnikId'=>auth()->user()->id, 'korisnikIme'=>auth()->user()->name ]);
             });
@@ -289,7 +294,6 @@ class Terminal extends Component
      */
     public function updated($key, $value)
     {
-        
         $exp = Str::of($key)->explode(delimiter: '.');
         if($exp[0] === 'selectAll' && is_numeric($value)){
            foreach($this->allInPage as $termid){
@@ -310,12 +314,32 @@ class Terminal extends Component
         }
     }
 
-    
-    public function terminalHistoryShowModal()
+        
+    /**
+     * History MODAL
+     *
+     * @return void
+     */
+    public function terminalHistoryShowModal($id)
     {
+        $this->historyData = null;
+        $this->modelId = $id;
+        $this->selectedTerminal = $this->selectedTerminalInfo();
+        $this->historyData = TerminalLokacijaHistory::select('terminal_lokacija_histories.*', 'terminal_status_tips.ts_naziv', 'lokacijas.l_naziv', 'lokacijas.mesto')
+                                    ->where('terminal_lokacija_histories.terminalId', '=', $this->modelId)
+                                    ->leftJoin('terminal_status_tips', 'terminal_lokacija_histories.terminal_statusId', '=', 'terminal_status_tips.id')
+                                    ->leftJoin('lokacijas', 'terminal_lokacija_histories.lokacijaId', '=', 'lokacijas.id')
+                                    ->orderBy('terminal_lokacija_histories.id', 'desc')
+                                    ->get();
 
+        $this->terminalHistoryVisible = true;
     }
     
+    public function datumFormat($dbdate)
+    {
+        return Carbon::parse($dbdate)->setTimezone('Europe/Belgrade')->translatedFormat('d. m. Y. - G:i:s');
+    }
+
     public function render()
     {
         return view('livewire.terminal', [

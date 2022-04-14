@@ -44,6 +44,7 @@ class Lokacijes extends Component
     public $orderBy;
 
     //delete check
+    public $odabranaLokacija;
     public $deletePosible;
     public $delName;
     public $brTerminala;
@@ -64,6 +65,11 @@ class Lokacijes extends Component
 
     public $errAddMsg = '';
 
+    public $searchPLokacijaNaziv;
+    public $searchPlokacijaMesto;
+    public $searchPlokacijaRegion;
+
+    public $lokacijaSaKojeUzima;
 
     /**
      * The validation rules
@@ -326,13 +332,10 @@ class Lokacijes extends Component
         $this->modelId = $id;
         $this->errAddMsg = '';
         $this->t_status = 0;
-
-        $ldat = Lokacija::find($this->modelId);
-        $this->delName = $ldat['l_naziv'].', '.$ldat['mesto'];
-
+        $this->odabranaLokacija = $this->lokacijaInfo();
+       
         $this->addingType = 'location';
         $this->modalAddTerminalVisible = true;
-        //dd($this->addingType);
         $this->selsectedTerminals = [];
         $this->searchSN = '';
         $this->p_lokacija_tipId = 0;
@@ -341,6 +344,21 @@ class Lokacijes extends Component
 
     }
     
+    private function lokacijaInfo()
+    {
+        return Lokacija::leftJoin('lokacija_tips', 'lokacijas.lokacija_tipId', '=', 'lokacija_tips.id')
+            ->leftJoin('regions', 'lokacijas.regionId', '=', 'regions.id')
+            ->where('lokacijas.id', '=', $this->modelId)
+            ->first();
+    }
+
+    private function lokacjaSaKojeUzimaInfo()
+    {
+        return Lokacija::leftJoin('lokacija_tips', 'lokacijas.lokacija_tipId', '=', 'lokacija_tips.id')
+            ->leftJoin('regions', 'lokacijas.regionId', '=', 'regions.id')
+            ->where('lokacijas.id', '=', $this->p_lokacijaId)
+            ->first();
+    }
     /**
      * terminaliZaLokaciju
      *
@@ -367,6 +385,18 @@ class Lokacijes extends Component
         //$this->selectAll[1] = false;
         return $terms;
     }
+
+    public function lokacijeTipa($tipId)
+    {
+        return Lokacija::select('lokacijas.*', 'regions.r_naziv')
+            ->where('lokacija_tipId', '=', $tipId)
+            ->leftJoin('regions', 'lokacijas.regionId', '=', 'regions.id')
+            ->where('l_naziv', 'like', '%'.$this->searchPLokacijaNaziv.'%')
+            ->where('mesto', 'like', '%'.$this->searchPlokacijaMesto.'%')
+            ->where('lokacijas.regionId', ($this->searchPlokacijaRegion > 0) ? '=' : '<>', $this->searchPlokacijaRegion)
+            ->paginate(Config::get('global.modal_search'), ['*'], 'loc');
+    }
+    
     
     /**
      * addTerminal
@@ -384,7 +414,7 @@ class Lokacijes extends Component
                         //terminal
                        $cuurent = TerminalLokacija::where('terminalId', $tid) -> first();
                         //insert to history table
-                         TerminalLokacijaHistory::create(['terminal_lokacijaId' => $cuurent['id'], 'terminalId' => $cuurent['terminalId'], 'lokacijaId' => $cuurent['lokacijaId'], 'terminal_statusId' => $cuurent['terminal_statusId'], 'korisnikId' => $cuurent['korisnikId'], 'korisnikIme' => $cuurent['korisnikIme']]);
+                         TerminalLokacijaHistory::create(['terminal_lokacijaId' => $cuurent['id'], 'terminalId' => $cuurent['terminalId'], 'lokacijaId' => $cuurent['lokacijaId'], 'terminal_statusId' => $cuurent['terminal_statusId'], 'korisnikId' => $cuurent['korisnikId'], 'korisnikIme' => $cuurent['korisnikIme'], 'created_at' => $cuurent['created_at'], 'updated_at' => $cuurent['updated_at']]);
                         //update current
                         TerminalLokacija::where('terminalId', $tid)->update(['lokacijaId'=> $this->modelId, 'terminal_statusId'=> $this->t_status, 'korisnikId'=>auth()->user()->id, 'korisnikIme'=>auth()->user()->name ]);
                     });
@@ -399,7 +429,7 @@ class Lokacijes extends Component
        
        // dd($this->t_status);
     }
-    
+
     /**
      * updated
      *
@@ -424,6 +454,14 @@ class Lokacijes extends Component
                     $this->selsectedTerminals = array_diff($this->selsectedTerminals, [$termid]);
                 }
             } */
+        }
+
+        if($this->modalAddTerminalVisible){
+            $this->odabranaLokacija = $this->lokacijaInfo();
+        }
+
+        if($this->modalAddTerminalVisible && $this->p_lokacijaId){
+            $this->lokacijaSaKojeUzima = $this->lokacjaSaKojeUzimaInfo();
         }
         
     }
