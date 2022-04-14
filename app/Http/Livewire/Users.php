@@ -253,7 +253,7 @@ class Users extends Component
                //prvo trenutna vrednost iz tabele
                $cuurent = KorisnikRadniOdnos::where('korisnikId', $this->modelId)->first();
                //zatim upis u history tabelu
-               KorisnikRadniOdnosHistory::create(['korisnik_radni_odnosId' => $cuurent['id'], 'korisnikId' => $cuurent['korisnikId'], 'radni_odnosId' => $cuurent['radni_odnosId']]);
+               KorisnikRadniOdnosHistory::create(['korisnik_radni_odnosId' => $cuurent['id'], 'korisnikId' => $cuurent['korisnikId'], 'radni_odnosId' => $cuurent['radni_odnosId'], 'created_at' => $cuurent['created_at'], 'updated_at' => $cuurent['updated_at']]);
                //update trenutnog stanja
                KorisnikRadniOdnos::where('korisnikId', $this->modelId)->update(['radni_odnosId' => $this->radniOdnosId]);
             });
@@ -375,7 +375,7 @@ class Users extends Component
                 //prvo trenutna vrednost iz tabele 
                 $cuurent = KorisnikRadniStatus::where('korisnikId', $this->modelId)->first();
                 //zatim upis u history tabelu
-                KorisnikRadniStatusHistory::create(['korisnik_radni_statusId' => $cuurent['id'], 'korisnikId' => $cuurent['korisnikId'], 'radni_statusId' => $cuurent['radni_statusId']]);
+                KorisnikRadniStatusHistory::create(['korisnik_radni_statusId' => $cuurent['id'], 'korisnikId' => $cuurent['korisnikId'], 'radni_statusId' => $cuurent['radni_statusId'], 'created_at' => $cuurent['created_at'], 'updated_at' => $cuurent['updated_at']]);
                 //update trenutnog stanja
                 KorisnikRadniStatus::where('korisnikId', $this->modelId)->update(['radni_statusId' => $this->radniStatusId]);
             });

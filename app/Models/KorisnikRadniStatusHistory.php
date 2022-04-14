@@ -16,6 +16,8 @@ class KorisnikRadniStatusHistory extends Model
     protected $fillable = [
         'korisnik_radni_statusId',
         'korisnikId',
-        'radni_statusId'
+        'radni_statusId',
+        'created_at',
+        'updated_at'
     ];
 }

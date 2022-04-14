@@ -18,5 +18,7 @@ class KorisnikRadniOdnosHistory extends Model
         'korisnik_radni_odnosId',
         'korisnikId',
         'radni_odnosId',
+        'created_at',
+        'updated_at'
     ];
 }
