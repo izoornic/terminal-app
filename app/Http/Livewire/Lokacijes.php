@@ -343,14 +343,14 @@ class Lokacijes extends Component
         $this->p_lokacija_tipId = 0;
         $this->p_lokacijaId = 0; */
 
-        $this->odabranaLokacija = $this->lokacijaInfo();
+        $this->odabranaLokacija = $this->lokacijaInfo($id);
     }
     
-    private function lokacijaInfo()
+    private function lokacijaInfo($id)
     {
         return Lokacija::leftJoin('lokacija_tips', 'lokacijas.lokacija_tipId', '=', 'lokacija_tips.id')
             ->leftJoin('regions', 'lokacijas.regionId', '=', 'regions.id')
-            ->where('lokacijas.id', '=', $this->modelId)
+            ->where('lokacijas.id', '=', $id)
             ->firstOrFail();
     }
 
@@ -454,7 +454,7 @@ class Lokacijes extends Component
         }
 
         if($this->modalAddTerminalVisible){
-            $this->odabranaLokacija = $this->lokacijaInfo();
+            $this->odabranaLokacija = $this->lokacijaInfo($this->modelId);
         }
 
         if($this->modalAddTerminalVisible && $this->p_lokacijaId){
