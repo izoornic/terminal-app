@@ -351,7 +351,7 @@ class Lokacijes extends Component
         return Lokacija::leftJoin('lokacija_tips', 'lokacijas.lokacija_tipId', '=', 'lokacija_tips.id')
             ->leftJoin('regions', 'lokacijas.regionId', '=', 'regions.id')
             ->where('lokacijas.id', '=', $this->modelId)
-            ->first();
+            ->firstOrFail();
     }
 
     private function lokacjaSaKojeUzimaInfo()
