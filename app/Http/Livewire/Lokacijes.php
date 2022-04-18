@@ -332,8 +332,9 @@ class Lokacijes extends Component
         $this->odabranaLokacija = null;
         $this->modelId = $id;
         //$this->odabranaLokacija = $this->lokacijaInfo();
-        $this->odabranaLokacija = Lokacija::leftJoin('lokacija_tips', 'lokacijas.lokacija_tipId', '=', 'lokacija_tips.id')
-        ->leftJoin('regions', 'regions.id', '=', 'lokacijas.regionId')
+        $this->odabranaLokacija = Lokacija::select('lokacijas.*', 'lokacija_tips.lt_naziv', 'regions.r_naziv')
+            ->leftJoin('lokacija_tips', 'lokacijas.lokacija_tipId', '=', 'lokacija_tips.id')
+            ->leftJoin('regions', 'regions.id', '=', 'lokacijas.regionId')
             ->where('lokacijas.id', '=', $this->modelId)
             ->first();
         /* $this->errAddMsg = '';
