@@ -332,10 +332,11 @@ class Lokacijes extends Component
         $this->modelId = $id;
         /* $this->errAddMsg = '';
         $this->t_status = 0;
-        
-        //dd($this->odabranaLokacija);
-        $this->addingType = 'location'; */
+         $this->addingType = 'location'; */
         $this->odabranaLokacija = $this->lokacijaInfo();
+        dd($this->odabranaLokacija);
+       
+        
         $this->modalAddTerminalVisible = true;
        /*  $this->selsectedTerminals = [];
         $this->searchSN = '';
