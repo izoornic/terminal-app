@@ -329,41 +329,32 @@ class Lokacijes extends Component
      */
     public function addTerminalShowModal($id)
     {
-        $this->odabranaLokacija = null;
         $this->modelId = $id;
-        //$this->odabranaLokacija = $this->lokacijaInfo();
-        $this->odabranaLokacija = Lokacija::select('lokacijas.*', 'lokacija_tips.lt_naziv', 'regions.r_naziv')
-            ->leftJoin('lokacija_tips', 'lokacijas.lokacija_tipId', '=', 'lokacija_tips.id')
-            ->leftJoin('regions', 'regions.id', '=', 'lokacijas.regionId')
-            ->where('lokacijas.id', '=', $this->modelId)
-            ->first();
-        /* $this->errAddMsg = '';
+        $this->odabranaLokacija = $this->lokacijaInfo();
+        $this->errAddMsg = '';
         $this->t_status = 0;
-         $this->addingType = 'location'; */
-        
-        //dd($this->odabranaLokacija);
-       
-        
-        $this->modalAddTerminalVisible = true;
-       /*  $this->selsectedTerminals = [];
+        $this->addingType = 'location';
+        $this->selsectedTerminals = [];
         $this->searchSN = '';
         $this->p_lokacija_tipId = 0;
-        $this->p_lokacijaId = 0; */
+        $this->p_lokacijaId = 0;
 
-        
+        $this->modalAddTerminalVisible = true;
     }
     
     private function lokacijaInfo()
     {
-        return Lokacija::leftJoin('lokacija_tips', 'lokacijas.lokacija_tipId', '=', 'lokacija_tips.id')
-            ->leftJoin('regions', 'lokacijas.regionId', '=', 'regions.id')
-            ->where('lokacijas.id', '=', $this->modelId)
-            ->firstOrFail();
+        return Lokacija::select('lokacijas.*', 'lokacija_tips.lt_naziv', 'regions.r_naziv')
+        ->leftJoin('lokacija_tips', 'lokacijas.lokacija_tipId', '=', 'lokacija_tips.id')
+        ->leftJoin('regions', 'regions.id', '=', 'lokacijas.regionId')
+        ->where('lokacijas.id', '=', $this->modelId)
+        ->first();
     }
 
     private function lokacjaSaKojeUzimaInfo()
     {
-        return Lokacija::leftJoin('lokacija_tips', 'lokacijas.lokacija_tipId', '=', 'lokacija_tips.id')
+        return Lokacija::select('lokacijas.*', 'lokacija_tips.lt_naziv', 'regions.r_naziv')
+            ->leftJoin('lokacija_tips', 'lokacijas.lokacija_tipId', '=', 'lokacija_tips.id')
             ->leftJoin('regions', 'lokacijas.regionId', '=', 'regions.id')
             ->where('lokacijas.id', '=', $this->p_lokacijaId)
             ->first();
