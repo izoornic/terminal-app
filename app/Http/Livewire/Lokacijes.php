@@ -456,13 +456,13 @@ class Lokacijes extends Component
             } */
         }
 
-        /* if($this->modalAddTerminalVisible){
+        if($this->modalAddTerminalVisible){
             $this->odabranaLokacija = $this->lokacijaInfo();
         }
 
         if($this->modalAddTerminalVisible && $this->p_lokacijaId){
             $this->lokacijaSaKojeUzima = $this->lokacjaSaKojeUzimaInfo();
-        } */
+        }
         
     }
 }
