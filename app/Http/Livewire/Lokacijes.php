@@ -333,8 +333,8 @@ class Lokacijes extends Component
         /* $this->errAddMsg = '';
         $this->t_status = 0;
          $this->addingType = 'location'; */
-        $this->odabranaLokacija = $this->lokacijaInfo();
-        dd($this->odabranaLokacija);
+        
+        //dd($this->odabranaLokacija);
        
         
         $this->modalAddTerminalVisible = true;
@@ -342,6 +342,8 @@ class Lokacijes extends Component
         $this->searchSN = '';
         $this->p_lokacija_tipId = 0;
         $this->p_lokacijaId = 0; */
+
+        $this->odabranaLokacija = $this->lokacijaInfo();
     }
     
     private function lokacijaInfo()
