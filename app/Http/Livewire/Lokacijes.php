@@ -330,6 +330,7 @@ class Lokacijes extends Component
     public function addTerminalShowModal($id)
     {
         $this->modelId = $id;
+        dd($this->modelId);
         $this->errAddMsg = '';
         $this->t_status = 0;
         $this->odabranaLokacija = $this->lokacijaInfo();
