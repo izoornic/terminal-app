@@ -251,7 +251,7 @@
         </x-slot>
         
         <x-slot name="content">
-            {{ $modelId}}
+            {{ $modelId }}
         </x-slot>
         
         <x-slot name="footer">
