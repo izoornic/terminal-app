@@ -203,14 +203,14 @@
                 {{ __('Da li ste sigurni da želite da obrišete lokaciju?') }}
             @else 
                 <p>Lokacija je povezana sa:</p>
-                @foreach (App\Http\Livewire\Lokacijes::locationUsers($modelId) as $key => $value) 
-
+                @foreach ($this->locationUsers($modelId) as $key => $value) 
                     @switch($key)
                         @case('users')
-                            <p>Korisnicima:</p>
+                            @if(count($value))
+                                <p>Korisnicima:</p>
+                            @endif
                         @break
-                    
-                        @case('trminal')
+                        @case('terminal')
                             <p>Ukupno terminala:</p>
                         @break
                         
@@ -438,14 +438,5 @@
                     {{ __('Dodaj terminal') }}
             </x-jet-danger-button>
         </x-slot>
-    </x-jet-dialog-modal>
-    <script>
-        window.livewire.onError(statusCode => {
-           // if (statusCode === 419) {
-                alert(statusCode)
-
-                return false
-           // }
-        })
-    </script>
+     </x-jet-dialog-modal>
 </div>

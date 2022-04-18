@@ -304,20 +304,20 @@ class Lokacijes extends Component
      * @param  mixed $id
      * @return void
      */
-    public static function locationUsers($id)
+    public function locationUsers($id)
     {
         $retval = [];
+        $retval['users'] = [];
         foreach(User::where('lokacijaId', $id)->get() as $row){
-            $retval['users'] = [];
             array_push($retval['users'], $row['name']);
         };
         //MORA DA SE UPDATUJE I FUNKCIJA deleteShowModal($id)
-        //dd($retval);
         if(TerminalLokacija::brojTerminalaNalokaciji($id)){
-            $retval['trminal'] = [];
-            array_push($retval['trminal'], TerminalLokacija::brojTerminalaNalokaciji($id));
-        }  
-        return $retval;
+            $retval['terminal'] = [];
+            array_push($retval['terminal'], TerminalLokacija::brojTerminalaNalokaciji($id));
+        } 
+        //dd($retval); 
+       return $retval;
     }
 
     //ADD TERMINAL MODAL    
