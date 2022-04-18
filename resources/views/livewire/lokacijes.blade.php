@@ -283,7 +283,7 @@
                 @if($addingType == 'location') 
                 {{-- DODAVANJE SA LOKACIJE --}}
                     @if(!$p_lokacijaId)
-                        <div class="mb-6">
+                        <div class="mb-6"> 
                             <select wire:model="p_lokacija_tipId" id="" class="block appearance-none w-full bg-gray-100 border border-gray-200 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
                                 <option value="">Izaberi vrstu lokacije</option>
                                 @foreach (App\Models\LokacijaTip::tipoviList() as $key => $value)    
@@ -439,5 +439,13 @@
             </x-jet-danger-button>
         </x-slot>
     </x-jet-dialog-modal>
+    <script>
+        window.livewire.onError(statusCode => {
+           // if (statusCode === 419) {
+                alert(statusCode)
 
+                return false
+           // }
+        })
+    </script>
 </div>

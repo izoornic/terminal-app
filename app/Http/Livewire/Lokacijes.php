@@ -364,7 +364,7 @@ class Lokacijes extends Component
      *
      * @param  mixed $id
      * @param  mixed $sn
-     * @param  mixed $bk
+     * @param  mixed $bk 
      * @return void
      */
     public function terminaliZaLokaciju($id, $sn = '', $bk = '')
