@@ -329,19 +329,17 @@ class Lokacijes extends Component
      */
     public function addTerminalShowModal($id)
     {
-        $this->modelId = $id;
+        /* $this->modelId = $id;
         $this->errAddMsg = '';
         $this->t_status = 0;
         $this->odabranaLokacija = $this->lokacijaInfo();
         //dd($this->odabranaLokacija);
-        $this->addingType = 'location';
+        $this->addingType = 'location'; */
         $this->modalAddTerminalVisible = true;
-        $this->selsectedTerminals = [];
+       /*  $this->selsectedTerminals = [];
         $this->searchSN = '';
         $this->p_lokacija_tipId = 0;
-        $this->p_lokacijaId = 0;
-
-
+        $this->p_lokacijaId = 0; */
     }
     
     private function lokacijaInfo()
@@ -449,11 +447,6 @@ class Lokacijes extends Component
            }
         }elseif($exp[0] === 'selectAll' && empty($value)){
             $this->selsectedTerminals = array_diff($this->selsectedTerminals, $this->allInPage);
-            /* foreach($this->allInPage as $termid){   
-                if(in_array($termid, $this->selsectedTerminals)){
-                    $this->selsectedTerminals = array_diff($this->selsectedTerminals, [$termid]);
-                }
-            } */
         }
 
         if($this->modalAddTerminalVisible){
