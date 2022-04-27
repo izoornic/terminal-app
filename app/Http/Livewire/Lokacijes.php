@@ -7,6 +7,7 @@ use App\Models\Lokacija;
 use App\Models\User;
 use App\Models\TerminalLokacija;
 use App\Models\TerminalLokacijaHistory;
+use App\Models\LokacijaKontaktOsoba;
 //use App\Models\TerminalStatusTip;
 //use App\Models\Tiket;
 use Livewire\Component;
@@ -71,6 +72,14 @@ class Lokacijes extends Component
 
     public $lokacijaSaKojeUzima;
 
+
+    //kontakt osoba u prodavnici
+    public $kontaktOsobaVisible;
+    public $kontaktOsobaInfo;
+
+    public $nameKo;
+    public $telKo;
+
     /**
      * The validation rules
      *
@@ -114,11 +123,12 @@ class Lokacijes extends Component
             break;
         };
         //return Lokacija::paginate(5);
-        return Lokacija::select('lokacijas.*', 'lokacija_tips.lt_naziv', 'regions.r_naziv', 'terminal_lokacijas.lokacijaId as ima_terminala', 'users.lokacijaId as ima_user')
+        return Lokacija::select('lokacijas.*', 'lokacija_tips.lt_naziv', 'regions.r_naziv', 'terminal_lokacijas.lokacijaId as ima_terminala', 'users.lokacijaId as ima_user', 'lokacija_kontakt_osobas.name as kontakt')
         ->leftJoin('regions', 'regions.id', '=', 'lokacijas.regionId')
         ->leftJoin('lokacija_tips', 'lokacijas.lokacija_tipId', '=', 'lokacija_tips.id')
         ->leftJoin('terminal_lokacijas', 'lokacijas.id', '=', 'terminal_lokacijas.lokacijaId')
         ->leftJoin('users', 'users.lokacijaId', '=', 'lokacijas.id')
+        ->leftJoin('lokacija_kontakt_osobas', 'lokacijas.id', '=', 'lokacija_kontakt_osobas.lokacijaId')
         ->where('lokacijas.l_naziv', 'like', '%'.$this->searchName.'%')
         ->where('lokacijas.mesto', 'like', '%'.$this->searchMesto.'%')
         ->where('lokacijas.regionId', ($this->searchRegion > 0) ? '=' : '<>', $this->searchRegion)
@@ -140,6 +150,9 @@ class Lokacijes extends Component
 
         $this->regionId = 0;
         $this->lokacija_tipId = 0;
+
+        $this->nameKo = '';
+        $this->telKo = '';
     }
 
     /**
@@ -191,6 +204,15 @@ class Lokacijes extends Component
 
         $this->regionId = $data->regionId;
         $this->lokacija_tipId = $data->lokacija_tipId;
+
+        if($this->kontaktOsobaInfo = $this->kontaktOsobaGetInfo()){
+            $this->nameKo = $this->kontaktOsobaInfo->name;
+            $this->telKo  = ($this->kontaktOsobaInfo->tel) ? ltrim($this->kontaktOsobaInfo->tel, '+381') : '';
+            //$this->telKo = $this->kontaktOsobaInfo->tel;
+        }else{
+            $this->nameKo = ''; 
+            $this->telKo = '';
+        }
     }
 
     /**
@@ -202,12 +224,12 @@ class Lokacijes extends Component
     public function modelData()
     {
         return [  
-            'l_naziv'   => $this->l_naziv,
-            'mesto'     => $this->mesto,
-            'adresa'   => $this->adresa,
-            'latitude'   => ($this->latitude == '') ? NULL : $this->latitude,
-            'longitude'   =>($this->longitude == '') ? NULL : $this->longitude,
-            'regionId'   => $this->regionId,
+            'l_naziv'          => $this->l_naziv,
+            'mesto'            => $this->mesto,
+            'adresa'           => $this->adresa,
+            'latitude'         => ($this->latitude == '') ? NULL : $this->latitude,
+            'longitude'        =>($this->longitude == '') ? NULL : $this->longitude,
+            'regionId'         => $this->regionId,
             'lokacija_tipId'   => $this->lokacija_tipId,    
         ];
     }
@@ -220,7 +242,14 @@ class Lokacijes extends Component
     public function create()
     {
         $this->validate();
-        Lokacija::create($this->modelData());
+        $new_loc = Lokacija::create($this->modelData());
+        if($this->lokacija_tipId == 3){
+            if($this->nameKo != ''){
+                //dd('Add new KO');
+                $tell = ($this->telKo != '') ? '+381'.$this->telKo : '';
+                LokacijaKontaktOsoba::create(['lokacijaId'=>$new_loc->id, 'name' => $this->nameKo, 'tel' => $tell]);
+            }
+        }
         $this->modalFormVisible = false;
         $this->loc_reset();
     }
@@ -233,7 +262,25 @@ class Lokacijes extends Component
     public function update()
     {
         $this->validate();
-        Lokacija::find($this->modelId)->update($this->modelData());
+        //Lokacija::find($this->modelId)->update($this->modelData());
+
+        if($this->lokacija_tipId == 3){
+            if($this->kontaktOsobaGetInfo()){
+                //Kontakt osoba postoji u bazi Da li treba UPDATE
+                if($this->nameKo != $this->kontaktOsobaInfo->name || $this->telKo != $this->kontaktOsobaInfo->tel ){
+                    //treba !
+                    $tell = ($this->telKo != '') ? '+381'.$this->telKo : '';
+                    LokacijaKontaktOsoba::where('lokacijaId', '=', $this->modelId)->update(['name' => $this->nameKo, 'tel' => $tell]);
+                }
+            }else{
+                //Nema je u bazi, Da li treba novi zapis
+                if($this->nameKo != ''){
+                    //dd('Add new KO');
+                    $tell = ($this->telKo != '') ? '+381'.$this->telKo : '';
+                    LokacijaKontaktOsoba::create(['lokacijaId'=>$this->modelId, 'name' => $this->nameKo, 'tel' => $tell]);
+                }
+            }
+        }
         $this->modalFormVisible = false;
     }
 
@@ -341,7 +388,12 @@ class Lokacijes extends Component
 
         $this->modalAddTerminalVisible = true;
     }
-    
+        
+    /**
+     * lokacijaInfo
+     *
+     * @return void
+     */
     private function lokacijaInfo()
     {
         return Lokacija::select('lokacijas.*', 'lokacija_tips.lt_naziv', 'regions.r_naziv')
@@ -350,7 +402,12 @@ class Lokacijes extends Component
         ->where('lokacijas.id', '=', $this->modelId)
         ->first();
     }
-
+    
+    /**
+     * lokacjaSaKojeUzimaInfo
+     *
+     * @return void
+     */
     private function lokacjaSaKojeUzimaInfo()
     {
         return Lokacija::select('lokacijas.*', 'lokacija_tips.lt_naziv', 'regions.r_naziv')
@@ -385,7 +442,13 @@ class Lokacijes extends Component
         //$this->selectAll[1] = false;
         return $terms;
     }
-
+    
+    /**
+     * lokacijeTipa
+     *
+     * @param  mixed $tipId
+     * @return void
+     */
     public function lokacijeTipa($tipId)
     {
         return Lokacija::select('lokacijas.*', 'regions.r_naziv')
@@ -429,7 +492,29 @@ class Lokacijes extends Component
        
        // dd($this->t_status);
     }
+    
+    /**
+     * Prikazuje Kontakt osoba Modal
+     *
+     * @param  mixed $id
+     * @return void
+     */
+    public function showKontaktOsobaModal($id)
+    {
+        $this->modelId = $id;
+        $this->odabranaLokacija = $this->lokacijaInfo();
+        $this->kontaktOsobaInfo = $this->kontaktOsobaGetInfo();
 
+
+
+        $this->kontaktOsobaVisible = true;
+    }
+
+    private function kontaktOsobaGetInfo()
+    {
+        return LokacijaKontaktOsoba::where('lokacijaId', '=', $this->modelId)
+                                ->first();
+    }
     /**
      * updated
      *
@@ -451,7 +536,7 @@ class Lokacijes extends Component
             $this->selsectedTerminals = array_diff($this->selsectedTerminals, $this->allInPage);
         }
 
-        if($this->modalAddTerminalVisible){
+        if($this->modalAddTerminalVisible || $this->kontaktOsobaVisible){
             $this->odabranaLokacija = $this->lokacijaInfo();
         }
 

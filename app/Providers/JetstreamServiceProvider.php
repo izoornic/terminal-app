@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Actions\Jetstream\DeleteUser;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Jetstream\Jetstream;
+use Illuminate\Support\Facades\Blade;
 
 class JetstreamServiceProvider extends ServiceProvider
 {
@@ -16,8 +17,20 @@ class JetstreamServiceProvider extends ServiceProvider
     public function register()
     {
         //
+        $this->registerComponent('textarea');
     }
-
+    
+    /**
+     * registerComponent
+     *
+     * @param  mixed $component
+     * @return void
+     */
+    protected function registerComponent(string $component)
+    {
+        Blade::component('jetstream::components.'.$component, 'jet-'.$component);
+    }
+    
     /**
      * Bootstrap any application services.
      *

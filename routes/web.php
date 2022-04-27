@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-
+//use App\Http\Controllers\SendEmailController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -17,6 +17,7 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+//Route::get('send-email', [SendEmailController::class, 'index']);
 /* Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard', function () {
     return view('dashboard');
 })->name('dashboard'); */
@@ -50,5 +51,9 @@ Route::group(['middleware' => [
     Route::get('/terminal', function(){
         return view('admin.terminal');
         })->name('terminal');
+
+    Route::get('/tiket', function(){
+        return view('admin.tiket');
+        })->name('tiket');
 
 });

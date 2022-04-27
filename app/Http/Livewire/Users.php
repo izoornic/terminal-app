@@ -185,7 +185,7 @@ class Users extends Component
         $this->lokacijaId   = $data->lokacijaId;
         $this->email        = $data->email;
         $this->telegramId   = ($data->telegramId > 0) ? $data->telegramId : "";
-        $this->tel          = ($data->tel) ? trim($data->tel, '+381') : '';
+        $this->tel          = ($data->tel) ? ltrim($data->tel, '+381') : '';
 
         $radniOdnos = KorisnikRadniOdnos::where('korisnikId', $this->modelId)->first();
         $this->radniOdnosId = $radniOdnos->radni_odnosId;

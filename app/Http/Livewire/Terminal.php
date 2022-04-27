@@ -6,6 +6,8 @@ use App\Models\TerminalLokacija;
 use App\Models\TerminalLokacijaHistory;
 use App\Models\Lokacija;
 
+use App\Http\Helpers;
+
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -13,7 +15,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Str;
 
-use Illuminate\Support\Carbon;
+//use Illuminate\Support\Carbon;
 
 class Terminal extends Component
 {
@@ -248,7 +250,8 @@ class Terminal extends Component
      */
     public function novaLokacija()
     {
-        return Lokacija::leftJoin('lokacija_tips', 'lokacijas.lokacija_tipId', '=', 'lokacija_tips.id')
+        return Lokacija::select('lokacijas.*', 'regions.r_naziv')
+                            ->leftJoin('lokacija_tips', 'lokacijas.lokacija_tipId', '=', 'lokacija_tips.id')
                             ->leftJoin('regions', 'lokacijas.regionId', '=', 'regions.id')
                             ->where('lokacijas.id', '=', $this->plokacija)
                             ->first();
@@ -335,10 +338,11 @@ class Terminal extends Component
         $this->terminalHistoryVisible = true;
     }
     
-    public function datumFormat($dbdate)
+    /* public function datumFormat($dbdate)
     {
-        return Carbon::parse($dbdate)->setTimezone('Europe/Belgrade')->translatedFormat('d. m. Y. - G:i:s');
-    }
+        //return Carbon::parse($dbdate)->setTimezone('Europe/Belgrade')->translatedFormat('d. m. Y. - G:i:s');
+        return Helpers::datumFormat($dbdate);
+    } */
 
     public function render()
     {
