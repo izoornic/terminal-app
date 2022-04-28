@@ -47,8 +47,8 @@ class Lokacijes extends Component
     //delete check
     public $odabranaLokacija;
     public $deletePosible;
-    public $delName;
     public $brTerminala;
+    public $terminaliList;
 
     //ADD terminal to location
     public $modalAddTerminalVisible;
@@ -304,13 +304,11 @@ class Lokacijes extends Component
      */
     public function deleteShowModal($id)
     {
-       
         $this->modelId = $id;
-
-        $ldat = Lokacija::where('id', $this->modelId)->first();
-        $this->delName = $ldat['l_naziv'].', '.$ldat['mesto'];
+        $this->odabranaLokacija = $this->lokacijaInfo();
+        /* $ldat = Lokacija::where('id', $this->modelId)->first();
+        $this->delName = $ldat['l_naziv'].', '.$ldat['mesto']; */
         //dd($ldat);
-        $this->modalConfirmDeleteVisible = true;
         $this->deletePosible = false;
         
         //check if lokacija zakacena za nekog
@@ -324,7 +322,24 @@ class Lokacijes extends Component
         if($this->brTerminala){
             $this->deletePosible = false;
         };
+
+        //prikazi terminale na lokaciji koja je korisnik
+        
+        if($this->odabranaLokacija->lokacija_tipId == 3){
+            $this->terminaliList = $this->terminalsAtLocation();
+        }
+
+        $this->modalConfirmDeleteVisible = true;
     }    
+
+    private function terminalsAtLocation()
+    {
+        return TerminalLokacija::select('terminal_status_tips.ts_naziv', 'terminals.sn', 'terminals.terminal_tipId', 'terminals.broj_kutije')
+                ->leftJoin('terminals', 'terminal_lokacijas.terminalId', '=', 'terminals.id')
+                ->leftJoin('terminal_status_tips', 'terminal_lokacijas.terminal_statusId', '=', 'terminal_status_tips.id')
+                ->where('lokacijaId', $this->modelId )
+                ->get();
+    }
 
     public function render()
     {
