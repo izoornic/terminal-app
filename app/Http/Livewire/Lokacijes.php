@@ -262,7 +262,7 @@ class Lokacijes extends Component
     public function update()
     {
         $this->validate();
-        //Lokacija::find($this->modelId)->update($this->modelData());
+        Lokacija::find($this->modelId)->update($this->modelData());
 
         if($this->lokacija_tipId == 3){
             if($this->kontaktOsobaGetInfo()){
