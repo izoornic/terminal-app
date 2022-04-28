@@ -89,7 +89,7 @@ class Lokacijes extends Component
     {
         return [   
             'l_naziv' => 'required',  
-            'regionId' => 'required',
+            'regionId' => ['required', 'not_in:0'],
             'lokacija_tipId' => 'required',
             'latitude' => ['regex:/^[-]?(([0-8]?[0-9])\.(\d+))|(90(\.0+)?)$/', 'nullable'],             
             'longitude' => ['regex:/^[-]?((((1[0-7][0-9])|([0-9]?[0-9]))\.(\d+))|180(\.0+)?)$/', 'nullable']       
