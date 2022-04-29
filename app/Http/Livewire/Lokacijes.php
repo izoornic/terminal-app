@@ -291,6 +291,9 @@ class Lokacijes extends Component
      */
     public function delete()
     {
+        if($this->kontaktOsobaGetInfo()){
+            LokacijaKontaktOsoba::where('lokacijaId', '=', $this->modelId)->delete();
+        }
         Lokacija::destroy($this->modelId);
         $this->modalConfirmDeleteVisible = false;
         $this->resetPage();
@@ -306,9 +309,7 @@ class Lokacijes extends Component
     {
         $this->modelId = $id;
         $this->odabranaLokacija = $this->lokacijaInfo();
-        /* $ldat = Lokacija::where('id', $this->modelId)->first();
-        $this->delName = $ldat['l_naziv'].', '.$ldat['mesto']; */
-        //dd($ldat);
+       
         $this->deletePosible = false;
         
         //check if lokacija zakacena za nekog
