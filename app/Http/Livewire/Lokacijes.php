@@ -122,18 +122,17 @@ class Lokacijes extends Component
                 $order = 'lokacija_tipId';
             break;
         };
-        //return Lokacija::paginate(5);
-        return Lokacija::select('lokacijas.*', 'lokacija_tips.lt_naziv', 'regions.r_naziv', 'terminal_lokacijas.lokacijaId as ima_terminala', 'users.lokacijaId as ima_user', 'lokacija_kontakt_osobas.name as kontakt')
+        //->leftJoin('terminal_lokacijas', 'lokacijas.id', '=', 'terminal_lokacijas.lokacijaId') ->groupBy('id') // u select=====>>> 'terminal_lokacijas.lokacijaId as ima_terminala'
+        //->leftJoin('users', 'users.lokacijaId', '=', 'lokacijas.id') // u select=====>>>   , 'users.lokacijaId as ima_user'
+        
+        return Lokacija::select('lokacijas.*', 'lokacija_tips.lt_naziv', 'regions.r_naziv', 'lokacija_kontakt_osobas.name as kontakt', 'lokacija_tips.id as tipid')
         ->leftJoin('regions', 'regions.id', '=', 'lokacijas.regionId')
         ->leftJoin('lokacija_tips', 'lokacijas.lokacija_tipId', '=', 'lokacija_tips.id')
-        ->leftJoin('terminal_lokacijas', 'lokacijas.id', '=', 'terminal_lokacijas.lokacijaId')
-        ->leftJoin('users', 'users.lokacijaId', '=', 'lokacijas.id')
         ->leftJoin('lokacija_kontakt_osobas', 'lokacijas.id', '=', 'lokacija_kontakt_osobas.lokacijaId')
         ->where('lokacijas.l_naziv', 'like', '%'.$this->searchName.'%')
         ->where('lokacijas.mesto', 'like', '%'.$this->searchMesto.'%')
         ->where('lokacijas.regionId', ($this->searchRegion > 0) ? '=' : '<>', $this->searchRegion)
         ->where('lokacijas.lokacija_tipId', ($this->searchTip > 0) ? '=' : '<>', $this->searchTip)
-        ->groupBy('id')
         ->orderBy($order)
         ->paginate(Config::get('global.paginate'), ['*'], 'lokacije');
     }

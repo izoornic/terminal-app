@@ -18,4 +18,12 @@ class TiketPrioritetTip extends Model
     {
         return TiketPrioritetTip::find($id)->first();
     }
+
+    public static function prioritetiList()
+    {
+        foreach(TiketPrioritetTip::all() as $pozicija){
+            $pozicija_list[$pozicija->id] = $pozicija->tp_naziv;
+        }
+        return  $pozicija_list;
+    }
 }

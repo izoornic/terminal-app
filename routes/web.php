@@ -55,5 +55,9 @@ Route::group(['middleware' => [
     Route::get('/tiket', function(){
         return view('admin.tiket');
         })->name('tiket');
+    
+    Route::get('/tiketview', function(){
+        return view('admin.tiketview');
+        })->name('tiketview');
 
 });

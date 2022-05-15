@@ -17,6 +17,7 @@ class TiketKomentar extends Model
     protected $fillable = [
         'tiketId',
         'slika',
-        'komentar'
+        'komentar',
+        'korisnikId'
     ];
 }

@@ -83,7 +83,7 @@ class User extends Authenticatable
                 pozicija_tips pt,
                 users u
             WHERE
-                s.id = ps.stranicaId AND ps.pozicija_tipId = pt.id AND pt.id = u.pozicija_tipId AND s.sub_menu_order IS NULL AND u.id = ?
+                s.id = ps.stranicaId AND ps.pozicija_tipId = pt.id AND pt.id = u.pozicija_tipId AND s.show_in_meni = 1 AND s.sub_menu_order IS NULL AND u.id = ?
             ORDER BY
                 s.menu_order' , 
             [$curentUserId]
