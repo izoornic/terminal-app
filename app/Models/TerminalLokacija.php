@@ -20,6 +20,7 @@ class TerminalLokacija extends Model
         'terminal_statusId',
         'korisnikId',
         'korisnikIme',
+        'updated_at'
     ];
 
     public static function brojTerminalaNalokaciji($id)

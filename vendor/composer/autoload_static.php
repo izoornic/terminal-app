@@ -582,6 +582,7 @@ class ComposerStaticInite2ba2be2abd18ef0cdf065015a13d775
         'App\\Http\\Livewire\\Frontpage' => __DIR__ . '/../..' . '/app/Http/Livewire/Frontpage.php',
         'App\\Http\\Livewire\\Lokacijes' => __DIR__ . '/../..' . '/app/Http/Livewire/Lokacijes.php',
         'App\\Http\\Livewire\\Pages' => __DIR__ . '/../..' . '/app/Http/Livewire/Pages.php',
+        'App\\Http\\Livewire\\Prijava' => __DIR__ . '/../..' . '/app/Http/Livewire/Prijava.php',
         'App\\Http\\Livewire\\Terminal' => __DIR__ . '/../..' . '/app/Http/Livewire/Terminal.php',
         'App\\Http\\Livewire\\Tikets' => __DIR__ . '/../..' . '/app/Http/Livewire/Tikets.php',
         'App\\Http\\Livewire\\Tiketview' => __DIR__ . '/../..' . '/app/Http/Livewire/Tiketview.php',

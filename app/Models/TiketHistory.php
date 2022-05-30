@@ -25,6 +25,7 @@ class TiketHistory extends Model
         'created_at',
         'updated_at',
         'tiket_prioritetId',
-        'br_komentara'
+        'br_komentara',
+        'korisnik_zatvorio_id'
     ];
 }

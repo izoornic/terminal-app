@@ -29,8 +29,10 @@
                         {{-- SEARCH ROW --}}
                             <tr class="bg-orange-50">
                                 <td><svg class="mx-auto fill-orange-600 w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Pro 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M3.853 54.87C10.47 40.9 24.54 32 40 32H472C487.5 32 501.5 40.9 508.1 54.87C514.8 68.84 512.7 85.37 502.1 97.33L320 320.9V448C320 460.1 313.2 471.2 302.3 476.6C291.5 482 278.5 480.9 268.8 473.6L204.8 425.6C196.7 419.6 192 410.1 192 400V320.9L9.042 97.33C-.745 85.37-2.765 68.84 3.854 54.87L3.853 54.87z"/></svg></td>
-                                <td></td>
-                                <td></td>
+                                <td colspan="2">
+                                <x-jet-input wire:model="searchTerminalId" id="" class="block bg-orange-50 w-full" type="text" placeholder="SN Terminala" />
+                                </td>
+                                
                                 <td>
                                     <select wire:model="searchStatus" id="" class="block appearance-none bg-orange-50 w-full border border-0 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
                                         <option value="1">Aktivan</option>
@@ -185,56 +187,63 @@
                     <x-jet-textarea id="opis_kvara" type="textarea" class="mt-1 block w-full disabled:opacity-50" wire:model.defer="opisKvataTxt" />
                     @error('opis_kvara') <span class="error">{{ $message }}</span> @enderror
                 </div> 
-                
-                @if(!$dodeljenUserId)
-				<div class="mt-4">
-                    <hr />
-                    <p>Dodeli tiket korisniku:</p>
-                    <table class="min-w-full divide-y divide-gray-200" style="width: 100% !important">
-                        <thead>
-                            <tr>
-                                <th class="px-3 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider"></th>
-                                <th class="px-3 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Ime</th>
-                                <th class="px-3 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Lokacija</th> 
-                                <th class="px-3 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Pozicija</th>   
-                            </tr>
-                            <tr class="bg-orange-50">
-                                <td><svg class="mx-auto fill-orange-600 w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Pro 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M3.853 54.87C10.47 40.9 24.54 32 40 32H472C487.5 32 501.5 40.9 508.1 54.87C514.8 68.84 512.7 85.37 502.1 97.33L320 320.9V448C320 460.1 313.2 471.2 302.3 476.6C291.5 482 278.5 480.9 268.8 473.6L204.8 425.6C196.7 419.6 192 410.1 192 400V320.9L9.042 97.33C-.745 85.37-2.765 68.84 3.854 54.87L3.853 54.87z"/></svg></td>
-                                <td><x-jet-input wire:model="searchUserName" id="" class="block bg-orange-50 w-full" type="text" placeholder="Ime" /></td>
-                                <td><x-jet-input wire:model="searchUserLokacija" id="" class="block bg-orange-50 w-full" type="text" placeholder="Lokacija" /></td>
-                                <td><x-jet-input wire:model="searchUserPozicija" id="" class="block bg-orange-50 w-full" type="text" placeholder="Pozicija" /></td>
-                            </tr>
-                        </thead>
-                        <tbody class="bg-white divide-y divide-gray-200"> 
-                        @foreach ($this->searchUser() as $value)
-                            <tr class="hover:bg-gray-100" wire:click="$set('dodeljenUserId', {{ $value->id }})" >    
-                                    <td></td>
-                                    <td>{{ $value->name }}</td>
-                                    <td>{{ $value->l_naziv}}</td>
-                                    <td>{{ $value->naziv}}</td>
-                            </tr>
-                        @endforeach
-                        </tbody>
-                    </table>
-                    <div class="mt-5">
-                        {{ $this->searchUser() ->links() }}
+                @if($userPozicija != 2)
+                    <!-- AKO nije koll centar bira servisera -->
+                    @if(!$dodeljenUserId)
+                    <div class="mt-4">
+                        <hr />
+                        <p>Dodeli tiket korisniku:</p>
+                        <table class="min-w-full divide-y divide-gray-200" style="width: 100% !important">
+                            <thead>
+                                <tr>
+                                    <th class="px-3 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider"></th>
+                                    <th class="px-3 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Ime</th>
+                                    <th class="px-3 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Lokacija</th> 
+                                    <th class="px-3 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Pozicija</th>   
+                                </tr>
+                                <tr class="bg-orange-50">
+                                    <td><svg class="mx-auto fill-orange-600 w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Pro 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M3.853 54.87C10.47 40.9 24.54 32 40 32H472C487.5 32 501.5 40.9 508.1 54.87C514.8 68.84 512.7 85.37 502.1 97.33L320 320.9V448C320 460.1 313.2 471.2 302.3 476.6C291.5 482 278.5 480.9 268.8 473.6L204.8 425.6C196.7 419.6 192 410.1 192 400V320.9L9.042 97.33C-.745 85.37-2.765 68.84 3.854 54.87L3.853 54.87z"/></svg></td>
+                                    <td><x-jet-input wire:model="searchUserName" id="" class="block bg-orange-50 w-full" type="text" placeholder="Ime" /></td>
+                                    <td><x-jet-input wire:model="searchUserLokacija" id="" class="block bg-orange-50 w-full" type="text" placeholder="Lokacija" /></td>
+                                    <td><x-jet-input wire:model="searchUserPozicija" id="" class="block bg-orange-50 w-full" type="text" placeholder="Pozicija" /></td>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200"> 
+                            @foreach ($this->searchUser() as $value)
+                                <tr class="hover:bg-gray-100" wire:click="$set('dodeljenUserId', {{ $value->id }})" >    
+                                        <td></td>
+                                        <td>{{ $value->name }}</td>
+                                        <td>{{ $value->l_naziv}}</td>
+                                        <td>{{ $value->naziv}}</td>
+                                </tr>
+                            @endforeach
+                            </tbody>
+                        </table>
+                        <div class="mt-5">
+                            {{ $this->searchUser() ->links() }}
+                        </div>
                     </div>
-                </div>
 
-			    @else
-                
-				<div class="mt-4">Tiket dodeljen korisniku:</div>
-				<div class="bg-sky-100 border-t-4 border-sky-500 rounded-b text-sky-900 px-4 py-3 shadow-md mb-6" role="alert">
-					<div class="flex">
-						<div class="py-1"><svg class="fill-current w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Pro 6.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M224 256c70.7 0 128-57.31 128-128s-57.3-128-128-128C153.3 0 96 57.31 96 128S153.3 256 224 256zM274.7 304H173.3C77.61 304 0 381.6 0 477.3c0 19.14 15.52 34.67 34.66 34.67h378.7C432.5 512 448 496.5 448 477.3C448 381.6 370.4 304 274.7 304z"/></svg></div>
-						<div>
-							<p>Korisnik: <span class="font-bold">{{ $dodeljenUserInfo->name }}</span> &nbsp;&nbsp;&nbsp; Pozicija: <span class="font-bold">{{ $dodeljenUserInfo->naziv }}</span></p>
-							<p class="text-sm">Lokacija: <span class="font-bold">{{ $dodeljenUserInfo->l_naziv }}, {{$dodeljenUserInfo->mesto}}</span></p>
-						</div>
-					</div>
-				</div> 
+                    @else
+                    
+                    <div class="mt-4">Tiket dodeljen korisniku:</div>
+                    <div class="bg-sky-100 border-t-4 border-sky-500 rounded-b text-sky-900 px-4 py-3 shadow-md mb-6" role="alert">
+                        <div class="flex">
+                            <div class="py-1"><svg class="fill-current w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Pro 6.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M224 256c70.7 0 128-57.31 128-128s-57.3-128-128-128C153.3 0 96 57.31 96 128S153.3 256 224 256zM274.7 304H173.3C77.61 304 0 381.6 0 477.3c0 19.14 15.52 34.67 34.66 34.67h378.7C432.5 512 448 496.5 448 477.3C448 381.6 370.4 304 274.7 304z"/></svg></div>
+                            <div>
+                                <p>Korisnik: <span class="font-bold">{{ $dodeljenUserInfo->name }}</span> &nbsp;&nbsp;&nbsp; Pozicija: <span class="font-bold">{{ $dodeljenUserInfo->naziv }}</span></p>
+                                <p class="text-sm">Lokacija: <span class="font-bold">{{ $dodeljenUserInfo->l_naziv }}, {{$dodeljenUserInfo->mesto}}</span></p>
+                            </div>
+                        </div>
+                    </div> 
+                    @endif
+                @else
+                    <!-- KOL centar Samo dva dugmeta  -->
+                    <div class="flex mt-4">
+                        
+                    </div>
+                   
                 @endif
-
                 <p>Odredi prioritet tiketa:</p>
                 <div class="flex mt-4">
                     @foreach (App\Models\TiketPrioritetTip::prList() as $value)
@@ -281,11 +290,25 @@
             <x-jet-secondary-button wire:click="$toggle('modalNewTiketVisible')" wire:loading.attr="disabled">
                 {{ __('Otkaži') }}
             </x-jet-secondary-button>
-            @if($dodeljenUserId && $prioritetTiketa)
-                <x-jet-danger-button class="ml-2" wire:click="create" wire:loading.attr="disabled">
-                    {{ __('Sačuvaj') }}
-                </x-jet-danger-button>     
-            @endif      
+            @if($userPozicija != 2)
+                @if($dodeljenUserId && $prioritetTiketa)
+                    <x-jet-danger-button class="ml-2" wire:click="create" wire:loading.attr="disabled">
+                        {{ __('Sačuvaj') }}
+                    </x-jet-danger-button>     
+                @endif 
+            @else
+                @if($prioritetTiketa && !App\Models\Tiket::daliTerminalImaOtvorenTiket($newTerminalId))
+                                    {{ App\Models\Tiket::daliTerminalImaOtvorenTiket($newTerminalId) }}
+                    <x-jet-danger-button class="ml-2" wire:click="createCallCentar(false)" wire:loading.attr="disabled">
+                    <svg class="float-left fill-current w-4 h-4 mr-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 384"><path d="M576,208V128a64,64,0,0,0-64-64H64A64,64,0,0,0,0,128v80a48,48,0,0,1,48,48A48,48,0,0,1,0,304v80a64,64,0,0,0,64,64H512a64.06,64.06,0,0,0,64-64V304a48,48,0,0,1,0-96ZM438,286.5H318.5V406h-61V286.5H138v-61H257.5V106h61V225.5H438Z" transform="translate(0 -64)"/></svg>
+                        {{ __('Otvori tiket') }}
+                    </x-jet-danger-button>
+                    <x-jet-secondary-button class="ml-2" wire:click="createCallCentar(true)" wire:loading.attr="disabled">
+                    <svg class="float-left fill-current w-4 h-4 mr-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Pro 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M331.8 224.1c28.29 0 54.88 10.99 74.86 30.97l19.59 19.59c40.01-17.74 71.25-53.3 81.62-96.65c5.725-23.92 5.34-47.08 .2148-68.4c-2.613-10.88-16.43-14.51-24.34-6.604l-68.9 68.9h-75.6V97.2l68.9-68.9c7.912-7.912 4.275-21.73-6.604-24.34c-21.32-5.125-44.48-5.51-68.4 .2148c-55.3 13.23-98.39 60.22-107.2 116.4C224.5 128.9 224.2 137 224.3 145l82.78 82.86C315.2 225.1 323.5 224.1 331.8 224.1zM384 278.6c-23.16-23.16-57.57-27.57-85.39-13.9L191.1 158L191.1 95.99l-127.1-95.99L0 63.1l96 127.1l62.04 .0077l106.7 106.6c-13.67 27.82-9.251 62.23 13.91 85.39l117 117.1c14.62 14.5 38.21 14.5 52.71-.0016l52.75-52.75c14.5-14.5 14.5-38.08-.0016-52.71L384 278.6zM227.9 307L168.7 247.9l-148.9 148.9c-26.37 26.37-26.37 69.08 0 95.45C32.96 505.4 50.21 512 67.5 512s34.54-6.592 47.72-19.78l119.1-119.1C225.5 352.3 222.6 329.4 227.9 307zM64 472c-13.25 0-24-10.75-24-24c0-13.26 10.75-24 24-24S88 434.7 88 448C88 461.3 77.25 472 64 472z"/></svg>
+                        {{ __('Dodeli servisu') }}
+                    </x-jet-danger-button>
+                @endif
+            @endif
         </x-slot>
     </x-jet-dialog-modal>
 

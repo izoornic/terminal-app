@@ -37,6 +37,7 @@ class Terminal extends Component
     public $canMoveTerminal = 0;
     public $selectedTerminal;
     public $modalStatusPremesti;
+    public $datum_premestanja_terminala;
 
     //select all
     public $selsectedTerminals = [];
@@ -202,6 +203,8 @@ class Terminal extends Component
         $this->selectedTerminal = $this->selectedTerminalInfo();
         //dd($this->selectedTerminal);
         $this->modalConfirmPremestiVisible = true;
+
+        $this->datum_premestanja_terminala = Helpers::datumKalendarNow();
     }    
 
     public function premestiSelectedShowModal(){
@@ -217,6 +220,8 @@ class Terminal extends Component
         $this->searchPlokacijaRegion = 0;
 
         $this->modalConfirmPremestiVisible = true;
+
+        $this->datum_premestanja_terminala = Helpers::datumKalendarNow();
     }
     /**
      * Info o izabranom terminalu na MODAL pop up-u
@@ -263,6 +268,10 @@ class Terminal extends Component
      * @return void
      */
     public function moveTerminal(){
+
+        if(!(bool)strtotime($this->datum_premestanja_terminala)) $this->datum_premestanja_terminala = Helpers::datumKalendarNow();
+        $this->datum_premestanja_terminala.= ' '.Helpers::vremeKalendarNow();
+
         if($this->multiSelected){
             foreach($this->selsectedTerminals as $item){
                 DB::transaction(function()use($item){
@@ -270,7 +279,7 @@ class Terminal extends Component
                     //insert to history table
                     TerminalLokacijaHistory::create(['terminal_lokacijaId' => $cuurent['id'], 'terminalId' => $cuurent['terminalId'], 'lokacijaId' => $cuurent['lokacijaId'], 'terminal_statusId' => $cuurent['terminal_statusId'], 'korisnikId' => $cuurent['korisnikId'], 'korisnikIme' => $cuurent['korisnikIme'], 'created_at' => $cuurent['created_at'], 'updated_at' => $cuurent['updated_at']]);
                     //update current
-                    TerminalLokacija::where('terminalId', $item)->update(['terminal_statusId'=> $this->modalStatusPremesti, 'lokacijaId' => $this->plokacija, 'korisnikId'=>auth()->user()->id, 'korisnikIme'=>auth()->user()->name ]);
+                    TerminalLokacija::where('terminalId', $item)->update(['terminal_statusId'=> $this->modalStatusPremesti, 'lokacijaId' => $this->plokacija, 'korisnikId'=>auth()->user()->id, 'korisnikIme'=>auth()->user()->name, 'updated_at'=>$this->datum_premestanja_terminala ]);
                 });
             }
         }else{
@@ -281,7 +290,7 @@ class Terminal extends Component
                 //insert to history table
                 TerminalLokacijaHistory::create(['terminal_lokacijaId' => $cuurent['id'], 'terminalId' => $cuurent['terminalId'], 'lokacijaId' => $cuurent['lokacijaId'], 'terminal_statusId' => $cuurent['terminal_statusId'], 'korisnikId' => $cuurent['korisnikId'], 'korisnikIme' => $cuurent['korisnikIme'], 'created_at' => $cuurent['created_at'], 'updated_at' => $cuurent['updated_at']]);
                 //update current
-                TerminalLokacija::where('terminalId', $this->modelId)->update(['terminal_statusId'=> $this->modalStatusPremesti, 'lokacijaId' => $this->plokacija, 'korisnikId'=>auth()->user()->id, 'korisnikIme'=>auth()->user()->name ]);
+                TerminalLokacija::where('terminalId', $this->modelId)->update(['terminal_statusId'=> $this->modalStatusPremesti, 'lokacijaId' => $this->plokacija, 'korisnikId'=>auth()->user()->id, 'korisnikIme'=>auth()->user()->name, 'updated_at'=>$this->datum_premestanja_terminala ]);
             });
         }
         $this->selsectedTerminals=[];

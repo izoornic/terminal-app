@@ -286,7 +286,7 @@
             </div>        
         @endif
 
-        <div class="mt-4">
+            <div class="mt-4">
                 <x-jet-label for="pterminalStatus" value="{{ __('Novi status terminala') }}" />
                     <select wire:model="modalStatusPremesti" id="" class="block appearance-none bg-gray-50 w-full border border-1 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
                         @foreach (App\Models\TerminalStatusTip::tipoviList() as $key => $value)    
@@ -294,7 +294,13 @@
                         @endforeach
                     </select>
                     @error('pterminalStatus') <span class="error">{{ $message }}</span> @enderror
-            </div>  
+            </div> 
+            
+            <div class="mb-6 mt-4">
+                <x-jet-label for="date_akcije" value="Datum promene:" />
+                <x-jet-input id="date_akcije" type="date" class="mt-1 block" value="{{ $datum_premestanja_terminala }}" wire:model.defer="datum_premestanja_terminala" />
+                <x-jet-input-error for="date_akcije" class="mt-2" />
+            </div>
 
         </x-slot>
 

@@ -64,9 +64,7 @@
                                     </select>
                                 </td>
                                 <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
+                                <td colspan="3" class="text-right text-sm pr-4">Ukupno: <span class="font-bold">{{ $data->total() }}</span></td>
                             </tr>
                             @if ($data->count())
                                 @foreach ($data as $item)
@@ -480,10 +478,17 @@
                                 @endforeach
                             </select>
                         </div>
+
+                        <div class="mb-6">
+                            <x-jet-label for="date_akcije" value="Datum promene:" />
+                            <x-jet-input id="date_akcije" type="date" class="mt-1 block" value="{{ $datum_dodavanja_terminala }}" wire:model.defer="datum_dodavanja_terminala" />
+                            <x-jet-input-error for="date_akcije" class="mt-2" />
+                        </div>
+
                         <div class="bg-blue-100 border-t border-b border-blue-500 text-blue-700 px-4 py-3" role="alert">
                             <p class="text-sm">Ukupno terminala: <span class="font-bold"> {{ count($selsectedTerminals) }}</span></p>
                         </div>
-
+                        
                         @else
                             <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
                                 <strong class="font-bold">Greška!</strong>

@@ -16,6 +16,8 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
+use App\Http\Helpers;
+
 class Lokacijes extends Component
 {
     use WithPagination;
@@ -71,7 +73,7 @@ class Lokacijes extends Component
     public $searchPlokacijaRegion;
 
     public $lokacijaSaKojeUzima;
-
+    public $datum_dodavanja_terminala;
 
     //kontakt osoba u prodavnici
     public $kontaktOsobaVisible;
@@ -400,6 +402,7 @@ class Lokacijes extends Component
         $this->searchSN = '';
         $this->p_lokacija_tipId = 0;
         $this->p_lokacijaId = 0;
+        $this->datum_dodavanja_terminala = Helpers::datumKalendarNow();
 
         $this->modalAddTerminalVisible = true;
     }
@@ -483,6 +486,10 @@ class Lokacijes extends Component
      */
     public function addTerminal()
     {
+        if(!(bool)strtotime($this->datum_dodavanja_terminala)) $this->datum_dodavanja_terminala = Helpers::datumKalendarNow();
+        $this->datum_dodavanja_terminala.= ' '.Helpers::vremeKalendarNow();
+        
+        //dd($this->datum_dodavanja_terminala);
         //ima li izabranih terminala
         if($this->t_status){
             if(count($this->selsectedTerminals)){
@@ -494,7 +501,7 @@ class Lokacijes extends Component
                         //insert to history table
                          TerminalLokacijaHistory::create(['terminal_lokacijaId' => $cuurent['id'], 'terminalId' => $cuurent['terminalId'], 'lokacijaId' => $cuurent['lokacijaId'], 'terminal_statusId' => $cuurent['terminal_statusId'], 'korisnikId' => $cuurent['korisnikId'], 'korisnikIme' => $cuurent['korisnikIme'], 'created_at' => $cuurent['created_at'], 'updated_at' => $cuurent['updated_at']]);
                         //update current
-                        TerminalLokacija::where('terminalId', $tid)->update(['lokacijaId'=> $this->modelId, 'terminal_statusId'=> $this->t_status, 'korisnikId'=>auth()->user()->id, 'korisnikIme'=>auth()->user()->name ]);
+                        TerminalLokacija::where('terminalId', $tid)->update(['lokacijaId'=> $this->modelId, 'terminal_statusId'=> $this->t_status, 'korisnikId'=>auth()->user()->id, 'korisnikIme'=>auth()->user()->name, 'updated_at'=>$this->datum_dodavanja_terminala ]);
                     });
                     $this->modalAddTerminalVisible = false;
                 }

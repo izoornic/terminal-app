@@ -22,7 +22,8 @@ class Tiket extends Model
         'korisnik_dodeljenId',
         'opis',
         'tiket_prioritetId',
-        'br_komentara'
+        'br_komentara',
+        'korisnik_zatvorio_id'
     ];
 
     public static function daliTerminalImaOtvorenTiket($tlid)

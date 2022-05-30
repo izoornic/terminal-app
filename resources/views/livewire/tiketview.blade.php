@@ -34,7 +34,10 @@
 				</div>
         
 				<div>@if($tiket->tks_naziv != "Zatvoren") <x-jet-danger-button wire:click="zatvoriTiketShowModal" title='promeni status'><svg class="fill-current w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Pro 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M448 32C483.3 32 512 60.65 512 96V416C512 451.3 483.3 480 448 480H64C28.65 480 0 451.3 0 416V96C0 60.65 28.65 32 64 32H448zM175 208.1L222.1 255.1L175 303C165.7 312.4 165.7 327.6 175 336.1C184.4 346.3 199.6 346.3 208.1 336.1L255.1 289.9L303 336.1C312.4 346.3 327.6 346.3 336.1 336.1C346.3 327.6 346.3 312.4 336.1 303L289.9 255.1L336.1 208.1C346.3 199.6 346.3 184.4 336.1 175C327.6 165.7 312.4 165.7 303 175L255.1 222.1L208.1 175C199.6 165.7 184.4 165.7 175 175C165.7 184.4 165.7 199.6 175 208.1V208.1z"/></svg> zatvori tiket</x-jet-button> 
-                    @else <a href="{{ route( 'tiket' ) }}" :active="request()->routeIs('tiket')"><span class="flex-none py-2 px-4 mx-2 font-bold rounded bg-{{$prioritetInfo->tr_bg_collor}} text-{{$prioritetInfo->btn_collor}}">TIKETI</span></a>
+                    @else 
+                    <a href="{{ route( 'tiket' ) }}"><span class="flex-none py-2 px-4 mx-2 font-bold rounded bg-{{$prioritetInfo->tr_bg_collor}} text-{{$prioritetInfo->btn_collor}}">TIKETI</span></a>
+                    <br />
+                    <p>Tiket zatvorio: <span class="font-bold">@if($zatvorioId > 0){{ $this->zatvorioInfo()->name }} @endif</span></p>
                     @endif</div>
             </div> 
         </div> 
@@ -92,7 +95,7 @@
                             <div class="py-2">
                                 <div><svg class="float-left fill-slate-600 w-4 h-4 mr-2 mt-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Pro 6.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M224 256c70.7 0 128-57.31 128-128s-57.3-128-128-128C153.3 0 96 57.31 96 128S153.3 256 224 256zM274.7 304H173.3C77.61 304 0 381.6 0 477.3c0 19.14 15.52 34.67 34.66 34.67h378.7C432.5 512 448 496.5 448 477.3C448 381.6 370.4 304 274.7 304z"/></svg>
                                 <span class="font-bold">{{ $komentar->name }}</span> <span class="text-sm ml-4">{{ App\Http\Helpers::datumFormat($komentar->created_at) }}</span>
-                                    <div class="border border-slate-500 bg-slate-50 px-2 py-2 ml-10">{{ $komentar->komentar }}<div>
+                                    <div class="border border-slate-500 bg-slate-50 px-2 py-2 ml-10">{{ $komentar->komentar }}</div>
                                 </div>
                             </div>
                         @endforeach
@@ -121,7 +124,8 @@
         </x-slot>
 
         <x-slot name="content">
-        @if(!$dodeljenUserId)
+            @if($curentUserPozicija != 2)
+                @if(!$noviDodeljenUserId)
 				<div class="mt-4">
                     <hr />
                     <p>Dodeli tiket korisniku:</p>
@@ -142,7 +146,7 @@
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200"> 
                         @foreach ($this->searchUser() as $value)
-                            <tr class="hover:bg-gray-100" wire:click="$set('dodeljenUserId', {{ $value->id }})" >    
+                            <tr class="hover:bg-gray-100" wire:click="$set('noviDodeljenUserId', {{ $value->id }})" >    
                                     <td></td>
                                     <td>{{ $value->name }}</td>
                                     <td>{{ $value->l_naziv}}</td>
@@ -163,13 +167,15 @@
 					<div class="flex">
 						<div class="py-1"><svg class="fill-current w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Pro 6.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M224 256c70.7 0 128-57.31 128-128s-57.3-128-128-128C153.3 0 96 57.31 96 128S153.3 256 224 256zM274.7 304H173.3C77.61 304 0 381.6 0 477.3c0 19.14 15.52 34.67 34.66 34.67h378.7C432.5 512 448 496.5 448 477.3C448 381.6 370.4 304 274.7 304z"/></svg></div>
 						<div>
-							<p>Korisnik: <span class="font-bold">{{ $dodeljenUserInfo->name }}</span> &nbsp;&nbsp;&nbsp; Pozicija: <span class="font-bold">{{ $dodeljenUserInfo->naziv }}</span></p>
-							<p class="text-sm">Lokacija: <span class="font-bold">{{ $dodeljenUserInfo->l_naziv }}, {{$dodeljenUserInfo->mesto}}</span></p>
+							<p>Korisnik: <span class="font-bold">{{ $noviDodeljenUserInfo->name }}</span> &nbsp;&nbsp;&nbsp; Pozicija: <span class="font-bold">{{ $noviDodeljenUserInfo->naziv }}</span></p>
+							<p class="text-sm">Lokacija: <span class="font-bold">{{ $noviDodeljenUserInfo->l_naziv }}, {{$noviDodeljenUserInfo->mesto}}</span></p>
 						</div>
 					</div>
 				</div> 
                 @endif
+            @else
 
+            @endif
                 <p>Odredi prioritet tiketa:</p>
                 <div class="flex mt-4">
                     @foreach (App\Models\TiketPrioritetTip::prList() as $value)
@@ -201,11 +207,16 @@
             <x-jet-secondary-button wire:click="$toggle('modalDodeliTiketVisible')" wire:loading.attr="disabled">
                 {{ __('Otkaži') }}
             </x-jet-secondary-button>
-            @if($dodeljenUserId && $prioritetTiketa)
+            @if($noviDodeljenUserId && $prioritetTiketa)
                 <x-jet-danger-button class="ml-2" wire:click="changeUser" wire:loading.attr="disabled">
                     {{ __('Sačuvaj') }}
                 </x-jet-danger-button>     
-            @endif      
+            @elseIf($curentUserPozicija == 2 && $dodeljenUserInfo == null)
+                <x-jet-danger-button class="ml-2" wire:click="changeToServis" wire:loading.attr="disabled">
+                <svg class="float-left fill-current w-4 h-4 mr-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Pro 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M331.8 224.1c28.29 0 54.88 10.99 74.86 30.97l19.59 19.59c40.01-17.74 71.25-53.3 81.62-96.65c5.725-23.92 5.34-47.08 .2148-68.4c-2.613-10.88-16.43-14.51-24.34-6.604l-68.9 68.9h-75.6V97.2l68.9-68.9c7.912-7.912 4.275-21.73-6.604-24.34c-21.32-5.125-44.48-5.51-68.4 .2148c-55.3 13.23-98.39 60.22-107.2 116.4C224.5 128.9 224.2 137 224.3 145l82.78 82.86C315.2 225.1 323.5 224.1 331.8 224.1zM384 278.6c-23.16-23.16-57.57-27.57-85.39-13.9L191.1 158L191.1 95.99l-127.1-95.99L0 63.1l96 127.1l62.04 .0077l106.7 106.6c-13.67 27.82-9.251 62.23 13.91 85.39l117 117.1c14.62 14.5 38.21 14.5 52.71-.0016l52.75-52.75c14.5-14.5 14.5-38.08-.0016-52.71L384 278.6zM227.9 307L168.7 247.9l-148.9 148.9c-26.37 26.37-26.37 69.08 0 95.45C32.96 505.4 50.21 512 67.5 512s34.54-6.592 47.72-19.78l119.1-119.1C225.5 352.3 222.6 329.4 227.9 307zM64 472c-13.25 0-24-10.75-24-24c0-13.26 10.75-24 24-24S88 434.7 88 448C88 461.3 77.25 472 64 472z"/></svg>
+                    {{ __('Dodeli servisu') }}
+                </x-jet-danger-button>
+            @endif
         </x-slot>
     </x-jet-dialog-modal>
 

@@ -23,6 +23,7 @@ return array(
     'App\\Http\\Livewire\\Frontpage' => $baseDir . '/app/Http/Livewire/Frontpage.php',
     'App\\Http\\Livewire\\Lokacijes' => $baseDir . '/app/Http/Livewire/Lokacijes.php',
     'App\\Http\\Livewire\\Pages' => $baseDir . '/app/Http/Livewire/Pages.php',
+    'App\\Http\\Livewire\\Prijava' => $baseDir . '/app/Http/Livewire/Prijava.php',
     'App\\Http\\Livewire\\Terminal' => $baseDir . '/app/Http/Livewire/Terminal.php',
     'App\\Http\\Livewire\\Tikets' => $baseDir . '/app/Http/Livewire/Tikets.php',
     'App\\Http\\Livewire\\Tiketview' => $baseDir . '/app/Http/Livewire/Tiketview.php',

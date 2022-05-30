@@ -11,14 +11,19 @@ class NotyfyMail extends Mailable
 {
     use Queueable, SerializesModels;
 
+    public $emData;
+    public $comments;
+    
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct()
+    public function __construct($dt, $coments = null)
     {
         //
+        $this->emData = $dt;
+        $this->comments = $coments;
     }
 
     /**
@@ -28,6 +33,7 @@ class NotyfyMail extends Mailable
      */
     public function build()
     {
-        return $this->view('emails.demoMail');
+        return $this->subject($this->emData['subject'])
+            ->view('emails.demoMail', ['data' => $this->emData, 'komentari' => $this->comments]);
     }
 }

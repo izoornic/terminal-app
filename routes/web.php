@@ -17,6 +17,14 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::any('/', function () {
+    return view('welcome');
+});
+
+Route::get('/prijava', function () {
+    return view('prijava');
+});
+
 //Route::get('send-email', [SendEmailController::class, 'index']);
 /* Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard', function () {
     return view('dashboard');
