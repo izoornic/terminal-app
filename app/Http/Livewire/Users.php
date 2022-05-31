@@ -83,7 +83,7 @@ class Users extends Component
             'pozicijaId' => 'required',
             'lokacijaId' => 'required',
             'telegramId' => ['digits_between:4,20', 'nullable'],
-            'tel' => ['digits_between:9,11', 'nullable'],
+            'tel' => ['digits_between:8,11', 'nullable'],
             'radniOdnosId' => 'required',
         ];
 
