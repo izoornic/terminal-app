@@ -35,7 +35,7 @@ class Tikets extends Component
     public $searchMesto;
     public $searchRegion;
     public $searchPrioritet;
-    public $searchStatus = 1;
+    public $searchStatus;
     public $searchTerminalId;
     public $tiketStatusId;
     
@@ -66,6 +66,7 @@ class Tikets extends Component
 
     public $dodeljenUserId;
     public $dodeljenUserInfo;
+    public $zatvorioId;
 
     public $prioritetTiketa;
     public $prioritetInfo;
@@ -112,7 +113,11 @@ class Tikets extends Component
                                 ->where('lokacijas.id', '=', auth()->user()->lokacijaId)
                                 ->first();
         $this->userRegion = $region->rid;
-        //dd($this->tiketAkcija);
+        
+        if (session('tiketSearchStatus') == null ){
+            session(['tiketSearchStatus' => 1]);
+        };
+        $this->searchStatus = session('tiketSearchStatus');
     }
 
     /**
@@ -189,6 +194,7 @@ class Tikets extends Component
         $this->modalNewTiketVisible = true;
         $this->prioritetTiketa = 4;
         $this->tiketStatusId = 2;
+        $this->zatvorioId = 0;
     }
         
     /**
@@ -338,6 +344,15 @@ class Tikets extends Component
         $this->create();
     }
 
+    public function createCallCentarClosedTiket()
+    {
+        $this->validate();
+        $this->tiketStatusId = 3;
+        $this->dodeljenUserId = null;
+        $this->zatvorioId = auth()->user()->id;
+        $this->create(); 
+    }
+
     /**
      * Podaci koji se prikazuju u email poruci
      *
@@ -348,6 +363,9 @@ class Tikets extends Component
     {
         $terminal_info = $this->selectedTerminalInfo();
        // Helpers::datumFormat($komentar->created_at)
+       $opisKvaraObj = TiketOpisKvaraTip::where('id', '=', $tik->opis_kvaraId)->first();
+       $opisKvara = ($opisKvaraObj == null) ? '' : $opisKvaraObj->tok_naziv;
+
        $mail_data = [
         'subject'   =>  'Novi tiket #'.$tik->id,
         'tiketlink' =>  'https://servis.epos.rs/tiketview?id='.$tik->id,
@@ -355,7 +373,7 @@ class Tikets extends Component
         'row1'      =>  'Prioritet: '.$this->prioritetInfo()->tp_naziv.' | Kreiran: '.Helpers::datumFormat($tik->created_at),
         'row2'      =>  'Otvorio: '.auth()->user()->name,
         'row3'      =>  'Dodeljen: '.$this->selectedUserInfo($this->dodeljenUserId)->name,
-        'row4'      =>  'Kvar: '.TiketOpisKvaraTip::where('id', '=', $tik->opis_kvaraId)->first()->tok_naziv,
+        'row4'      =>  'Kvar: '.$opisKvara,
         'row5'      =>  'Opis: '.$tik->	opis,
         'row6'      =>  ' -::- ---  -::-',
         'row7'      =>  'Terminal: sn: '.$terminal_info->sn,
@@ -382,7 +400,7 @@ class Tikets extends Component
         }
         //sef servisa
         if($this->dodeljenUserId != null && $this->dodeljenUserId != $this->sefServisa()->id){
-            $sefservisa = $this-sefServisa()->email;
+            $sefservisa = $this->sefServisa()->email;
             array_push($retval, $sefservisa);
         }
 
@@ -420,7 +438,8 @@ class Tikets extends Component
             'korisnik_dodeljenId'   =>  $this->dodeljenUserId,
             'opis'                  =>  $this->opisKvataTxt,
             'tiket_prioritetId'     =>  $this->prioritetTiketa ,
-            'br_komentara'          =>  0
+            'br_komentara'          =>  0,
+            'korisnik_zatvorio_id'  =>  $this->zatvorioId
 
         ];
     }
@@ -432,14 +451,14 @@ class Tikets extends Component
      * @param  mixed $id
      * @return void
      */
-    /* public function updateShowModal($id)
+    public function updateShowModal($id)
     {
         $this->resetValidation();
         $this->reset();
         $this->modalFormVisible = true;
         $this->modelId = $id;
         $this->loadModel();
-    } */
+    }
 
     /**
      * The update function
@@ -459,12 +478,12 @@ class Tikets extends Component
      *
      * @param  mixed $id
      * @return void
-     */
+    */
     public function deleteShowModal($id)
     {
         $this->modelId = $id;
         $this->modalConfirmDeleteVisible = true;
-    }    
+    }
 
      /**
      * The delete function.
@@ -487,6 +506,8 @@ class Tikets extends Component
      */
     public function updated()
     {
+        session(['tiketSearchStatus' =>  $this->searchStatus]);
+
         if($this->modalNewTiketVisible){
             $this->newTerminalInfo = $this->selectedTerminalInfo();
             if($this->dodeljenUserId){

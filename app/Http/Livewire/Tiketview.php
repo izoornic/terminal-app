@@ -352,6 +352,8 @@ class Tiketview extends Component
         $heding = ($sub == 'Dodeljen tiket - #') ? 'Na servisnom portalu dodeljen vam je tiket #' : $sub;
         $zatvorio = ($sub == 'Zatvoren tiket #') ? ' | Tiket zatvorio: '.auth()->user()->name : '';
         
+        $opisKvaraObj = TiketOpisKvaraTip::where('id', '=', $this->tiket->opis_kvaraId)->first();
+        $opisKvara = ($opisKvaraObj == null) ? '' : $opisKvaraObj->tok_naziv;
        // Helpers::datumFormat($komentar->created_at)
        $mail_data = [
         'subject'   =>  $sub.$this->tiket->tkid,
@@ -360,7 +362,7 @@ class Tiketview extends Component
         'row1'      =>  'Prioritet: '.$this->prioritetInfo()->tp_naziv.' | Kreiran: '.Helpers::datumFormat($this->tiket->created_at),
         'row2'      =>  'Otvorio: '.$kreirao,
         'row3'      =>  'Dodeljen: '.$dodeljen_ime. ' '. $zatvorio,
-        'row4'      =>  'Kvar: '.TiketOpisKvaraTip::where('id', '=', $this->tiket->opis_kvaraId)->first()->tok_naziv,
+        'row4'      =>  'Kvar: '.$opisKvara,
         'row5'      =>  'Opis: '.$this->tiket->opis,
         'row6'      =>  ' -::-  ---  -::-',
         'row7'      =>  'Terminal: sn: '.$terminal_info->sn,

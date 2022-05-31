@@ -5,8 +5,11 @@ namespace App\Http\Livewire;
 use App\Models\TerminalLokacija;
 use App\Models\TerminalLokacijaHistory;
 use App\Models\Lokacija;
-
-use App\Http\Helpers;
+use App\Models\TiketPrioritetTip;
+use App\Models\User;
+use App\Models\TiketAkcijaKorisnikPozicija;
+use App\Models\Tiket;
+use App\Models\TiketOpisKvaraTip;
 
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -15,7 +18,9 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Str;
 
-//use Illuminate\Support\Carbon;
+use Mail;
+use App\Mail\NotyfyMail;
+use App\Http\Helpers;
 
 class Terminal extends Component
 {
@@ -60,10 +65,266 @@ class Terminal extends Component
     public $terminalHistoryVisible;
     public $historyData;
 
+    //add Tiket Modal
+    public $newTiketVisible;
+    public $userPozicija;
+    public $prioritetTiketa;
+    public $newTerminalInfo;
+    public $newTiketTerminalId;
+    public $prioritetInfo;
+    public $opisKvaraList;
+    public $tiketStatusId;
+    public $opisKvataTxt;
+    public $zatvorioId;
+    
+
+    //search korisnika kome se dodeljuje tiket
+    public $searchUserName;
+    public $searchUserLokacija;
+    public $searchUserPozicija;
+    
+    public $dodeljenUserId;
+    public $dodeljenUserInfo;
+
+    public $tiketAkcija;
+    public $userRegion;
+
+    public function newTiketShowModal($tid)
+    {
+        $this->zatvorioId = 0;
+        $this->opisKvataTxt = '';
+        $this->tiketStatusId = 2;
+        $this->opisKvaraList = '';
+        $this->searchUserName = '';
+        $this->searchUserLokacija ='';
+        $this->searchUserPozicija ='';
+
+        $this->dodeljenUserInfo = null;
+        $this->dodeljenUserId = null;
+
+        $this->prioritetTiketa = 4;
+        $this->newTiketTerminalId = $tid;
+        $this->modelId = $tid;
+        $this->newTerminalInfo = $this->selectedTerminalTiketInfo();
+        $this->prioritetInfo = $this->prioritetInfo();
+        $this->newTiketVisible = true;
+    }
+     /**
+     * createCallCentar
+     *
+     * @param  mixed $dodela
+     * @return void
+     */
+    public function createCallCentar($dodela)
+    {
+        $this->validate();
+        $this->dodeljenUserId = ($dodela) ? $this->sefServisa()->id : null;
+        $this->tiketStatusId = ($dodela) ? 2 : 1;
+        $this->createTiket();
+    }
+
+    public function createCallCentarClosedTiket()
+    {
+        $this->validate();
+        $this->tiketStatusId = 3;
+        $this->dodeljenUserId = null;
+        $this->zatvorioId = auth()->user()->id;
+        $this->createTiket(); 
+    }
+    /**
+     * The create novi tiket function.
+     *
+     * @return void
+     */
+    public function createTiket()
+    {
+        $this->validate();
+        //dd($this->sefServisa());
+        $tik = Tiket::create($this->modelTiketData());
+        
+        //send email
+        
+        
+        foreach ($this->mail_to_users() as $mail_to_user) {
+            try {
+                Mail::to($mail_to_user)->send(new NotyfyMail($this->tiketData($tik)));
+            } catch (Exception $e) {
+                if (count(Mail::failures()) > 0) {
+                    $failures[] = $mail_to_user;
+                }
+            }
+        }
+
+        $this->newTiketVisible = false;
+    }
+
+    /**
+     * mail_to_users # MORA UPDATE
+     *  Mail se salje sefu servisa samo ako je prebacen na servis
+     * @return void
+     */
+    private function mail_to_users()
+    {
+        //$user_email = $this->selectedUserInfo(auth()->user()->id)->email;
+        $retval = [];
+        if($this->dodeljenUserId != null && $this->dodeljenUserId != auth()->user()->id){
+            $dodeljen = $this->selectedUserInfo($this->dodeljenUserId)->email;
+            array_push($retval, $dodeljen);
+        }
+        //sef servisa
+        if($this->dodeljenUserId != null && $this->dodeljenUserId != $this->sefServisa()->id){
+            $sefservisa = $this->sefServisa()->email;
+            array_push($retval, $sefservisa);
+        }
+
+        return $retval;
+    }
+
+    /**
+     * The data for the model mapped
+     * in this component.
+     *
+     * @return void
+     */
+    public function modelTiketData()
+    {
+        return [ 
+            'tremina_lokacijalId'   =>  $this->newTiketTerminalId,
+            'tiket_statusId'        =>  $this->tiketStatusId,
+            'opis_kvaraId'          =>  $this->opisKvaraList,
+            'korisnik_prijavaId'    =>  auth()->user()->id,
+            'korisnik_dodeljenId'   =>  $this->dodeljenUserId,
+            'opis'                  =>  $this->opisKvataTxt,
+            'tiket_prioritetId'     =>  $this->prioritetTiketa,
+            'br_komentara'          =>  0,
+            'korisnik_zatvorio_id'  =>  $this->zatvorioId
+
+        ];
+    }
+
+    /**
+     * Podaci koji se prikazuju u email poruci
+     *
+     * @param  mixed $tik
+     * @return void
+     */
+    private function tiketData($tik)
+    {
+        $terminal_info = $this->selectedTerminalInfo();
+        // Helpers::datumFormat($komentar->created_at)
+        $opisKvaraObj = TiketOpisKvaraTip::where('id', '=', $tik->opis_kvaraId)->first();
+        $opisKvara = ($opisKvaraObj == null) ? '' : $opisKvaraObj->tok_naziv;
+
+       $mail_data = [
+        'subject'   =>  'Novi tiket #'.$tik->id,
+        'tiketlink' =>  'https://servis.epos.rs/tiketview?id='.$tik->id,
+        'hedaing'   =>  'Na servisnom portalu je otvoren novi tiket #'.$tik->id,
+        'row1'      =>  'Prioritet: '.$this->prioritetInfo()->tp_naziv.' | Kreiran: '.Helpers::datumFormat($tik->created_at),
+        'row2'      =>  'Otvorio: '.auth()->user()->name,
+        'row3'      =>  'Dodeljen: '.$this->selectedUserInfo($this->dodeljenUserId)->name,
+        'row4'      =>  'Kvar: '.$opisKvara,
+        'row5'      =>  'Opis: '.$tik->	opis,
+        'row6'      =>  ' -::- ---  -::-',
+        'row7'      =>  'Terminal: sn: '.$terminal_info->sn,
+        'row8'      =>  'Status: '.$terminal_info->ts_naziv,
+        'row9'      =>  'Lokacija: '.$terminal_info->l_naziv.', '.$terminal_info->mesto,
+        'row10'     =>  'Region: '. $terminal_info->r_naziv,
+        'row11'     =>  'Kontakt osoba: '. $terminal_info->name.'  tel: '.$terminal_info->tel
+        ];
+        return $mail_data;
+    }
+
+     /**
+     * id Sefa Servisa
+     *
+     * @return void
+     */
+    private function sefServisa()
+    {
+        return User::select('users.id', 'users.name', 'users.tel', 'users.email')
+            ->join('lokacijas', 'lokacijas.id', '=', 'users.lokacijaId')
+            ->join('regions', 'regions.id', '=', 'lokacijas.regionId')
+            ->where('users.pozicija_tipId', '=', 3)
+            ->where('regions.id', '=', $this->selectedTerminalInfo()->rid)
+            ->first();
+    }
+
+    /**
+     * selectedUserInfo
+     *
+     * @return void
+     */
+    private function selectedUserInfo($user_id)
+    {
+        return User::select('users.id', 'users.name', 'users.email', 'lokacijas.l_naziv', 'lokacijas.mesto', 'pozicija_tips.naziv')
+                    ->leftJoin('lokacijas', 'users.lokacijaId', '=', 'lokacijas.id')
+                    ->leftJoin('pozicija_tips', 'users.pozicija_tipId', '=', 'pozicija_tips.id')
+                    ->where('users.id', '=', $user_id)
+                    ->first();
+    }
+    private function selectedTerminalTiketInfo(){
+        return TerminalLokacija::select('terminal_lokacijas.*', 'terminals.sn', 'terminals.terminal_tipId as tid', 'terminal_status_tips.ts_naziv', 'lokacijas.l_naziv', 'lokacijas.mesto', 'lokacija_kontakt_osobas.name', 'lokacija_kontakt_osobas.tel', 'regions.r_naziv', 'regions.id as rid')
+                    ->leftJoin('terminals', 'terminal_lokacijas.terminalId', '=', 'terminals.id')
+                    ->leftJoin('terminal_status_tips', 'terminal_lokacijas.terminal_statusId', '=', 'terminal_status_tips.id')
+                    ->leftJoin('lokacijas', 'terminal_lokacijas.lokacijaId', '=', 'lokacijas.id')
+                    ->leftJoin('lokacija_kontakt_osobas', 'lokacijas.id', '=', 'lokacija_kontakt_osobas.lokacijaId')
+                    ->leftJoin('regions', 'lokacijas.regionId', '=', 'regions.id')
+                    ->where('terminalId', $this->newTiketTerminalId)
+                    -> first();
+    }
+
+     /**
+     * Pronadji korisnika kome dodeljujes tiket
+     *
+     * @return void
+     */
+    public function searchUser()
+    {
+        return User::select('users.id', 'users.name', 'lokacijas.l_naziv', 'pozicija_tips.naziv')
+                    ->leftJoin('lokacijas', 'users.lokacijaId', '=', 'lokacijas.id')
+                    ->leftJoin('pozicija_tips', 'users.pozicija_tipId', '=', 'pozicija_tips.id')
+                    ->leftJoin('regions', 'regions.id', '=', 'lokacijas.regionId')
+                    ->where('name', 'like', '%'.$this->searchUserName.'%')
+                    ->where('l_naziv', 'like', '%'.$this->searchUserLokacija.'%')
+                    ->where('naziv', 'like', '%'.$this->searchUserPozicija.'%')
+                    ->when($this->tiketAkcija[1] == "region", function ($rtval){
+                        return $rtval->where('regions.id', '=', $this->userRegion);
+                    })
+                    ->paginate(Config::get('global.modal_search'), ['*'], 'usersp');
+    }    
+
+     /**
+     * prioritetInfo
+     *
+     * @return void
+     */
+    private function prioritetInfo()
+    {
+        return TiketPrioritetTip::where('id', '=', $this->prioritetTiketa)->first();
+    }
+
     /**
      * Put your custom public properties here!
      */
+    public function mount()
+    {
+        $this->userPozicija = auth()->user()->pozicija_tipId;
 
+        $akcija = TiketAkcijaKorisnikPozicija::select('tiket_akcija_tips.id as akcijaid', 'tiket_akcija_tips.tiket_akcija', 'tiket_akcija_vrednost_tips.id as vrednostId', 'tiket_akcija_vrednost_tips.akcija_vrednost_opis')
+        ->leftJoin('tiket_akcija_tips', 'tiket_akcija_tips.id', '=', 'tiket_akcija_korisnik_pozicijas.tiket_akcijaId')
+        ->leftJoin('tiket_akcija_vrednost_tips', 'tiket_akcija_vrednost_tips.id', '=', 'tiket_akcija_korisnik_pozicijas.tiket_akcijavrednostId')
+        ->where('tiket_akcija_korisnik_pozicijas.korisnik_pozicijaId', '=', auth()->user()->pozicija_tipId)
+        ->get();
+        foreach ($akcija as $value){
+            $this->tiketAkcija[$value->akcijaid] = $value->akcija_vrednost_opis;
+        }
+
+        $region = Lokacija::select('regions.id as rid')
+                                ->leftJoin('regions', 'regions.id', '=', 'lokacijas.regionId')
+                                ->where('lokacijas.id', '=', auth()->user()->lokacijaId)
+                                ->first();
+        $this->userRegion = $region->rid;
+    }
     /**
      * The validation rules
      *
@@ -71,9 +332,16 @@ class Terminal extends Component
      */
     public function rules()
     {
-        return [
+        if($this->newTiketVisible){
+            return [
+                'opisKvaraList' => 'required' 
+            ];
+        }else{
+            return [
 
-        ];
+            ];
+        }
+        
     }
 
     /**
@@ -229,11 +497,13 @@ class Terminal extends Component
      * @return void
      */
     private function selectedTerminalInfo(){
-        return TerminalLokacija::select('terminal_lokacijas.*', 'terminals.sn', 'terminal_status_tips.ts_naziv', 'lokacijas.l_naziv', 'lokacijas.mesto')
-        ->where('terminalId', $this->modelId)
+        return TerminalLokacija::select('terminal_lokacijas.*', 'terminals.sn', 'terminals.terminal_tipId as tid', 'terminal_status_tips.ts_naziv', 'lokacijas.l_naziv', 'lokacijas.mesto', 'lokacija_kontakt_osobas.name', 'lokacija_kontakt_osobas.tel', 'regions.r_naziv', 'regions.id as rid')
         ->leftJoin('terminals', 'terminal_lokacijas.terminalId', '=', 'terminals.id')
         ->leftJoin('terminal_status_tips', 'terminal_lokacijas.terminal_statusId', '=', 'terminal_status_tips.id')
         ->leftJoin('lokacijas', 'terminal_lokacijas.lokacijaId', '=', 'lokacijas.id')
+        ->leftJoin('lokacija_kontakt_osobas', 'lokacijas.id', '=', 'lokacija_kontakt_osobas.lokacijaId')
+        ->leftJoin('regions', 'lokacijas.regionId', '=', 'regions.id')
+        ->where('terminalId', $this->modelId)
         -> first();
     }
 
@@ -323,6 +593,15 @@ class Terminal extends Component
 
         if($this->multiSelected && ($this->modalFormVisible || $this->modalConfirmPremestiVisible)){
             $this->multiSelectedInfo = $this->multiSelectedTInfo();
+        }
+
+        if($this->newTiketVisible){
+            $this->newTerminalInfo = $this->selectedTerminalTiketInfo();
+            $this->prioritetInfo = $this->prioritetInfo();
+
+            if($this->dodeljenUserId){
+                $this->dodeljenUserInfo = $this->selectedUserInfo($this->dodeljenUserId);
+            }
         }
     }
 
