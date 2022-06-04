@@ -476,8 +476,13 @@ class Terminal extends Component
     }    
 
     public function premestiSelectedShowModal(){
+        
         $this->multiSelected = true;
         $this->multiSelectedInfo = $this->multiSelectedTInfo();
+
+        //status na listi se setuje prema prvom izabranom terminalu
+        $this->modalStatusPremesti = TerminalLokacija::where('terminalId', $this->selsectedTerminals[0])->first()->terminal_statusId;
+        //dd($this->modalStatusPremesti);
 
         $this->plokacijaTip = 0;
         $this->plokacija = 0;
