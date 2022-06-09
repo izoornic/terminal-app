@@ -131,7 +131,7 @@ class Tikets extends Component
 
        // searchStatus
 
-        $rtval = Tiket::select('tikets.id as tikid', 'tikets.created_at', 'tikets.updated_at', 'tikets.br_komentara','lokacijas.l_naziv', 'lokacijas.mesto', 'terminals.sn', 'users.name', 'tiket_status_tips.tks_naziv', 'tiket_prioritet_tips.tp_naziv', 'tiket_prioritet_tips.btn_collor', 'tiket_prioritet_tips.tr_bg_collor', 'regions.r_naziv')
+        $rtval = Tiket::select('tikets.id as tikid', 'tikets.created_at', 'tikets.updated_at', 'tikets.br_komentara','lokacijas.l_naziv', 'lokacijas.mesto', 'terminals.sn', 'users.name','tiket_status_tips.id as tstid', 'tiket_status_tips.tks_naziv', 'tiket_prioritet_tips.tp_naziv', 'tiket_prioritet_tips.btn_collor', 'tiket_prioritet_tips.tr_bg_collor', 'regions.r_naziv')
             ->leftJoin('tiket_status_tips', 'tikets.tiket_statusId', '=', 'tiket_status_tips.id')
             ->leftJoin('tiket_prioritet_tips', 'tikets.tiket_prioritetId', '=', 'tiket_prioritet_tips.id')
             ->leftJoin('users', 'tikets.korisnik_dodeljenId', '=', 'users.id')

@@ -12,7 +12,7 @@ class TiketOpisKvaraTip extends Model
     public static function opisList($id)
     {
         $kvar_list =[];
-        foreach(TiketOpisKvaraTip::where('termnal_tipId', '=', $id)->get() as $kvar){
+        foreach(TiketOpisKvaraTip::where('termnal_tipId', '=', $id)->orderBy('list_order')->get() as $kvar){
             $kvar_list[$kvar->id] = $kvar->tok_naziv;
         }
         return  $kvar_list;

@@ -38,7 +38,10 @@
                     <a href="{{ route( 'tiket' ) }}"><span class="flex-none py-2 px-4 mx-2 font-bold rounded bg-{{$prioritetInfo->tr_bg_collor}} text-{{$prioritetInfo->btn_collor}}">TIKETI</span></a>
                     <br />
                     <p>Tiket zatvorio: <span class="font-bold">@if($zatvorioId > 0){{ $this->zatvorioInfo()->name }} @endif</span></p>
-                    @endif</div>
+                    @endif
+                    @if($curentUserPozicija == 1)<div class="py-4"><x-jet-button wire:click="obrisiTiketShowModal" title='promeni status'><svg class="fill-current w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Pro 6.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M135.2 17.69C140.6 6.848 151.7 0 163.8 0H284.2C296.3 0 307.4 6.848 312.8 17.69L320 32H416C433.7 32 448 46.33 448 64C448 81.67 433.7 96 416 96H32C14.33 96 0 81.67 0 64C0 46.33 14.33 32 32 32H128L135.2 17.69zM31.1 128H416V448C416 483.3 387.3 512 352 512H95.1C60.65 512 31.1 483.3 31.1 448V128zM111.1 208V432C111.1 440.8 119.2 448 127.1 448C136.8 448 143.1 440.8 143.1 432V208C143.1 199.2 136.8 192 127.1 192C119.2 192 111.1 199.2 111.1 208zM207.1 208V432C207.1 440.8 215.2 448 223.1 448C232.8 448 240 440.8 240 432V208C240 199.2 232.8 192 223.1 192C215.2 192 207.1 199.2 207.1 208zM304 208V432C304 440.8 311.2 448 320 448C328.8 448 336 440.8 336 432V208C336 199.2 328.8 192 320 192C311.2 192 304 199.2 304 208z"/></svg> obriši tiket</x-jet-button></div>
+                        @endif
+                    </div>
             </div> 
         </div> 
     </div>
@@ -241,6 +244,30 @@
             </x-jet-secondary-button>
                 <x-jet-danger-button class="ml-2" wire:click="closeTiket" wire:loading.attr="disabled">
                     {{ __('Zatvori tiket') }}
+                </x-jet-danger-button>         
+        </x-slot>
+    </x-jet-dialog-modal>
+
+    {{-- Obrisi tiket MODAL --}}
+    <x-jet-dialog-modal wire:model="obrisiTiketModalVisible">
+        <x-slot name="title">
+        <svg class="fill-current float-left w-6 h-4 mr-4 mt-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Pro 6.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M135.2 17.69C140.6 6.848 151.7 0 163.8 0H284.2C296.3 0 307.4 6.848 312.8 17.69L320 32H416C433.7 32 448 46.33 448 64C448 81.67 433.7 96 416 96H32C14.33 96 0 81.67 0 64C0 46.33 14.33 32 32 32H128L135.2 17.69zM31.1 128H416V448C416 483.3 387.3 512 352 512H95.1C60.65 512 31.1 483.3 31.1 448V128zM111.1 208V432C111.1 440.8 119.2 448 127.1 448C136.8 448 143.1 440.8 143.1 432V208C143.1 199.2 136.8 192 127.1 192C119.2 192 111.1 199.2 111.1 208zM207.1 208V432C207.1 440.8 215.2 448 223.1 448C232.8 448 240 440.8 240 432V208C240 199.2 232.8 192 223.1 192C215.2 192 207.1 199.2 207.1 208zM304 208V432C304 440.8 311.2 448 320 448C328.8 448 336 440.8 336 432V208C336 199.2 328.8 192 320 192C311.2 192 304 199.2 304 208z"/></svg> 
+        Obriši tiket
+    </x-slot>
+
+        <x-slot name="content">
+            <p class="font-bold my-4">Da li ste sigurni da želite da obrišete tiket #{{ $tikid }} ?</p>
+            <hr/>
+            <p class="py-4"><svg class="fill-red-600 float-left w-4 h-4 mr-4 mt-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Pro 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M256 0C114.6 0 0 114.6 0 256s114.6 256 256 256s256-114.6 256-256S397.4 0 256 0zM232 152C232 138.8 242.8 128 256 128s24 10.75 24 24v128c0 13.25-10.75 24-24 24S232 293.3 232 280V152zM256 400c-17.36 0-31.44-14.08-31.44-31.44c0-17.36 14.07-31.44 31.44-31.44s31.44 14.08 31.44 31.44C287.4 385.9 273.4 400 256 400z"/></svg>Brisanjem tiketa brišete sve dodate komentare.</p> 
+            <p><svg class="fill-red-600 float-left w-4 h-4 mr-4 mt-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Pro 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M256 0C114.6 0 0 114.6 0 256s114.6 256 256 256s256-114.6 256-256S397.4 0 256 0zM232 152C232 138.8 242.8 128 256 128s24 10.75 24 24v128c0 13.25-10.75 24-24 24S232 293.3 232 280V152zM256 400c-17.36 0-31.44-14.08-31.44-31.44c0-17.36 14.07-31.44 31.44-31.44s31.44 14.08 31.44 31.44C287.4 385.9 273.4 400 256 400z"/></svg>Tiket neće biti vidljiv u istoriji terminala!</p>
+        </x-slot>
+
+        <x-slot name="footer">
+        <x-jet-secondary-button wire:click="$toggle('obrisiTiketModalVisible')" wire:loading.attr="disabled">
+                {{ __('Otkaži') }}
+            </x-jet-secondary-button>
+                <x-jet-danger-button class="ml-2" wire:click="deleteTiket" wire:loading.attr="disabled">
+                    {{ __('Obriši tiket') }}
                 </x-jet-danger-button>         
         </x-slot>
     </x-jet-dialog-modal>

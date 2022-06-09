@@ -62,6 +62,11 @@ class Tiketview extends Component
 
     public $zatvorioId;
     public $curentUserPozicija;
+
+    public $obrisiTiketModalVisible;
+
+    
+
     /**
      * mount
      *
@@ -166,7 +171,7 @@ class Tiketview extends Component
                     ->get();
     }
 
-        /**
+    /**
      * Info o izabranom terminalu 
      *
      * @return void
@@ -180,7 +185,7 @@ class Tiketview extends Component
                     ->leftJoin('lokacija_kontakt_osobas', 'lokacijas.id', '=', 'lokacija_kontakt_osobas.lokacijaId')
                     ->leftJoin('regions', 'lokacijas.regionId', '=', 'regions.id')
                     -> first();
-}
+    }
 
     
     /**
@@ -490,6 +495,29 @@ class Tiketview extends Component
             }
 
         $this->modalZatvoriTiketVisible = false;
+        $this->emit('tiketRefresh');
+    }
+
+    public function obrisiTiketShowModal()
+    {
+        $this->obrisiTiketModalVisible = true;
+    }
+
+    public function deleteTiket()
+    {
+        DB::transaction(function(){
+            DB::transaction(function(){
+                //prvo komentari 
+                TiketKomentar::where('tiketId', $this->tikid)->delete();
+                //sad istorija tiketa
+                TiketHistory::where('tiketId', $this->tikid)->delete();
+                //sad tiket it self
+                Tiket::where('id', $this->tikid)->delete();
+            });
+        });
+
+        $this->validTiket = false;
+        $this->obrisiTiketModalVisible = false;
         $this->emit('tiketRefresh');
     }
 

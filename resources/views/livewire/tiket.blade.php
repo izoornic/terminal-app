@@ -73,7 +73,7 @@
                                     $dateCreate = explode('-', App\Http\Helpers::datumFormat($item->created_at));
                                     $dateUpdate = explode('-', App\Http\Helpers::datumFormat($item->updated_at));
                                 @endphp
-                                    <tr>
+                                    <tr class="@if($item->tstid == 3) bg-emerald-50 @endif">
                                         <td class="px-2 py-2">{{ $item->tikid }}</td>
                                         <td class="px-2 pr-2">{{ $dateCreate[0] }}<br />{{ $dateCreate[1] }}</td>
                                         <td class="px-2 pr-2">{{ $dateUpdate[0] }}<br />{{ $dateUpdate[1] }}</td>
