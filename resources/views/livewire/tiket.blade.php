@@ -114,7 +114,7 @@
         </x-slot>
 
         <x-slot name="content">
-        @if(!$newTerminalId)
+        @if(!$newTerminalLokacijaId)
             {{-- Nadji terminal --}}
             <table class="min-w-full divide-y divide-gray-200 mt-4" style="width: 100% !important">
                 <thead>
@@ -133,7 +133,7 @@
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200"> 
                 @foreach ($this->searchTerminal() as $value)
-                    <tr class="hover:bg-gray-100" wire:click="$set('newTerminalId', {{ $value->id }})" >    
+                    <tr class="hover:bg-gray-100" wire:click="$set('newTerminalLokacijaId', {{ $value->id }})" >    
                             <td></td>
                             <td>{{ $value->sn }}</td>
                             <td>{{ $value->l_naziv}}</td>
@@ -148,11 +148,11 @@
         @else
            {{-- Nasao terminal bira dalje --}}
            {{-- Sada proveravamo dali terminal ima otvoren tiket --}}
-           @if(App\Models\Tiket::daliTerminalImaOtvorenTiket($newTerminalId))
+           @if(App\Models\Tiket::daliTerminalImaOtvorenTiket($newTerminalLokacijaId))
                 {{-- PRIKAZ GRESKE --}}
                 <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative my-4" role="alert">
                     <strong class="font-bold">Greška!</strong>
-                    <span class="block sm:inline">Terminal ima aktivan Tiket. Otvoren: {{ App\Http\Helpers::datumFormat(App\Models\Tiket::daliTerminalImaOtvorenTiket($newTerminalId)->created_at) }}</span>
+                    <span class="block sm:inline">Terminal ima aktivan Tiket. Otvoren: {{ App\Http\Helpers::datumFormat(App\Models\Tiket::daliTerminalImaOtvorenTiket($newTerminalLokacijaId)->created_at) }}</span>
                     <span class="absolute top-0 bottom-0 right-0 px-4 py-3">
                         <svg class="fill-current h-6 w-6 text-red-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Pro 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M506.3 417l-213.3-364c-16.33-28-57.54-28-73.98 0l-213.2 364C-10.59 444.9 9.849 480 42.74 480h426.6C502.1 480 522.6 445 506.3 417zM232 168c0-13.25 10.75-24 24-24S280 154.8 280 168v128c0 13.25-10.75 24-23.1 24S232 309.3 232 296V168zM256 416c-17.36 0-31.44-14.08-31.44-31.44c0-17.36 14.07-31.44 31.44-31.44s31.44 14.08 31.44 31.44C287.4 401.9 273.4 416 256 416z"/></svg>
                     </span>
@@ -297,7 +297,7 @@
                     </x-jet-danger-button>     
                 @endif 
             @else
-                @if($prioritetTiketa && !App\Models\Tiket::daliTerminalImaOtvorenTiket($newTerminalId))
+                @if($prioritetTiketa && !App\Models\Tiket::daliTerminalImaOtvorenTiket($newTerminalLokacijaId))
                     <x-jet-danger-button class="ml-2" wire:click="createCallCentar(false)" wire:loading.attr="disabled">
                     <svg class="float-left fill-current w-4 h-4 mr-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 384"><path d="M576,208V128a64,64,0,0,0-64-64H64A64,64,0,0,0,0,128v80a48,48,0,0,1,48,48A48,48,0,0,1,0,304v80a64,64,0,0,0,64,64H512a64.06,64.06,0,0,0,64-64V304a48,48,0,0,1,0-96ZM438,286.5H318.5V406h-61V286.5H138v-61H257.5V106h61V225.5H438Z" transform="translate(0 -64)"/></svg>
                         {{ __('Otvori tiket') }}

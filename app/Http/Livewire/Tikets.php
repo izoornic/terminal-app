@@ -51,7 +51,7 @@ class Tikets extends Component
     public $searchTerminalSn;
     
     //terminal_lokacija id izabranog terminala
-    public $newTerminalId;
+    public $newTerminalLokacijaId;
     //info o izabranom terminalu iz baze
     public $newTerminalInfo;
     //opis kvara izabran iz liste
@@ -205,7 +205,7 @@ class Tikets extends Component
     private function resetAll()
     {
         $this->newPretragaPo = 0;
-        $this->newTerminalId = 0;
+        $this->newTerminalLokacijaId = 0;
         $this->searchTerminalLokacijaNaziv = '';
         $this->searchTerminalMesto = '';
         $this->searchTerminalSn = '';
@@ -230,7 +230,7 @@ class Tikets extends Component
      */
     public function searchTerminal() 
     {
-        return TerminalLokacija::select('terminal_lokacijas.id', 'lokacijas.l_naziv', 'lokacijas.mesto', 'terminals.sn')
+        return TerminalLokacija::select('terminal_lokacijas.id', 'terminal_lokacijas.terminalId' ,'lokacijas.l_naziv', 'lokacijas.mesto', 'terminals.sn')
                 ->leftJoin('lokacijas', 'lokacijas.id', '=', 'terminal_lokacijas.lokacijaId')
                 ->leftJoin('terminals', 'terminals.id', '=', 'terminal_lokacijas.terminalId')
                 ->leftJoin('regions', 'lokacijas.regionId', '=', 'regions.id')
@@ -256,7 +256,7 @@ class Tikets extends Component
                     ->leftJoin('lokacijas', 'terminal_lokacijas.lokacijaId', '=', 'lokacijas.id')
                     ->leftJoin('lokacija_kontakt_osobas', 'lokacijas.id', '=', 'lokacija_kontakt_osobas.lokacijaId')
                     ->leftJoin('regions', 'lokacijas.regionId', '=', 'regions.id')
-                    ->where('terminal_lokacijas.id', $this->newTerminalId)
+                    ->where('terminal_lokacijas.id', $this->newTerminalLokacijaId)
                     -> first();
     }
     
@@ -431,7 +431,7 @@ class Tikets extends Component
     public function modelData()
     {
         return [ 
-            'tremina_lokacijalId'   =>  $this->newTerminalId,
+            'tremina_lokacijalId'   =>  $this->newTerminalLokacijaId,
             'tiket_statusId'        =>  $this->tiketStatusId,
             'opis_kvaraId'          =>  $this->opisKvaraList,
             'korisnik_prijavaId'    =>  auth()->user()->id,

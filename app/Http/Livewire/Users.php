@@ -293,7 +293,7 @@ class Users extends Component
                 User::destroy($this->modelId);
             });
         } catch (\Throwable $th) {
-            abort(403, 'Unauthorized action.');
+            abort(403, 'Unauthorized action!.');
         }
         $this->modalConfirmDeleteVisible = false;
         $this->resetPage();

@@ -112,7 +112,9 @@ class Tiketview extends Component
                 }
             }
             
-            $curTiket = Tiket::select('korisnik_prijavaId', 'korisnik_dodeljenId', 'tiket_prioritetId', 'korisnik_zatvorio_id')->where('tikets.id', '=', $this->tikid)->first();
+            $curTiket = Tiket::select('korisnik_prijavaId', 'korisnik_dodeljenId', 'tiket_prioritetId', 'korisnik_zatvorio_id')
+                                    ->where('tikets.id', '=', $this->tikid)
+                                    ->first();
             $this->prioritetTiketa = $curTiket->tiket_prioritetId;
             $this->dodeljenUserId = $curTiket->korisnik_dodeljenId;
             $this->zatvorioId = $curTiket->korisnik_zatvorio_id;
@@ -178,7 +180,7 @@ class Tiketview extends Component
      */
     public function selectedTerminalInfo(){
         return TerminalLokacija::select('terminal_lokacijas.*', 'terminals.sn', 'terminal_status_tips.ts_naziv', 'lokacijas.l_naziv', 'lokacijas.mesto', 'lokacija_kontakt_osobas.name', 'lokacija_kontakt_osobas.tel', 'regions.r_naziv')
-                    ->where('terminalId',  $this->tiket->tremina_lokacijalId)
+                    ->where('terminal_lokacijas.id',  $this->tiket->tremina_lokacijalId)
                     ->leftJoin('terminals', 'terminal_lokacijas.terminalId', '=', 'terminals.id')
                     ->leftJoin('terminal_status_tips', 'terminal_lokacijas.terminal_statusId', '=', 'terminal_status_tips.id')
                     ->leftJoin('lokacijas', 'terminal_lokacijas.lokacijaId', '=', 'lokacijas.id')

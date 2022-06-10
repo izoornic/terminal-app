@@ -70,7 +70,7 @@ class Terminal extends Component
     public $userPozicija;
     public $prioritetTiketa;
     public $newTerminalInfo;
-    public $newTiketTerminalId;
+    public $newTiketTerminalLokacijaId;
     public $prioritetInfo;
     public $opisKvaraList;
     public $tiketStatusId;
@@ -103,7 +103,7 @@ class Terminal extends Component
         $this->dodeljenUserId = null;
 
         $this->prioritetTiketa = 4;
-        $this->newTiketTerminalId = $tid;
+        $this->newTiketTerminalLokacijaId = TerminalLokacija::select('id')->where('terminalId', '=', $tid)->first()->id;
         $this->modelId = $tid;
         $this->newTerminalInfo = $this->selectedTerminalTiketInfo();
         $this->prioritetInfo = $this->prioritetInfo();
@@ -189,7 +189,7 @@ class Terminal extends Component
     public function modelTiketData()
     {
         return [ 
-            'tremina_lokacijalId'   =>  $this->newTiketTerminalId,
+            'tremina_lokacijalId'   =>  $this->newTiketTerminalLokacijaId,
             'tiket_statusId'        =>  $this->tiketStatusId,
             'opis_kvaraId'          =>  $this->opisKvaraList,
             'korisnik_prijavaId'    =>  auth()->user()->id,
@@ -269,7 +269,7 @@ class Terminal extends Component
                     ->leftJoin('lokacijas', 'terminal_lokacijas.lokacijaId', '=', 'lokacijas.id')
                     ->leftJoin('lokacija_kontakt_osobas', 'lokacijas.id', '=', 'lokacija_kontakt_osobas.lokacijaId')
                     ->leftJoin('regions', 'lokacijas.regionId', '=', 'regions.id')
-                    ->where('terminalId', $this->newTiketTerminalId)
+                    ->where('terminal_lokacijas.id', $this->newTiketTerminalLokacijaId)
                     -> first();
     }
 

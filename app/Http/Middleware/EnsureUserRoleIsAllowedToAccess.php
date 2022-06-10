@@ -20,7 +20,6 @@ class EnsureUserRoleIsAllowedToAccess
      */
     public function handle(Request $request, Closure $next)
     {
-
         try {
             $userRole = auth()->user()->pozicija_tipId;
             $currentRouteName = Route::currentRouteName();
@@ -28,10 +27,10 @@ class EnsureUserRoleIsAllowedToAccess
             if (PozicijaPrikazStranica::isRoleHasRightToAccess($userRole, $currentRouteName)) {
                 return $next($request);
             } else {
-                abort(403, 'Unauthorized action 2.');
+                abort(403, 'Unauthorized action 203.');
             }
         } catch (\Throwable $th) {
-            abort(403, 'Unauthorized action.');
+            abort(403, 'Unauthorized action 204.');
         }
     }
 
