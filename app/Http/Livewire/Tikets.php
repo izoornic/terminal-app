@@ -256,7 +256,7 @@ class Tikets extends Component
                     ->leftJoin('lokacijas', 'terminal_lokacijas.lokacijaId', '=', 'lokacijas.id')
                     ->leftJoin('lokacija_kontakt_osobas', 'lokacijas.id', '=', 'lokacija_kontakt_osobas.lokacijaId')
                     ->leftJoin('regions', 'lokacijas.regionId', '=', 'regions.id')
-                    ->where('terminalId', $this->newTerminalId)
+                    ->where('terminal_lokacijas.id', $this->newTerminalId)
                     -> first();
     }
     
