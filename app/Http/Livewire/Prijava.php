@@ -81,7 +81,7 @@ class Prijava extends Component
         //$resp = Http::asForm()->post($path, $data);
         //$request = Request::create( $path, $method, $data );
         //$response = Route::dispatch( $request );
-        //dd($data);
+        dd($data);
     }
 
     /**
