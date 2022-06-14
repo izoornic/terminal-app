@@ -13,6 +13,7 @@ use App\Models\SmsLog;
 use App\Http\SmsResponse;
 
 use App\Models\TerminalLokacija;
+use Validator;
 
 class Prijava extends Component
 {
@@ -30,6 +31,7 @@ class Prijava extends Component
     public function mount()
     {
         $this->searchClick = false;
+        //$this->serialNum = 'A26-12RB-1K13684';
     }
     
     /**
@@ -44,7 +46,7 @@ class Prijava extends Component
         $this->terminal = $this->selectedTerminalInfo();
         return [  
             'opisKvaraList' => 'required',
-            'telefon' => 'phone:RS,mobile',
+            'telefon' => ['phone:RS,mobile', 'required'],
             'prijavaIme' => 'required'
         ];
     }
