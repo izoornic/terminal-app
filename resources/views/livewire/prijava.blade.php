@@ -53,17 +53,12 @@
                             <p>Staus: <span class="font-bold">{{ $terminal->ts_naziv }}</span></p>
                             <p>Lokacija:  <span class="font-bold">{{ $terminal->l_naziv }}</span>, {{$terminal->mesto}}</p>
                             <p>Region:  <span class="font-bold">{{ $terminal->r_naziv }}</span></p>
-                            <div class="mt-4">
-                                <svg class="float-left fill-current w-6 h-4 mr-2 mt-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 448"><defs><style>.a{fill:#fff;}</style></defs><path d="M512,0H64A64,64,0,0,0,0,64V384a64,64,0,0,0,64,64H512a64,64,0,0,0,64-64V64A64,64,0,0,0,512,0Z"/><circle class="a" cx="186.65" cy="137.79" r="86.21"/><path class="a" d="M382.28,317.58h133a25,25,0,0,0,24.94-24.94V76.51a25,25,0,0,0-24.94-24.94h-133a24.94,24.94,0,0,0-24.93,24.94V292.64A24.94,24.94,0,0,0,382.28,317.58Zm83.13-24.94H431.69c-4.1,0-7.84-3.74-7.84-8.31a8.34,8.34,0,0,1,8.31-8.32h33.25c4.57,0,8.31,3.74,8.31,7.85A8.45,8.45,0,0,1,465.41,292.64ZM390.6,84.82H507V251.08H390.6Z"/><path class="a" d="M57.33,396.43H316a21.61,21.61,0,0,0,21.55-21.55A107.77,107.77,0,0,0,229.76,267.11H143.54A107.76,107.76,0,0,0,35.77,374.88,21.59,21.59,0,0,0,57.33,396.43Z"/></svg>
-                                <span class='font-bold'>{{ $terminal->name }}<br/>
-                                {{ $terminal->tel }}</span>
-                            </div>
                         </div>
                     </div>
                 </div>
 
                 <div class="mt-4">
-                        <x-jet-label for="opisKvaraList" value="{{ __('Izaberi kvar iz liste') }}" />
+                        <x-jet-label for="opisKvaraList" value="{{ __('Izaberite kvar iz liste:') }}" />
                         <select wire:model="opisKvaraList" id="" class="block appearance-none w-full border border-1 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
                         <option value="0">---</option>    
                             @foreach (App\Models\TiketOpisKvaraTip::opisList($terminal->tid) as $key => $value)    
@@ -75,22 +70,41 @@
                 
 
                     <div class="mt-4">
-                        <x-jet-label for="opis_kvara" value="{{ __('Opis kvara') }}" />
+                        <x-jet-label for="opis_kvara" value="{{ __('Opis kvara:') }}" />
                         <x-jet-textarea id="opis_kvara" type="textarea" class="mt-1 block w-full disabled:opacity-50" wire:model.defer="opisKvataTxt" />
                         @error('opis_kvara') <span class="error">{{ $message }}</span> @enderror
                     </div> 
 
                     @if($opisKvaraList != 0)
-                    <p>Ovde ide logika za telefon</p>
+                    <div class="mt-4">
+                      <p class="font-bold">Unesite ime i broj telefona na koji će Vam biti poslat verifikacioni kod.</p>
+                    </div>
+                    <div class="mt-4">
+                        <x-jet-label for="prijavaIme" value="{{ __('Ime i prezime:') }}" />
+                        <x-jet-input wire:model="prijavaIme" id="" class="block mt-1 w-full" type="text" />
+                        @error('prijavaIme') <span class="error">{{ $message }}</span> @enderror
+                    </div> 
+                    <div class="mt-4">
+                      <x-jet-label for="telefon" value="{{ __('Broj telefona:') }}" />
+                      <div class="mt-4 flex rounded-md shadow-sm">
+                      
+                          <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-m">
+                            +381
+                          </span>
+                          <input wire:model.difer="telefon" class="form-input flex-1 block w-full rounded-none rounded-r-md transition duration-150 ease-in-out sm:text-sm sm:leading-5" >
+                          @error('telefon') &nbsp;<span class="error">{{ $message }}</span>@enderror
+                      </div>
+                    </div> 
+
+                    </div>
+                      <div class="px-4 py-3 bg-gray-50 text-right sm:px-6">
+                        <button wire:click="sendSMS" type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Save</button>
+                      </div>
+                    </div>
+
                     @endif
                 @endif
             @endif
-            
-          </div>
-          <div class="px-4 py-3 bg-gray-50 text-right sm:px-6">
-            <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Save</button>
-          </div>
-        </div>
       
     </div>
   </div>

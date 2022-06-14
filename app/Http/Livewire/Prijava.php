@@ -7,6 +7,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Http\Client\Response;
+
+use App\Models\SmsLog;
+
 use App\Http\SmsResponse;
 
 use App\Models\TerminalLokacija;
@@ -19,54 +22,64 @@ class Prijava extends Component
     public $searchClick;
     public $opisKvaraList;
     public $opisKvataTxt;
+    public $telefon;
+    public $prijavaIme;
+    public $verifikacioniKod;
    // public $LocSMS;
 
     public function mount()
     {
         $this->searchClick = false;
-        $data = [   
-            'ANI'=>'381637265275', 
-            'DNIS'=>'Epos Servis', 
-            'poruka'=>'Verifikacioni kod je: 123 456', 
-            'pwd'=>'ZetaSysteM0513', 
-            'guid'=>'987654',
-            'tip'=>'BULK'
-    ];
-        //$this->LocSMS = "HOHI"; //$this->sendSMS();
-        //dd($this->LocSMS);
-        //$this->LocSMS = Http::get('212.62.32.60/BulkWS/SagaBgd.SeP.SMS.BulkStruct.asmx/BulkNizSeparator?ANI=381637265275&DNIS=Epos servis&poruka=Poruka 3&pwd=ZetaSysteM0513&guid=123456&tip=BULK');
-        //$resp = Http::asForm()->post('212.62.32.60/BulkWS/SagaBgd.SeP.SMS.BulkStruct.asmx/BulkNizSeparator', $data);
-        //print_r($this->LocSMS);
-        //print_r($resp->transferStats->response);
-        //dd($resp->transferStats);
     }
-
+    
+    /**
+     * rules
+     *
+     * @return void
+     */
+    public function rules()
+    {
+        //kakva glupost!!! Ako ne updatujem ovde ne vidi podatke o terminalu....
+        // 'telefon' => ['required', 'digits_between:8,11'],
+        $this->terminal = $this->selectedTerminalInfo();
+        return [  
+            'opisKvaraList' => 'required',
+            'telefon' => 'phone:RS,mobile',
+            'prijavaIme' => 'required'
+        ];
+    }
+    
     public function SearchTerminal()
     {
         $this->terminal = $this->selectedTerminalInfo();
         $this->searchClick = true;
         //dd($this->terminal);
-        $this->serialNum;
+        $this->telefon = '';
+        $this->prijavaIme = '';
+
     }
     
     public function sendSMS()
     {
-        $this->koko = 'Upadd';
-       
-        /* $path = '212.62.32.60/BulkWS/SagaBgd.SeP.SMS.BulkStruct.asmx/BulkNizSeparator';
+        if(substr($this->telefon, 0, 1) == '0') $this->telefon = ltrim($this->telefon,"0");
+        $this->validate();
+        //dd($this->telefon);
+        $this->verifikacioniKod = $this->createVerificationCode();
+        //insert data to DB and then send SMS
+
+        $path = '212.62.32.60/BulkWS/SagaBgd.SeP.SMS.BulkStruct.asmx/BulkNizSeparator';
         $method = 'POST';
-        //$data = 'ANI=381637265275&DNIS=Epos Servis&poruka=Verifikacioni kod je: 123 456&pwd=ZetaSysteM0513&guid=987654&tip=BULK';
-        $data = [   'ANI'=>'381637265275', 
-                    'DNIS'=>'Epos Servis', 
-                    'poruka'=>'Verifikacioni kod je: 123 456', 
+        $data = [   'ANI'=>'381'.$this->telefon, 
+                    'DNIS'=>'Zeta System EPOS', 
+                    'poruka'=>'Verifikacioni kod je: '.$this->verifikacioniKod, 
                     'pwd'=>'ZetaSysteM0513', 
-                    'guid'=>'987654',
+                    'guid'=>$this->selectedTerminalInfo()->id,
                     'tip'=>'BULK'
                 ];
-        $request = Request::create( $path, $method, $data );
-        return $response = Route::dispatch( $request ); */
-        //$response = Http::get('212.62.32.60/BulkWS/SagaBgd.SeP.SMS.BulkStruct.asmx/BulkNizSeparator?ANI=381637265275&DNIS=Epos servis&poruka=Poruka 3&pwd=ZetaSysteM0513&guid=123456&tip=BULK');
-        $this->LocSMS = 'U funkciji';//$response;
+        //$resp = Http::asForm()->post($path, $data);
+        //$request = Request::create( $path, $method, $data );
+        //$response = Route::dispatch( $request );
+        //dd($data);
     }
 
     /**
@@ -75,7 +88,7 @@ class Prijava extends Component
      * @return void
      */
     public function selectedTerminalInfo(){
-        return TerminalLokacija::select('terminal_lokacijas.*', 'terminals.terminal_tipId as tid', 'terminals.sn', 'terminal_status_tips.ts_naziv', 'lokacijas.l_naziv', 'lokacijas.mesto', 'lokacija_kontakt_osobas.name', 'lokacija_kontakt_osobas.tel', 'regions.r_naziv')
+        return TerminalLokacija::select('terminal_lokacijas.*', 'terminals.terminal_tipId as tid', 'terminal_status_tips.ts_naziv', 'lokacijas.l_naziv', 'lokacijas.mesto', 'lokacija_kontakt_osobas.name', 'lokacija_kontakt_osobas.tel', 'regions.r_naziv')
                     ->where('terminals.sn',  $this->serialNum)
                     ->leftJoin('terminals', 'terminal_lokacijas.terminalId', '=', 'terminals.id')
                     ->leftJoin('terminal_status_tips', 'terminal_lokacijas.terminal_statusId', '=', 'terminal_status_tips.id')
@@ -83,6 +96,11 @@ class Prijava extends Component
                     ->leftJoin('lokacija_kontakt_osobas', 'lokacijas.id', '=', 'lokacija_kontakt_osobas.lokacijaId')
                     ->leftJoin('regions', 'lokacijas.regionId', '=', 'regions.id')
                     ->first();
+    }
+
+    private function createVerificationCode()
+    {
+        return mt_rand(100000,999999);
     }
 
     public function updated()
