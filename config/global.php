@@ -4,7 +4,7 @@ return [
 
 	'siteFooter' => '© 2021 Copyright: EPOS',
 
-	'version' => 'V 0.1.9.5',
+	'version' => 'V 0.1.9.6',
 
 	'paginate' => 10,
 

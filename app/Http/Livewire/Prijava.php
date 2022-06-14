@@ -43,10 +43,11 @@ class Prijava extends Component
     {
         //kakva glupost!!! Ako ne updatujem ovde ne vidi podatke o terminalu....
         // 'telefon' => ['required', 'digits_between:8,11'],
+        // 'telefon' => ['phone:RS,mobile', 'required'],
         $this->terminal = $this->selectedTerminalInfo();
         return [  
             'opisKvaraList' => 'required',
-            'telefon' => ['phone:RS,mobile', 'required'],
+            'telefon' => ['required', 'digits_between:8,11'],
             'prijavaIme' => 'required'
         ];
     }
@@ -81,7 +82,7 @@ class Prijava extends Component
         //$resp = Http::asForm()->post($path, $data);
         //$request = Request::create( $path, $method, $data );
         //$response = Route::dispatch( $request );
-        dd($data);
+        //dd($data);
     }
 
     /**
