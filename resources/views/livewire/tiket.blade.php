@@ -78,7 +78,7 @@
                                         <td class="px-2 pr-2">{{ $dateCreate[0] }}<br />{{ $dateCreate[1] }}</td>
                                         <td class="px-2 pr-2">{{ $dateUpdate[0] }}<br />{{ $dateUpdate[1] }}</td>
                                         <td class="px-2 pr-2">{{ $item->tks_naziv }} <br /> {{ $item->name }}</td>  
-                                        <td class="px-2 pr-2">{{ $item->l_naziv }} </td>
+                                        <td class="px-2 pr-2">{{ $item->l_naziv }}<br /><span class="text-sm text-red-400">{{ $item->tok_naziv }}</span> </td>
                                         <td class="px-2 pr-2">{{ $item->mesto }}<br />{{ $item->r_naziv }}</td>
                                         <td class="px-2 pr-2">{{ $item->br_komentara }}</td>
                                         <td class="px-2 pr-2"><span class="flex-none py-2 px-4 mx-2 font-bold rounded bg-{{$item->tr_bg_collor}} text-{{$item->btn_collor}}" >{{ $item->tp_naziv }}</span></td>                                       

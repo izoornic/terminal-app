@@ -131,7 +131,7 @@ class Tikets extends Component
 
        // searchStatus
 
-        $rtval = Tiket::select('tikets.id as tikid', 'tikets.created_at', 'tikets.updated_at', 'tikets.br_komentara','lokacijas.l_naziv', 'lokacijas.mesto', 'terminals.sn', 'users.name','tiket_status_tips.id as tstid', 'tiket_status_tips.tks_naziv', 'tiket_prioritet_tips.tp_naziv', 'tiket_prioritet_tips.btn_collor', 'tiket_prioritet_tips.tr_bg_collor', 'regions.r_naziv')
+        $rtval = Tiket::select('tikets.id as tikid', 'tikets.created_at', 'tikets.updated_at', 'tikets.br_komentara','lokacijas.l_naziv', 'lokacijas.mesto', 'terminals.sn', 'users.name','tiket_status_tips.id as tstid', 'tiket_status_tips.tks_naziv', 'tiket_prioritet_tips.tp_naziv', 'tiket_prioritet_tips.btn_collor', 'tiket_prioritet_tips.tr_bg_collor', 'regions.r_naziv', 'tiket_opis_kvara_tips.tok_naziv')
             ->leftJoin('tiket_status_tips', 'tikets.tiket_statusId', '=', 'tiket_status_tips.id')
             ->leftJoin('tiket_prioritet_tips', 'tikets.tiket_prioritetId', '=', 'tiket_prioritet_tips.id')
             ->leftJoin('users', 'tikets.korisnik_dodeljenId', '=', 'users.id')
@@ -139,6 +139,7 @@ class Tikets extends Component
             ->leftJoin('lokacijas', 'lokacijas.id', '=', 'terminal_lokacijas.lokacijaId')
             ->leftJoin('regions', 'lokacijas.regionId', '=', 'regions.id')
             ->leftJoin('terminals', 'terminals.id', '=', 'terminal_lokacijas.terminalId')
+            ->leftJoin('tiket_opis_kvara_tips', 'tikets.opis_kvaraId', '=', 'tiket_opis_kvara_tips.id')
             ->where('l_naziv', 'like', '%'.$this->searchLokacijaNaziv.'%')
             ->where('mesto', 'like', '%'.$this->searchMesto.'%')
             ->where('regions.id', ($this->searchRegion > 0) ? '=' : '<>', $this->searchRegion)
@@ -250,7 +251,7 @@ class Tikets extends Component
      * @return void
      */
     private function selectedTerminalInfo(){
-        return TerminalLokacija::select('terminal_lokacijas.*', 'terminals.terminal_tipId as tid', 'terminal_status_tips.ts_naziv', 'lokacijas.l_naziv', 'lokacijas.mesto', 'lokacija_kontakt_osobas.name', 'lokacija_kontakt_osobas.tel', 'regions.r_naziv', 'regions.id as rid')
+        return TerminalLokacija::select('terminal_lokacijas.*', 'terminals.sn', 'terminals.terminal_tipId as tid', 'terminal_status_tips.ts_naziv', 'lokacijas.l_naziv', 'lokacijas.mesto', 'lokacija_kontakt_osobas.name', 'lokacija_kontakt_osobas.tel', 'regions.r_naziv', 'regions.id as rid')
                     ->leftJoin('terminals', 'terminal_lokacijas.terminalId', '=', 'terminals.id')
                     ->leftJoin('terminal_status_tips', 'terminal_lokacijas.terminal_statusId', '=', 'terminal_status_tips.id')
                     ->leftJoin('lokacijas', 'terminal_lokacijas.lokacijaId', '=', 'lokacijas.id')
