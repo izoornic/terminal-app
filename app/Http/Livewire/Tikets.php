@@ -18,9 +18,10 @@ use Livewire\WithPagination;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Config;
 
-use Mail;
-use App\Mail\NotyfyMail;
 use App\Http\Helpers;
+
+use App\Ivan\SelectedTerminalInfo;
+use App\Ivan\MailToUser;
 
 //use App\Http\Controllers\SendEmailController;
 
@@ -78,6 +79,9 @@ class Tikets extends Component
     public $tiketAkcija;
     public $userRegion;
 
+    //Klasa koja salje mailove
+    private $mailToUser;
+
     /**
      * The validation rules
      *
@@ -127,11 +131,8 @@ class Tikets extends Component
      */
     public function read()
     {
-        
-
-       // searchStatus
-
-        $rtval = Tiket::select('tikets.id as tikid', 'tikets.created_at', 'tikets.updated_at', 'tikets.br_komentara','lokacijas.l_naziv', 'lokacijas.mesto', 'terminals.sn', 'users.name','tiket_status_tips.id as tstid', 'tiket_status_tips.tks_naziv', 'tiket_prioritet_tips.tp_naziv', 'tiket_prioritet_tips.btn_collor', 'tiket_prioritet_tips.tr_bg_collor', 'regions.r_naziv', 'tiket_opis_kvara_tips.tok_naziv')
+       
+        return Tiket::select('tikets.id as tikid', 'tikets.created_at', 'tikets.updated_at', 'tikets.br_komentara','lokacijas.l_naziv', 'lokacijas.mesto', 'terminals.sn', 'users.name','tiket_status_tips.id as tstid', 'tiket_status_tips.tks_naziv', 'tiket_prioritet_tips.tp_naziv', 'tiket_prioritet_tips.btn_collor', 'tiket_prioritet_tips.tr_bg_collor', 'regions.r_naziv', 'tiket_opis_kvara_tips.tok_naziv')
             ->leftJoin('tiket_status_tips', 'tikets.tiket_statusId', '=', 'tiket_status_tips.id')
             ->leftJoin('tiket_prioritet_tips', 'tikets.tiket_prioritetId', '=', 'tiket_prioritet_tips.id')
             ->leftJoin('users', 'tikets.korisnik_dodeljenId', '=', 'users.id')
@@ -161,14 +162,13 @@ class Tikets extends Component
                 return $rtval->where('regions.id', '=', $this->userRegion);
             })
             ->when($this->tiketAkcija[1] == "dodeljen", function($rtval){
-                return  $rtval->where('tikets.korisnik_dodeljenId', '=', auth()->user()->id)
-                ->orWhere('tikets.korisnik_prijavaId', '=', auth()->user()->id);
+                return  $rtval->where(function($query){
+                    return $query->where('tikets.korisnik_dodeljenId', '=', auth()->user()->id)
+                            ->orWhere('tikets.korisnik_prijavaId', '=', auth()->user()->id);
+                });
             })
             ->orderBy($this->orderBy, ($this->orderBy=='tiket_prioritet_tips.id') ? 'asc' : 'desc')
             ->paginate(Config::get('global.paginate'), ['*'], 'tik');
-
-       
-        return $rtval;
     }
     /**
      * Loads the model data
@@ -242,24 +242,8 @@ class Tikets extends Component
                     return $rtval->where('regions.id', '=', $this->userRegion);
                 })
                 ->paginate(Config::get('global.modal_search'), ['*'], 'loc');
-       
     }
-
-    /**
-     * Info o izabranom terminalu na MODAL pop up-u
-     *
-     * @return void
-     */
-    private function selectedTerminalInfo(){
-        return TerminalLokacija::select('terminal_lokacijas.*', 'terminals.sn', 'terminals.terminal_tipId as tid', 'terminal_status_tips.ts_naziv', 'lokacijas.l_naziv', 'lokacijas.mesto', 'lokacija_kontakt_osobas.name', 'lokacija_kontakt_osobas.tel', 'regions.r_naziv', 'regions.id as rid')
-                    ->leftJoin('terminals', 'terminal_lokacijas.terminalId', '=', 'terminals.id')
-                    ->leftJoin('terminal_status_tips', 'terminal_lokacijas.terminal_statusId', '=', 'terminal_status_tips.id')
-                    ->leftJoin('lokacijas', 'terminal_lokacijas.lokacijaId', '=', 'lokacijas.id')
-                    ->leftJoin('lokacija_kontakt_osobas', 'lokacijas.id', '=', 'lokacija_kontakt_osobas.lokacijaId')
-                    ->leftJoin('regions', 'lokacijas.regionId', '=', 'regions.id')
-                    ->where('terminal_lokacijas.id', $this->newTerminalLokacijaId)
-                    -> first();
-    }
+    
     
     /**
      * Pronadji korisnika kome dodeljujes tiket
@@ -315,17 +299,8 @@ class Tikets extends Component
         $tik = Tiket::create($this->modelData());
         
         //send email
-        
-        
-        foreach ($this->mail_to_users() as $mail_to_user) {
-            try {
-                Mail::to($mail_to_user)->send(new NotyfyMail($this->tiketData($tik)));
-            } catch (Exception $e) {
-                if (count(Mail::failures()) > 0) {
-                    $failures[] = $mail_to_user;
-                }
-            }
-        }
+        $this->mailToUser = new MailToUser($tik->id);
+        $this->mailToUser->sendEmails('novi');
 
         $this->modalNewTiketVisible = false;
         $this->resetAll();
@@ -354,59 +329,7 @@ class Tikets extends Component
         $this->create(); 
     }
 
-    /**
-     * Podaci koji se prikazuju u email poruci
-     *
-     * @param  mixed $tik
-     * @return void
-     */
-    private function tiketData($tik)
-    {
-        $terminal_info = $this->selectedTerminalInfo();
-       // Helpers::datumFormat($komentar->created_at)
-       $opisKvaraObj = TiketOpisKvaraTip::where('id', '=', $tik->opis_kvaraId)->first();
-       $opisKvara = ($opisKvaraObj == null) ? '' : $opisKvaraObj->tok_naziv;
-
-       $mail_data = [
-        'subject'   =>  'Novi tiket #'.$tik->id,
-        'tiketlink' =>  'https://servis.epos.rs/tiketview?id='.$tik->id,
-        'hedaing'   =>  'Na servisnom portalu je otvoren novi tiket #'.$tik->id,
-        'row1'      =>  'Prioritet: '.$this->prioritetInfo()->tp_naziv.' | Kreiran: '.Helpers::datumFormat($tik->created_at),
-        'row2'      =>  'Otvorio: '.auth()->user()->name,
-        'row3'      =>  'Dodeljen: '.$this->selectedUserInfo($this->dodeljenUserId)->name,
-        'row4'      =>  'Kvar: '.$opisKvara,
-        'row5'      =>  'Opis: '.$tik->	opis,
-        'row6'      =>  ' -::- ---  -::-',
-        'row7'      =>  'Terminal: sn: '.$terminal_info->sn,
-        'row8'      =>  'Status: '.$terminal_info->ts_naziv,
-        'row9'      =>  'Lokacija: '.$terminal_info->l_naziv.', '.$terminal_info->mesto,
-        'row10'     =>  'Region: '. $terminal_info->r_naziv,
-        'row11'     =>  'Kontakt osoba: '. $terminal_info->name.'  tel: '.$terminal_info->tel
-        ];
-        return $mail_data;
-    }
-
-    /**
-     * mail_to_users ############################################################### MORA UPDATE
-     * ############################################################################# Mail se salje sefu servisa samo ako je prebacen na servis
-     * @return void
-     */
-    private function mail_to_users()
-    {
-        //$user_email = $this->selectedUserInfo(auth()->user()->id)->email;
-        $retval = [];
-        if($this->dodeljenUserId != null && $this->dodeljenUserId != auth()->user()->id){
-            $dodeljen = $this->selectedUserInfo($this->dodeljenUserId)->email;
-            array_push($retval, $dodeljen);
-        }
-        //sef servisa
-        if($this->dodeljenUserId != null && $this->dodeljenUserId != $this->sefServisa()->id){
-            $sefservisa = $this->sefServisa()->email;
-            array_push($retval, $sefservisa);
-        }
-
-        return $retval;
-    }
+    
 
     /**
      * id Sefa Servisa
@@ -419,7 +342,7 @@ class Tikets extends Component
             ->join('lokacijas', 'lokacijas.id', '=', 'users.lokacijaId')
             ->join('regions', 'regions.id', '=', 'lokacijas.regionId')
             ->where('users.pozicija_tipId', '=', 3)
-            ->where('regions.id', '=', $this->selectedTerminalInfo()->rid)
+            ->where('regions.id', '=', SelectedTerminalInfo::selectedTerminalInfo($this->newTerminalLokacijaId)->rid)
             ->first();
     }
 
@@ -510,7 +433,7 @@ class Tikets extends Component
         session(['tiketSearchStatus' =>  $this->searchStatus]);
 
         if($this->modalNewTiketVisible){
-            $this->newTerminalInfo = $this->selectedTerminalInfo();
+            $this->newTerminalInfo = SelectedTerminalInfo::selectedTerminalInfo($this->newTerminalLokacijaId);
             if($this->dodeljenUserId){
                 $this->dodeljenUserInfo = $this->selectedUserInfo($this->dodeljenUserId);
             }

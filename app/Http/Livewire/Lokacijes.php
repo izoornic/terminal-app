@@ -82,6 +82,8 @@ class Lokacijes extends Component
     public $nameKo;
     public $telKo;
 
+    public $pib;
+
     /**
      * The validation rules
      *
@@ -94,7 +96,8 @@ class Lokacijes extends Component
             'regionId' => ['required', 'not_in:0'],
             'lokacija_tipId' => 'required',
             'latitude' => ['regex:/^[-]?(([0-8]?[0-9])\.(\d+))|(90(\.0+)?)$/', 'nullable'],             
-            'longitude' => ['regex:/^[-]?((((1[0-7][0-9])|([0-9]?[0-9]))\.(\d+))|180(\.0+)?)$/', 'nullable']       
+            'longitude' => ['regex:/^[-]?((((1[0-7][0-9])|([0-9]?[0-9]))\.(\d+))|180(\.0+)?)$/', 'nullable'],
+            'pib' => ['digits_between:8,16']      
         ];
     }
 
@@ -154,6 +157,7 @@ class Lokacijes extends Component
 
         $this->nameKo = '';
         $this->telKo = '';
+        $this->pib = '';
     }
 
     /**
@@ -202,6 +206,7 @@ class Lokacijes extends Component
         $this->adresa = $data->adresa;
         $this->latitude = $data->latitude;
         $this->longitude = $data->longitude;
+        $this->pib = $data->pib;
 
         $this->regionId = $data->regionId;
         $this->lokacija_tipId = $data->lokacija_tipId;
@@ -231,7 +236,8 @@ class Lokacijes extends Component
             'latitude'         => ($this->latitude == '') ? NULL : $this->latitude,
             'longitude'        =>($this->longitude == '') ? NULL : $this->longitude,
             'regionId'         => $this->regionId,
-            'lokacija_tipId'   => $this->lokacija_tipId,    
+            'lokacija_tipId'   => $this->lokacija_tipId,
+            'pib'              =>$this->pib,   
         ];
     }
 

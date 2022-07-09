@@ -18,9 +18,12 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Str;
 
-use Mail;
-use App\Mail\NotyfyMail;
 use App\Http\Helpers;
+
+use App\Ivan\TerminalHistory;
+use App\Ivan\SelectedTerminalInfo;
+use App\Ivan\MailToUser;
+
 
 class Terminal extends Component
 {
@@ -143,41 +146,11 @@ class Terminal extends Component
         $tik = Tiket::create($this->modelTiketData());
         
         //send email
-        
-        
-        foreach ($this->mail_to_users() as $mail_to_user) {
-            try {
-                Mail::to($mail_to_user)->send(new NotyfyMail($this->tiketData($tik)));
-            } catch (Exception $e) {
-                if (count(Mail::failures()) > 0) {
-                    $failures[] = $mail_to_user;
-                }
-            }
-        }
+        //send email
+        $this->mailToUser = new MailToUser($tik->id);
+        $this->mailToUser->sendEmails('novi');
 
         $this->newTiketVisible = false;
-    }
-
-    /**
-     * mail_to_users # MORA UPDATE
-     *  Mail se salje sefu servisa samo ako je prebacen na servis
-     * @return void
-     */
-    private function mail_to_users()
-    {
-        //$user_email = $this->selectedUserInfo(auth()->user()->id)->email;
-        $retval = [];
-        if($this->dodeljenUserId != null && $this->dodeljenUserId != auth()->user()->id){
-            $dodeljen = $this->selectedUserInfo($this->dodeljenUserId)->email;
-            array_push($retval, $dodeljen);
-        }
-        //sef servisa
-        if($this->dodeljenUserId != null && $this->dodeljenUserId != $this->sefServisa()->id){
-            $sefservisa = $this->sefServisa()->email;
-            array_push($retval, $sefservisa);
-        }
-
-        return $retval;
     }
 
     /**
@@ -202,38 +175,6 @@ class Terminal extends Component
         ];
     }
 
-    /**
-     * Podaci koji se prikazuju u email poruci
-     *
-     * @param  mixed $tik
-     * @return void
-     */
-    private function tiketData($tik)
-    {
-        $terminal_info = $this->selectedTerminalInfo();
-        // Helpers::datumFormat($komentar->created_at)
-        $opisKvaraObj = TiketOpisKvaraTip::where('id', '=', $tik->opis_kvaraId)->first();
-        $opisKvara = ($opisKvaraObj == null) ? '' : $opisKvaraObj->tok_naziv;
-
-       $mail_data = [
-        'subject'   =>  'Novi tiket #'.$tik->id,
-        'tiketlink' =>  'https://servis.epos.rs/tiketview?id='.$tik->id,
-        'hedaing'   =>  'Na servisnom portalu je otvoren novi tiket #'.$tik->id,
-        'row1'      =>  'Prioritet: '.$this->prioritetInfo()->tp_naziv.' | Kreiran: '.Helpers::datumFormat($tik->created_at),
-        'row2'      =>  'Otvorio: '.auth()->user()->name,
-        'row3'      =>  'Dodeljen: '.$this->selectedUserInfo($this->dodeljenUserId)->name,
-        'row4'      =>  'Kvar: '.$opisKvara,
-        'row5'      =>  'Opis: '.$tik->	opis,
-        'row6'      =>  ' -::- ---  -::-',
-        'row7'      =>  'Terminal: sn: '.$terminal_info->sn,
-        'row8'      =>  'Status: '.$terminal_info->ts_naziv,
-        'row9'      =>  'Lokacija: '.$terminal_info->l_naziv.', '.$terminal_info->mesto,
-        'row10'     =>  'Region: '. $terminal_info->r_naziv,
-        'row11'     =>  'Kontakt osoba: '. $terminal_info->name.'  tel: '.$terminal_info->tel
-        ];
-        return $mail_data;
-    }
-
      /**
      * id Sefa Servisa
      *
@@ -245,7 +186,7 @@ class Terminal extends Component
             ->join('lokacijas', 'lokacijas.id', '=', 'users.lokacijaId')
             ->join('regions', 'regions.id', '=', 'lokacijas.regionId')
             ->where('users.pozicija_tipId', '=', 3)
-            ->where('regions.id', '=', $this->selectedTerminalInfo()->rid)
+            ->where('regions.id', '=',SelectedTerminalInfo::selectedTerminalInfoTerminalId($this->modelId)->rid)
             ->first();
     }
 
@@ -387,7 +328,7 @@ class Terminal extends Component
         $this->multiSelected = false;
         $this->modelId = $id;
         $this->modalStatus = $status;
-        $this->selectedTerminal = $this->selectedTerminalInfo();
+        $this->selectedTerminal = SelectedTerminalInfo::selectedTerminalInfoTerminalId($this->modelId);
         //$this->resetValidation();
         //$this->reset();
         $this->modalFormVisible = true;
@@ -468,7 +409,7 @@ class Terminal extends Component
         $this->searchPlokacijaMesto ='';
         $this->searchPlokacijaRegion = 0;
         //podaci o terminalu koji se premesta
-        $this->selectedTerminal = $this->selectedTerminalInfo();
+        $this->selectedTerminal = SelectedTerminalInfo::selectedTerminalInfoTerminalId($this->modelId);
         //dd($this->selectedTerminal);
         $this->modalConfirmPremestiVisible = true;
 
@@ -495,21 +436,6 @@ class Terminal extends Component
         $this->modalConfirmPremestiVisible = true;
 
         $this->datum_premestanja_terminala = Helpers::datumKalendarNow();
-    }
-    /**
-     * Info o izabranom terminalu na MODAL pop up-u
-     *
-     * @return void
-     */
-    private function selectedTerminalInfo(){
-        return TerminalLokacija::select('terminal_lokacijas.*', 'terminals.sn', 'terminals.terminal_tipId as tid', 'terminal_status_tips.ts_naziv', 'lokacijas.l_naziv', 'lokacijas.mesto', 'lokacija_kontakt_osobas.name', 'lokacija_kontakt_osobas.tel', 'regions.r_naziv', 'regions.id as rid')
-        ->leftJoin('terminals', 'terminal_lokacijas.terminalId', '=', 'terminals.id')
-        ->leftJoin('terminal_status_tips', 'terminal_lokacijas.terminal_statusId', '=', 'terminal_status_tips.id')
-        ->leftJoin('lokacijas', 'terminal_lokacijas.lokacijaId', '=', 'lokacijas.id')
-        ->leftJoin('lokacija_kontakt_osobas', 'lokacijas.id', '=', 'lokacija_kontakt_osobas.lokacijaId')
-        ->leftJoin('regions', 'lokacijas.regionId', '=', 'regions.id')
-        ->where('terminalId', $this->modelId)
-        -> first();
     }
 
     public function lokacijeTipa($tipId)
@@ -593,7 +519,7 @@ class Terminal extends Component
         }
 
         if($this->modalConfirmPremestiVisible || $this->modalFormVisible){
-            $this->selectedTerminal = $this->selectedTerminalInfo();
+            $this->selectedTerminal = SelectedTerminalInfo::selectedTerminalInfoTerminalId($this->modelId);
         }
 
         if($this->multiSelected && ($this->modalFormVisible || $this->modalConfirmPremestiVisible)){
@@ -620,22 +546,11 @@ class Terminal extends Component
     {
         $this->historyData = null;
         $this->modelId = $id;
-        $this->selectedTerminal = $this->selectedTerminalInfo();
-        $this->historyData = TerminalLokacijaHistory::select('terminal_lokacija_histories.*', 'terminal_status_tips.ts_naziv', 'lokacijas.l_naziv', 'lokacijas.mesto')
-                                    ->where('terminal_lokacija_histories.terminalId', '=', $this->modelId)
-                                    ->leftJoin('terminal_status_tips', 'terminal_lokacija_histories.terminal_statusId', '=', 'terminal_status_tips.id')
-                                    ->leftJoin('lokacijas', 'terminal_lokacija_histories.lokacijaId', '=', 'lokacijas.id')
-                                    ->orderBy('terminal_lokacija_histories.id', 'desc')
-                                    ->get();
+        $this->selectedTerminal = SelectedTerminalInfo::selectedTerminalInfoTerminalId($this->modelId);
+        $this->historyData = TerminalHistory::terminalHistoryData($this->modelId);
 
         $this->terminalHistoryVisible = true;
     }
-    
-    /* public function datumFormat($dbdate)
-    {
-        //return Carbon::parse($dbdate)->setTimezone('Europe/Belgrade')->translatedFormat('d. m. Y. - G:i:s');
-        return Helpers::datumFormat($dbdate);
-    } */
 
     public function render()
     {

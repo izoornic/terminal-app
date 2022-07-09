@@ -21,6 +21,7 @@ class Lokacija extends Model
         'adresa',
         'latitude',
         'longitude',
+        'pib'
     ];
 
     public static function userLokacijeList()

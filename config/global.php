@@ -2,9 +2,9 @@
 
 return [
 
-	'siteFooter' => '© 2021 Copyright: EPOS',
+	'siteFooter' => '© 2022 Copyright: Zeta System EPOS',
 
-	'version' => 'V 0.1.9.7',
+	'version' => 'V 0.2.0',
 
 	'paginate' => 10,
 

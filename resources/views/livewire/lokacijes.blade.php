@@ -169,6 +169,11 @@
                 @error('adresa') <span class="error">{{ $message }}</span> @enderror
             </div>
             <div class="mt-4">
+                <x-jet-label for="pib" value="{{ __('PIB') }}" />
+                <x-jet-input wire:model="pib" id="" class="block mt-1 w-full" type="text" />
+                @error('pib') <span class="error">{{ $message }}</span> @enderror
+            </div>
+            <div class="mt-4">
                 <x-jet-label for="latitude" value="{{ __('Latitude') }}" />
                 <x-jet-input wire:model="latitude" id="" class="block mt-1 w-full" type="text" />
                 @error('latitude') <span class="error">{{ $message }}</span> @enderror
@@ -253,6 +258,7 @@
                             <div>
                                 <p><span class="font-bold">{{ $odabranaLokacija->l_naziv}}</span>, Adresa: <span class="font-bold">{{ $odabranaLokacija->adresa}}</span></p>
                                 <p>Mesto: <span class="font-bold">{{ $odabranaLokacija->mesto }}</span>, Region: <span class="font-bold">{{ $odabranaLokacija->r_naziv }}</span></p>
+                                <p>PIB: <span class="font-bold">{{ $odabranaLokacija->pib }}</span>
                             </div>
                     </div>
                 </div> 

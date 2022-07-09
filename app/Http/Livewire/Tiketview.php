@@ -17,12 +17,15 @@ use App\Models\TiketOpisKvaraTip;
 use App\Models\Lokacija;
 use App\Models\Region;
 use App\Models\TiketPrioritetTip;
+use App\Models\SmsLog;
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Config;
 
-use Mail;
-use App\Mail\NotyfyMail;
+use App\Ivan\MailToUser;
+use App\Ivan\TerminalHistory;
+use App\Ivan\SelectedTerminalInfo;
+
 use App\Http\Helpers;
 
 class Tiketview extends Component
@@ -57,6 +60,7 @@ class Tiketview extends Component
     public $dodeljenUserInfo;
 
     public $listeners = ['tiketRefresh' => 'render'];
+
     //zatvori tiket MODAL
     public $modalZatvoriTiketVisible;
 
@@ -65,8 +69,9 @@ class Tiketview extends Component
 
     public $obrisiTiketModalVisible;
 
-    
+    public $kreiranOlineInfo;
 
+    private $mailToUser;
     /**
      * mount
      *
@@ -155,8 +160,13 @@ class Tiketview extends Component
         
         $this->kvarAkcijaId = $this->tiket->tokid;
         $this->brojKomentra = $this->tiket->br_komentara;
-        $this->userKreirao = ($this->tiket->korisnik_prijavaId == null) ? '' : User::where('id', '=', $this->tiket->korisnik_prijavaId)->firstOrFail();
-        //dd($this->tiket->korisnik_prijavaId);
+        if($this->tiket->korisnik_prijavaId == null){
+            $this->userKreirao = '';
+            $this->kreiranOlineInfo = SmsLog::where('tiketId', '=', $this->tiket->tkid)->firstOrFail();
+        }else{
+            $this->userKreirao = User::where('id', '=', $this->tiket->korisnik_prijavaId)->firstOrFail();
+        }
+
         return $this->tiket;
     }
     
@@ -173,22 +183,6 @@ class Tiketview extends Component
                     ->get();
     }
 
-    /**
-     * Info o izabranom terminalu 
-     *
-     * @return void
-     */
-    public function selectedTerminalInfo(){
-        return TerminalLokacija::select('terminal_lokacijas.*', 'terminals.sn', 'terminal_status_tips.ts_naziv', 'lokacijas.l_naziv', 'lokacijas.adresa', 'lokacijas.mesto', 'lokacija_kontakt_osobas.name', 'lokacija_kontakt_osobas.tel', 'regions.r_naziv')
-                    ->where('terminal_lokacijas.id',  $this->tiket->tremina_lokacijalId)
-                    ->leftJoin('terminals', 'terminal_lokacijas.terminalId', '=', 'terminals.id')
-                    ->leftJoin('terminal_status_tips', 'terminal_lokacijas.terminal_statusId', '=', 'terminal_status_tips.id')
-                    ->leftJoin('lokacijas', 'terminal_lokacijas.lokacijaId', '=', 'lokacijas.id')
-                    ->leftJoin('lokacija_kontakt_osobas', 'lokacijas.id', '=', 'lokacija_kontakt_osobas.lokacijaId')
-                    ->leftJoin('regions', 'lokacijas.regionId', '=', 'regions.id')
-                    -> first();
-    }
-
     
     /**
      * history of onre terminal
@@ -197,12 +191,7 @@ class Tiketview extends Component
      */
     public function historyData()
     {
-        return TerminalLokacijaHistory::select('terminal_lokacija_histories.*', 'terminal_status_tips.ts_naziv', 'lokacijas.l_naziv', 'lokacijas.mesto')
-                    ->where('terminal_lokacija_histories.terminal_lokacijaId', '=',  $this->tiket->tremina_lokacijalId )
-                    ->leftJoin('terminal_status_tips', 'terminal_lokacija_histories.terminal_statusId', '=', 'terminal_status_tips.id')
-                    ->leftJoin('lokacijas', 'terminal_lokacija_histories.lokacijaId', '=', 'lokacijas.id')
-                    ->orderBy('terminal_lokacija_histories.id', 'desc')
-                    ->get();
+       return TerminalHistory::terminalHistoryData($this->tiket->tremina_lokacijalId);
     }
 
     public function readComments(){
@@ -212,7 +201,12 @@ class Tiketview extends Component
                     ->get();
     }
 
-
+    
+    /**
+     * dodeliTiketShowModal
+     *
+     * @return void
+     */
     public function dodeliTiketShowModal(){
        
         $this->noviDodeljenUserId = false;
@@ -226,6 +220,7 @@ class Tiketview extends Component
      /**
      * Pronadji korisnika kome dodeljujes tiket
      *
+     * ->simplePaginate(Config::get('global.modal_search'), ['*'], 'usersp');
      * @return void
      */
     public function searchUser()
@@ -240,7 +235,7 @@ class Tiketview extends Component
                     ->where('name', 'like', '%'.$this->searchUserName.'%')
                     ->where('l_naziv', 'like', '%'.$this->searchUserLokacija.'%')
                     ->where('naziv', 'like', '%'.$this->searchUserPozicija.'%')
-                    ->paginate(Config::get('global.modal_search'), ['*'], 'usersp');
+                    ->get();
     }  
 
     /**
@@ -324,61 +319,14 @@ class Tiketview extends Component
         });
 
         $this->tiket = $this->TiketInfo();
-
+        $this->mailToUser = new MailToUser($this->tikid);
+        $comentari = $this->readComments();
+        $this->mailToUser->sendEmails('dodeljen', $comentari);
         
-        foreach ($this->mail_to_users() as $mail_to_user) {
-            try {
-                Mail::to($mail_to_user)->send(new NotyfyMail($this->tiketData('Dodeljen tiket - #')));
-            } catch (Exception $e) {
-                if (count(Mail::failures()) > 0) {
-                    $failures[] = $mail_to_user;
-                }
-            }
-        }
-
         $this->noviDodeljenUserId = false;
         $this->modalDodeliTiketVisible = false;
         $this->emit('tiketRefresh');
-        //$this->mount();
-        //$this->redirect('#');
-    }
 
-    /**
-     * Podaci koji se prikazuju u email poruci
-     *
-     * @param  mixed $tik
-     * @return void
-     */
-    private function tiketData($sub)
-    {
-        $this->tiket = $this->TiketInfo();
-        $terminal_info = $this->selectedTerminalInfo();
-        $dodeljen_ime = ($this->selectedUserInfo($this->dodeljenUserId) != null) ? $this->selectedUserInfo($this->dodeljenUserId)->name : 'Tiket nije dodeljen';
-        $kreirao = ($this->userKreirao != '') ? $this->userKreirao->name : 'on line';
-        //dd($this->tiket->opis);
-        $heding = ($sub == 'Dodeljen tiket - #') ? 'Na servisnom portalu dodeljen vam je tiket #' : $sub;
-        $zatvorio = ($sub == 'Zatvoren tiket #') ? ' | Tiket zatvorio: '.auth()->user()->name : '';
-        
-        $opisKvaraObj = TiketOpisKvaraTip::where('id', '=', $this->tiket->opis_kvaraId)->first();
-        $opisKvara = ($opisKvaraObj == null) ? '' : $opisKvaraObj->tok_naziv;
-       // Helpers::datumFormat($komentar->created_at)
-       $mail_data = [
-        'subject'   =>  $sub.$this->tiket->tkid,
-        'tiketlink' =>  'https://servis.epos.rs/tiketview?id='.$this->tiket->tkid,
-        'hedaing'   =>  $heding.$this->tiket->tkid,
-        'row1'      =>  'Prioritet: '.$this->prioritetInfo()->tp_naziv.' | Kreiran: '.Helpers::datumFormat($this->tiket->created_at),
-        'row2'      =>  'Otvorio: '.$kreirao,
-        'row3'      =>  'Dodeljen: '.$dodeljen_ime. ' '. $zatvorio,
-        'row4'      =>  'Kvar: '.$opisKvara,
-        'row5'      =>  'Opis: '.$this->tiket->opis,
-        'row6'      =>  ' -::-  ---  -::-',
-        'row7'      =>  'Terminal: sn: '.$terminal_info->sn,
-        'row8'      =>  'Status: '.$terminal_info->ts_naziv,
-        'row9'      =>  'Lokacija: '.$terminal_info->l_naziv.', '.$terminal_info->mesto,
-        'row10'     =>  'Region: '. $terminal_info->r_naziv,
-        'row11'     =>  'Kontakt osoba: '. $terminal_info->name.'  tel: '.$terminal_info->tel
-        ];
-        return $mail_data;
     }
 
     /**
@@ -397,18 +345,6 @@ class Tiketview extends Component
     }
 
     /**
-     * Dodeljen/Kreirao Servisa
-     *
-     * @return void
-     */
-    private function dodeljenKreirao($id)
-    {
-        return User::select('users.id', 'users.name', 'users.tel', 'users.email', 'users.pozicija_tipId')
-            ->where('users.id', '=', $id)
-            ->first();
-    }
-
-    /**
      * Posalji Komentar click function
      *
      * @return void
@@ -416,50 +352,20 @@ class Tiketview extends Component
     public function posaljiKomentar($zatvaranje_tiketa = false)
     {   
         //dd($this->mail_to_users());
-
+       
         if($this->newKoment != ''){
             $this->brojKomentra ++;
             DB::transaction(function(){
                 TiketKomentar::create(['tiketId' => $this->tikid, 'komentar'=>$this->newKoment, 'korisnikId' => auth()->user()->id]);
                 Tiket::where('id', $this->tikid)->update(['br_komentara' => $this->brojKomentra ]);
             });
+
             if(!$zatvaranje_tiketa){
+                $this->mailToUser = new MailToUser($this->tikid);
                 $comentari = $this->readComments();
-                foreach ($this->mail_to_users() as $mail_to_user) {
-                    try {
-                        Mail::to($mail_to_user)->send(new NotyfyMail($this->tiketData('Novi komentar na tiket - #'), $comentari));
-                    } catch (Exception $e) {
-                        if (count(Mail::failures()) > 0) {
-                            $failures[] = $mail_to_user;
-                        }
-                    }
-                }
+                $this->mailToUser->sendEmails('komentar', $comentari);
             }
         }
-    }
-
-    private function mail_to_users()
-    {
-        //dd(gettype($this->userKreirao));
-        $retval = [];
-        $email_primaci = [
-            'kreirao' => (gettype($this->userKreirao) == 'string') ? null : $this->dodeljenKreirao($this->userKreirao->id),
-            'dodeljen' => (gettype($this->dodeljenUserId) == 'integer') ? $this->dodeljenKreirao($this->dodeljenUserId) : null,
-            'sef' => $this->sefServisa()
-        ];
-
-        foreach($email_primaci as $primac){
-            if($primac != null){
-                if($primac->id != auth()->user()->id){
-                    if(!in_array($primac->email, $retval)){
-                        if($primac->pozicija_tipId != 2){
-                            array_push($retval, $primac->email);
-                        }
-                    }
-                }
-            }
-        }
-        return $retval;
     }
         
     /**
@@ -485,16 +391,9 @@ class Tiketview extends Component
             Tiket::where('tikets.id', $this->tikid)->update([ 'tiket_statusId' => 3, 'korisnik_zatvorio_id'=>auth()->user()->id]);
         });
 
+        $this->mailToUser = new MailToUser($this->tikid);
         $comentari = $this->readComments();
-            foreach ($this->mail_to_users() as $mail_to_user) {
-                try {
-                    Mail::to($mail_to_user)->send(new NotyfyMail($this->tiketData('Zatvoren tiket #'), $comentari));
-                } catch (Exception $e) {
-                    if (count(Mail::failures()) > 0) {
-                        $failures[] = $mail_to_user;
-                    }
-                }
-            }
+        $this->mailToUser->sendEmails('zatvoren', $comentari);
 
         $this->modalZatvoriTiketVisible = false;
         $this->emit('tiketRefresh');
@@ -541,7 +440,7 @@ class Tiketview extends Component
     public function render()
     {
         if($this->validTiket){
-            return view('livewire.tiketview', ['tiket' => $this->read(), 'akcije'=>$this->kvarAkcije(), 'terminal' => $this->selectedTerminalInfo(), 'historyData' => $this->historyData(), 'komentari' => $this->readComments()]);
+            return view('livewire.tiketview', ['tiket' => $this->read(), 'akcije'=>$this->kvarAkcije(), 'terminal' => SelectedTerminalInfo::selectedTerminalInfo($this->tiket->tremina_lokacijalId), 'historyData' => $this->historyData(), 'komentari' => $this->readComments()]);
         }else{
             return view('livewire.errortiket', []);
         }

@@ -37,7 +37,7 @@ Route::group(['middleware' => [
 ]], function(){
 
     Route::get('/dashboard', function(){
-        return view('dashboard');
+        return view('admin.dashboard');
         })->name('dashboard');
 
     Route::get('/pages', function(){

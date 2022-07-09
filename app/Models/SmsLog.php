@@ -19,5 +19,9 @@ class SmsLog extends Model
         'tiketId',
         'prijava_tel',
         'prijava_ime',
+        'prijava_ip',
+        'response_time',
+        'response_ok',
+        'response_code'
     ];
 }
