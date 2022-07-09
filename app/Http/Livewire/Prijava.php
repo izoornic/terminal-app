@@ -186,19 +186,24 @@ class Prijava extends Component
             }
 
             DB::transaction(function()use($dodeljen){
-                $tiket = Tiket::create([
+                $tikRow = [
                     'tremina_lokacijalId' => $this->terminal->id,
                     'tiket_statusId' => 1,
                     'opis_kvaraId' => $this->opisKvaraList,
-                    'korisnik_dodeljenId' => ($dodeljen == 0) ? 'null' : $dodeljen,
                     'opis' => $this->opisKvataTxt,
                     'tiket_prioritetId' => 4,
-                ]);
+                ];
+
+                if ($dodeljen) $tikRow['korisnik_dodeljenId'] = $dodeljen;
+
+                $tiket = Tiket::create($tikRow);
                 
                 SmsLog::find($this->sms_log_id)->update(['tiketId' => $tiket->id ]);
-                //mora ovde da bi se videla promenjiva $tiket
-                $this->mailToUserObj = new MailToUser($tiket->id);
-                $this->mailToUserObj->sendEmails('novi');
+                if($dodeljen){
+                    //mora ovde da bi se videla promenjiva $tiket
+                    $this->mailToUserObj = new MailToUser($tiket->id);
+                    $this->mailToUserObj->sendEmails('novi');
+                }
             });
             $this->tiket_verifikovan = true;
             //posalji mailove
