@@ -162,7 +162,7 @@
                   @elseif(!$verifikacijaSubmited)
                   {{-- POSLAT SMS PROVERA VERIFIKACIONOG KODA --}}
                     <div class="mt-4">
-                        <p class= "my-4">Na broj: <span class="font-bold">+381 {{ $telefon_display }} </span> je poslata SMS poruka sa verifikacinim kodom. {{ $telefon }} - {{ $verifikacioniKod }}</p>
+                        <p class= "my-4">Na broj: <span class="font-bold">+381 {{ $telefon_display }} </span> je poslata SMS poruka sa verifikacinim kodom.</p>
                         <x-jet-label for="verifikacioniKodInput" value="{{ __('Unesite verifikacioni kod:') }}" />
                         <x-jet-input wire:model.defer="verifikacioniKodInput" id="" class="block mt-1 w-full" type="text" />
                         @error('verifikacioniKodInput') <span class="error">{{ $message }}</span> @enderror
