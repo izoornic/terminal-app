@@ -156,7 +156,7 @@ class MailToUser
     private function tiketData($sub)
     {
         $terminal_info = SelectedTerminalInfo::selectedTerminalInfo($this->tiket->tremina_lokacijalId);
-        dd($this->tiket);
+        //$this->tikedd(t);
         $dodeljen_ime = ($this->tiket->korisnik_dodeljenId != null) ? $this->userInfo($this->tiket->korisnik_dodeljenId)->name : 'Tiket nije dodeljen';
         $kreirao = ($this->tiket->korisnik_prijavaId != null) ? $this->userInfo($this->tiket->korisnik_prijavaId)->name : 'on line';
         
