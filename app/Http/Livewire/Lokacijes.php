@@ -137,7 +137,7 @@ class Lokacijes extends Component
         ->leftJoin('lokacija_kontakt_osobas', 'lokacijas.id', '=', 'lokacija_kontakt_osobas.lokacijaId')
         ->where('lokacijas.l_naziv', 'like', '%'.$this->searchName.'%')
         ->where('lokacijas.mesto', 'like', '%'.$this->searchMesto.'%')
-        ->when($this->searchPib != null, function ($rtval){
+        ->when($this->searchPib, function ($rtval){
             return $rtval->where('lokacijas.pib', 'like', '%'.$this->searchPib.'%');
         } )
         ->where('lokacijas.regionId', ($this->searchRegion > 0) ? '=' : '<>', $this->searchRegion)
