@@ -130,14 +130,16 @@ class Lokacijes extends Component
         };
         //->leftJoin('terminal_lokacijas', 'lokacijas.id', '=', 'terminal_lokacijas.lokacijaId') ->groupBy('id') // u select=====>>> 'terminal_lokacijas.lokacijaId as ima_terminala'
         //->leftJoin('users', 'users.lokacijaId', '=', 'lokacijas.id') // u select=====>>>   , 'users.lokacijaId as ima_user'
-        
+        //dd($this->searchPib);
         return Lokacija::select('lokacijas.*', 'lokacija_tips.lt_naziv', 'regions.r_naziv', 'lokacija_kontakt_osobas.name as kontakt', 'lokacija_tips.id as tipid')
         ->leftJoin('regions', 'regions.id', '=', 'lokacijas.regionId')
         ->leftJoin('lokacija_tips', 'lokacijas.lokacija_tipId', '=', 'lokacija_tips.id')
         ->leftJoin('lokacija_kontakt_osobas', 'lokacijas.id', '=', 'lokacija_kontakt_osobas.lokacijaId')
         ->where('lokacijas.l_naziv', 'like', '%'.$this->searchName.'%')
         ->where('lokacijas.mesto', 'like', '%'.$this->searchMesto.'%')
-        ->where('lokacijas.pib', 'like', '%'.$this->searchPib.'%')
+        ->when($this->searchPib != null, function ($rtval){
+            return $rtval->where('lokacijas.pib', 'like', '%'.$this->searchPib.'%');
+        } )
         ->where('lokacijas.regionId', ($this->searchRegion > 0) ? '=' : '<>', $this->searchRegion)
         ->where('lokacijas.lokacija_tipId', ($this->searchTip > 0) ? '=' : '<>', $this->searchTip)
         ->orderBy($order)
