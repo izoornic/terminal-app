@@ -42,6 +42,7 @@ class Lokacijes extends Component
     public $searchMesto;
     public $searchTip = 0;
     public $searchRegion = 0;
+    public $searchPib;
 
     //order
     public $orderBy;
@@ -136,6 +137,7 @@ class Lokacijes extends Component
         ->leftJoin('lokacija_kontakt_osobas', 'lokacijas.id', '=', 'lokacija_kontakt_osobas.lokacijaId')
         ->where('lokacijas.l_naziv', 'like', '%'.$this->searchName.'%')
         ->where('lokacijas.mesto', 'like', '%'.$this->searchMesto.'%')
+        ->where('lokacijas.pib', 'like', '%'.$this->searchPib.'%')
         ->where('lokacijas.regionId', ($this->searchRegion > 0) ? '=' : '<>', $this->searchRegion)
         ->where('lokacijas.lokacija_tipId', ($this->searchTip > 0) ? '=' : '<>', $this->searchTip)
         ->orderBy($order)
