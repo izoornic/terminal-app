@@ -545,8 +545,8 @@ class Terminal extends Component
     public function terminalHistoryShowModal($id)
     {
         $this->historyData = null;
-        $this->modelId = $id;
-        $this->selectedTerminal = SelectedTerminalInfo::selectedTerminalInfoTerminalId($this->modelId);
+        $this->modelId = $id; //ovo je id terminal lokacija tabele
+        $this->selectedTerminal = SelectedTerminalInfo::selectedTerminalInfoTerminalLokacijaId($this->modelId);
         $this->historyData = TerminalHistory::terminalHistoryData($this->modelId);
 
         $this->terminalHistoryVisible = true;
