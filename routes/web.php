@@ -25,6 +25,10 @@ Route::get('/prijava', function () {
     return view('prijava');
 });
 
+Route::get('/blaclist', function () {
+    return (view('blacklist'));
+});
+
 //Route::get('send-email', [SendEmailController::class, 'index']);
 /* Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard', function () {
     return view('dashboard');
@@ -67,5 +71,13 @@ Route::group(['middleware' => [
     Route::get('/tiketview', function(){
         return view('admin.tiketview');
         })->name('tiketview');
+
+    Route::get('/licenca-lokacije', function(){
+        return view('admin.licenca-lokacije');
+        })->name('licenca-lokacije');
+
+    Route::get('/licenca-terminali', function(){
+        return view('admin.licenca-terminali');
+        })->name('licenca-terminali');
 
 });
