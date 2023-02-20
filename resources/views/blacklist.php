@@ -16,3 +16,4 @@ header('Content-Length: ' . strlen($contents));
 header('Connection: close');
 
 echo $contents;
+

@@ -25,7 +25,7 @@ Route::get('/prijava', function () {
     return view('prijava');
 });
 
-Route::get('/blaclist', function () {
+Route::get('/blacklist', function () {
     return (view('blacklist'));
 });
 
