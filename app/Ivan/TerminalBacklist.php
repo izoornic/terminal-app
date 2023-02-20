@@ -7,6 +7,8 @@ use App\Models\TerminalLokacijaHistory;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
+use File;
+
 class TerminalBacklist
 {
     /**
@@ -44,8 +46,10 @@ class TerminalBacklist
         foreach($terminals as $terminal){
             $blaclist_file_content .= $terminal->sn.PHP_EOL; //"\n";
         }
-        //dd($blaclist_file_content);
+        //dd(base_path().'/public/img/blacklist.txt');
         Storage::disk('public')->put('blacklist.txt', $blaclist_file_content);
+        //dd(base_path().'/storage/app/public/storage/blacklist.txt', base_path().'/public/img/blacklist.txt');
+        File::copy(base_path().'/storage/app/public/blacklist.txt', base_path().'/public/bl/blacklist.txt');
     }
 
 }
