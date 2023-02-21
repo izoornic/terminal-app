@@ -5,7 +5,7 @@
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
-        'reference' => 'fd8b0d97cd3d019556303bb09e7ac9ca5610f4ba',
+        'reference' => 'be19f2d13d98d946f5cff218037b840755099c67',
         'name' => 'laravel/laravel',
         'dev' => true,
     ),
@@ -451,7 +451,7 @@
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
-            'reference' => 'fd8b0d97cd3d019556303bb09e7ac9ca5610f4ba',
+            'reference' => 'be19f2d13d98d946f5cff218037b840755099c67',
             'dev_requirement' => false,
         ),
         'laravel/sail' => array(
@@ -1078,6 +1078,15 @@
             'aliases' => array(),
             'reference' => '4ee7d41aa5268107906ea8a4d9ceccde136dbd5b',
             'dev_requirement' => true,
+        ),
+        'spatie/crypto' => array(
+            'pretty_version' => '2.0.2',
+            'version' => '2.0.2.0',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../spatie/crypto',
+            'aliases' => array(),
+            'reference' => 'afaa9968bbd8e066d4e73b31671e3cc45467c4e0',
+            'dev_requirement' => false,
         ),
         'spatie/flare-client-php' => array(
             'pretty_version' => '1.0.3',

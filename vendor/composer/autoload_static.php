@@ -89,6 +89,7 @@ class ComposerStaticInite2ba2be2abd18ef0cdf065015a13d775
             'Spatie\\LaravelIgnition\\' => 23,
             'Spatie\\Ignition\\' => 16,
             'Spatie\\FlareClient\\' => 19,
+            'Spatie\\Crypto\\' => 14,
             'Spatie\\Backtrace\\' => 17,
         ),
         'R' => 
@@ -337,6 +338,10 @@ class ComposerStaticInite2ba2be2abd18ef0cdf065015a13d775
         'Spatie\\FlareClient\\' => 
         array (
             0 => __DIR__ . '/..' . '/spatie/flare-client-php/src',
+        ),
+        'Spatie\\Crypto\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/spatie/crypto/src',
         ),
         'Spatie\\Backtrace\\' => 
         array (
@@ -598,6 +603,7 @@ class ComposerStaticInite2ba2be2abd18ef0cdf065015a13d775
         'App\\Console\\Commands\\LivewireCostumCroudCommand' => __DIR__ . '/../..' . '/app/Console/Commands/LivewireCostumCroudCommand.php',
         'App\\Console\\Kernel' => __DIR__ . '/../..' . '/app/Console/Kernel.php',
         'App\\Exceptions\\Handler' => __DIR__ . '/../..' . '/app/Exceptions/Handler.php',
+        'App\\Http\\Controllers\\Api\\LicenceController' => __DIR__ . '/../..' . '/app/Http/Controllers/Api/LicenceController.php',
         'App\\Http\\Controllers\\Controller' => __DIR__ . '/../..' . '/app/Http/Controllers/Controller.php',
         'App\\Http\\Controllers\\SendEmailController' => __DIR__ . '/../..' . '/app/Http/Controllers/SendEmailController.php',
         'App\\Http\\Helpers' => __DIR__ . '/../..' . '/app/Http/Helpers.php',
@@ -5028,6 +5034,13 @@ class ComposerStaticInite2ba2be2abd18ef0cdf065015a13d775
         'Spatie\\Backtrace\\CodeSnippet' => __DIR__ . '/..' . '/spatie/backtrace/src/CodeSnippet.php',
         'Spatie\\Backtrace\\File' => __DIR__ . '/..' . '/spatie/backtrace/src/File.php',
         'Spatie\\Backtrace\\Frame' => __DIR__ . '/..' . '/spatie/backtrace/src/Frame.php',
+        'Spatie\\Crypto\\Rsa\\Exceptions\\CouldNotDecryptData' => __DIR__ . '/..' . '/spatie/crypto/src/Rsa/Exceptions/CouldNotDecryptData.php',
+        'Spatie\\Crypto\\Rsa\\Exceptions\\FileDoesNotExist' => __DIR__ . '/..' . '/spatie/crypto/src/Rsa/Exceptions/FileDoesNotExist.php',
+        'Spatie\\Crypto\\Rsa\\Exceptions\\InvalidPrivateKey' => __DIR__ . '/..' . '/spatie/crypto/src/Rsa/Exceptions/InvalidPrivateKey.php',
+        'Spatie\\Crypto\\Rsa\\Exceptions\\InvalidPublicKey' => __DIR__ . '/..' . '/spatie/crypto/src/Rsa/Exceptions/InvalidPublicKey.php',
+        'Spatie\\Crypto\\Rsa\\KeyPair' => __DIR__ . '/..' . '/spatie/crypto/src/Rsa/KeyPair.php',
+        'Spatie\\Crypto\\Rsa\\PrivateKey' => __DIR__ . '/..' . '/spatie/crypto/src/Rsa/PrivateKey.php',
+        'Spatie\\Crypto\\Rsa\\PublicKey' => __DIR__ . '/..' . '/spatie/crypto/src/Rsa/PublicKey.php',
         'Spatie\\FlareClient\\Api' => __DIR__ . '/..' . '/spatie/flare-client-php/src/Api.php',
         'Spatie\\FlareClient\\Concerns\\HasContext' => __DIR__ . '/..' . '/spatie/flare-client-php/src/Concerns/HasContext.php',
         'Spatie\\FlareClient\\Concerns\\UsesTime' => __DIR__ . '/..' . '/spatie/flare-client-php/src/Concerns/UsesTime.php',

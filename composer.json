@@ -13,6 +13,7 @@
         "laravel/tinker": "^2.7",
         "livewire/livewire": "^2.5",
         "propaganistas/laravel-phone": "^4.3",
+        "spatie/crypto": "^2.0",
         "te7a-houdini/laravel-trix": "^2.0"
     },
     "require-dev": {
