@@ -15,8 +15,8 @@ class ApiDataController extends Controller
      */
      public function index()
      {
-         //$response = Http::get('https://servis.epos.rs/api/licenca/A26-12RB-1K12746');
-         $response = Http::get('http://localhost/api/licenca/A26-12RB-1K12658');
+         $response = Http::get('https://servis.epos.rs/api/licenca/A26-12RB-1K12746');
+         //$response = Http::get('http://localhost/api/licenca/A26-12RB-1K12658');
          $pathToPublicKey = base_path().'/storage/app/lickey/lic_public';
          $publicKey = PublicKey::fromFile($pathToPublicKey);
 
