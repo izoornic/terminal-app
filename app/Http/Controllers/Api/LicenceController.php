@@ -32,22 +32,22 @@ class LicenceController extends Controller
      */
     public function show($snn)
     {
-        $pathToPrivateKey = base_path().'/storage/app/lickey/lic_private';
+        //$key_path = base_path().'/storage/app/lickey/';
         //(new KeyPair())->generate($key_path."lic_private", $key_path."lic_public");
         //
         $terminal = Terminal::where('sn', $snn) -> first();
-        $cdata = json_encode([  'status' => true,
-                                'tdata' => $terminal ]);
+        $str_to_sign = 'zeta-epos-2023-02-22';
 
-        $privateKey = PrivateKey::fromFile($pathToPrivateKey);
-        $encryptedData = $privateKey->encrypt($cdata);
+        $pathToPrivateKey = base_path().'/storage/app/lickey/lic_private';
+        $signature = PrivateKey::fromFile($pathToPrivateKey)->sign($str_to_sign);
 
         //dd($encryptedData);
 
-        /* return response()->json([
+        return response()->json([
             'status' => true,
-            'data'  => "'".$encryptedData."'"
-        ], 200, ['Content-Type' => 'application/json;charset=UTF-8', 'Charset' => 'utf-8'],JSON_UNESCAPED_UNICODE); */
+            'signature' => $signature,
+            'data'  => $terminal
+        ]);
         
         return $encryptedData;
     }

@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ApiDataController;
 //use App\Http\Controllers\SendEmailController;
 /*
 |--------------------------------------------------------------------------
@@ -28,6 +29,8 @@ Route::get('/prijava', function () {
 Route::get('/blacklist', function () {
     return (view('blacklist'));
 });
+
+Route::get('/apitest', [ApiDataController::class, 'index']);
 
 //Route::get('send-email', [SendEmailController::class, 'index']);
 /* Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard', function () {
