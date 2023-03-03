@@ -65,7 +65,31 @@
                                     </select>
                                 </td>
                                 <td colspan="2" class="text-right text-sm pr-4">Ukupno: <span class="font-bold">{{ $data->total() }}</span></td>    
-                            </tr>                     
+                            </tr>  
+                            
+
+                            {{-- SEARCH ROW 2 --}}
+                            <tr class="bg-orange-50 border-dashed border-t-2 border-gray-300">
+                                <td></td>
+                                <td></td>
+                                <td colspan="2"class="text-right" ></td>
+                                <td>
+                                    <select wire:model="searchVrstaKvara" id="" class="block appearance-none bg-orange-50 w-full border border-0 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+                                                <option value="">-- Vrsta kvara --</option>
+                                            @foreach (App\Models\TiketOpisKvaraTip::opisList() as $key => $value)    
+                                                <option value="{{ $key }}">{{ $value }}</option>
+                                            @endforeach
+                                    </select> 
+                                </td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td colspan="2" class="text-right text-sm pr-4"></td>    
+                            </tr>
+
+
+
+                        
                         <tbody class="bg-white divide-y divide-gray-200">                           
                             @if ($data->count())
                                 @foreach ($data as $item)

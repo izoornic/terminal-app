@@ -364,7 +364,7 @@
                                 <p class="mb-2 text-base font-normal text-gray-500 dark:text-gray-400">Lokacija: <span class="font-bold">{{ $item->lokacija }} , {{ $item->mesto }}</span></p>
                             @else
                                 <h3 class="flex items-center mb-1 text-lg font-semibold text-gray-900 dark:text-white"> - <span class="bg-sky-100 text-sky-900 text-sm font-medium mr-2 px-2.5 py-0.5 rounded dark:bg-blue-200 dark:text-blue-800 ml-3">{{ App\Http\Helpers::datumFormat($item->updated_at) }}</span></h3>
-                                <p class="mb-0 text-base font-normal text-gray-500 dark:text-gray-400"><span class="font-bold">Tiket #{{ $item->lokacija }}</span> , {{ $item->mesto }} : {{ $item->dodeljen }}</p>
+                                <p class="mb-0 text-base font-normal text-gray-500 dark:text-gray-400"><span class="font-bold"><x-jet-nav-link href="{{ route( 'tiketview', ['id' => $item->lokacija] ) }}">Tiket #{{ $item->lokacija }}</span></x-jet-nav-link> , {{ $item->mesto }} : {{ $item->dodeljen }}</p>
                                 <p class="mb-2 text-base font-normal text-gray-500 dark:text-gray-400">Opis kvara: <span class="font-bold">{{ $item->user_ime }}</span></p>
                             @endif
                         </li>

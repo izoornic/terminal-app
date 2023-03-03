@@ -39,7 +39,10 @@ class Tikets extends Component
     public $searchStatus;
     public $searchTerminalId;
     public $tiketStatusId;
+    public $searchVrstaKvara;
     
+    // UPDATE MODAL
+    public $modalFormVisible;
 
     //MODAL dodaj tiket
     public $modalNewTiketVisible;
@@ -146,6 +149,7 @@ class Tikets extends Component
             ->where('regions.id', ($this->searchRegion > 0) ? '=' : '<>', $this->searchRegion)
             ->where('tikets.tiket_prioritetId', ($this->searchPrioritet > 0) ? '=' : '<>', $this->searchPrioritet)
             ->where('terminals.sn', 'like', '%'.$this->searchTerminalId.'%')
+            ->where('tiket_opis_kvara_tips.id', ($this->searchVrstaKvara > 0) ? '=' : '<>', $this->searchVrstaKvara)
             ->when($this->searchStatus == 1, function ($rtval){
                 return $rtval->where('tikets.tiket_statusId', '<>', 3);
             } )
@@ -205,7 +209,7 @@ class Tikets extends Component
      */
     private function resetAll()
     {
-        $this->newPretragaPo = 0;
+        //$this->newPretragaPo = 0;
         $this->newTerminalLokacijaId = 0;
         $this->searchTerminalLokacijaNaziv = '';
         $this->searchTerminalMesto = '';
@@ -334,7 +338,7 @@ class Tikets extends Component
     /**
      * id Sefa Servisa
      *
-     * @return void
+     * @return object
      */
     private function sefServisa()
     {

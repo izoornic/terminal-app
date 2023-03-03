@@ -20,12 +20,13 @@ class ApiDataController extends Controller
          $pathToPublicKey = base_path().'/storage/app/lickey/lic_public';
          $publicKey = PublicKey::fromFile($pathToPublicKey);
 
-         $apiData = json_decode($request->getContent(), true);
+         $apiData = json_decode($response);
+
 
          //$decryptedData = $publicKey->decrypt($response);
 
         //$jsonData = $response->json();
-         dd($apiData);
+         dd($publicKey->verify('zeta-epos-2023-02-22', $apiData->signature)); // returns false;);
  
      }
 }

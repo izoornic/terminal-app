@@ -9,7 +9,7 @@ class TiketOpisKvaraTip extends Model
 {
     use HasFactory;
 
-    public static function opisList($id)
+    public static function opisList($id = 1)
     {
         $kvar_list =[];
         foreach(TiketOpisKvaraTip::where('termnal_tipId', '=', $id)->orderBy('list_order')->get() as $kvar){
@@ -17,4 +17,6 @@ class TiketOpisKvaraTip extends Model
         }
         return  $kvar_list;
     }
+
+    
 }

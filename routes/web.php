@@ -82,5 +82,9 @@ Route::group(['middleware' => [
     Route::get('/licenca-terminali', function(){
         return view('admin.licenca-terminali');
         })->name('licenca-terminali');
+    
+    Route::get('/distributeri', function(){
+        return view('admin.distributer');
+        })->name('distributeri');
 
 });

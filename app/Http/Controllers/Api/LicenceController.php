@@ -37,7 +37,7 @@ class LicenceController extends Controller
         //
         $terminal = Terminal::where('sn', $snn) -> first();
         $str_to_sign = 'zeta-epos-2023-02-22';
-
+       
         $pathToPrivateKey = base_path().'/storage/app/lickey/lic_private';
         $signature = PrivateKey::fromFile($pathToPrivateKey)->sign($str_to_sign);
 
@@ -46,6 +46,7 @@ class LicenceController extends Controller
         return response()->json([
             'status' => true,
             'signature' => $signature,
+            'len' => strlen($signature),
             'data'  => $terminal
         ]);
         
