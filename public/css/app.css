@@ -1222,6 +1222,9 @@ select {
 .w-3\/5 {
   width: 60%;
 }
+.w-80 {
+  width: 20rem;
+}
 .min-w-0 {
   min-width: 0px;
 }
@@ -1499,10 +1502,6 @@ select {
 .border-gray-100 {
   --tw-border-opacity: 1;
   border-color: rgb(243 244 246 / var(--tw-border-opacity));
-}
-.border-gray-500 {
-  --tw-border-opacity: 1;
-  border-color: rgb(107 114 128 / var(--tw-border-opacity));
 }
 .border-red-400 {
   --tw-border-opacity: 1;

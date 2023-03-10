@@ -270,7 +270,7 @@ class LicencaLokacija extends Component
     /**
      * lokacijaInfo
      *
-     * @return void
+     * @return object
      */
     private function lokacijaInfo()
     {

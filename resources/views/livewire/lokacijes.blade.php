@@ -468,7 +468,7 @@
                             <tr>
                                 <td></td>
                                 <td><x-jet-input wire:model="searchSN" id="" class="block bg-orange-50 w-full" type="text" placeholder="Seriski broj" /></td>
-                                <td><x-jet-input wire:model="searchBK" id="" class="block bg-orange-50 w-full" type="text" placeholder="Seriski broj" /></td>
+                                <td><x-jet-input wire:model="searchBK" id="" class="block bg-orange-50 w-full" type="text" placeholder="Broj kutije" /></td>
                                 <td></td>
                             </tr>
                             <tbody>

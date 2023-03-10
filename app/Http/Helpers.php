@@ -12,6 +12,11 @@ class Helpers
         return Carbon::parse($dbdate)->setTimezone('Europe/Belgrade')->translatedFormat('d. m. Y. - G:i:s');
     }
 
+    public static function datumFormatDan($dbdate)
+    {
+        return Carbon::parse($dbdate)->setTimezone('Europe/Belgrade')->translatedFormat('d. m. Y.');
+    }
+
     public static function datumKalendarNow()
     {
        return Carbon::now()->format('Y-m-d');

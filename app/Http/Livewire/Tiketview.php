@@ -332,7 +332,7 @@ class Tiketview extends Component
     /**
      * id Sefa Servisa
      *
-     * @return void
+     * @return object
      */
     private function sefServisa()
     {

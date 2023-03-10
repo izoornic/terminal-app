@@ -27,4 +27,10 @@ class LicencaDistributerTip extends Model
         'datum_kraj_ugovora',
         'dani_prekoracenja_licence'
     ];
+
+    public static function DistributerName($id)
+    {
+        return (string) LicencaDistributerTip::find($id)->distributer_naziv;
+    }
+
 }

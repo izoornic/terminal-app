@@ -87,4 +87,12 @@ Route::group(['middleware' => [
         return view('admin.distributer');
         })->name('distributeri');
 
+    Route::get('/distributer-licenca', function(){
+        return view('admin.distributer-licence');
+        })->name('distributer-licenca');
+
+    Route::get('/distributer-treminal', function(){
+        return view('admin.distributer-treminali');
+        })->name('distributer-treminal');
+
 });
