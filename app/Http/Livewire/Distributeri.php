@@ -31,13 +31,16 @@ class Distributeri extends Component
     public $datum_ugovora;
     public $datum_kraj_ugovora;
     public $dani_prekoracenja_licence;
+    public $broj_licenci;
+    public $broj_terminala;
 
     
     //delete
     public $modalConfirmDeleteVisible;
+    public $delete_possible;
     
     //OREDER BY
-    public $orderBy;
+    public $orderBy = 'id';
 
     //SEARCH
     public $searchName;
@@ -58,7 +61,7 @@ class Distributeri extends Component
             'd_zip' => ['required', 'digits:5'],
             'd_mesto' => 'required',
             'd_email' => ['required','email'],
-            'd_pib' => ['required', 'digits:8'],
+            'd_pib' => ['required', 'digits_between:8,10'],
             'd_mb' => ['required', 'digits:8'],
             'datum_ugovora' => ['required', 'date_format:Y-m-d'],
             'datum_kraj_ugovora'=> ['required', 'date_format:Y-m-d'],
@@ -87,6 +90,8 @@ class Distributeri extends Component
         $this->datum_ugovora    = $data->datum_ugovora;
         $this->datum_kraj_ugovora       = $data->datum_kraj_ugovora;
         $this->dani_prekoracenja_licence     = $data->dani_prekoracenja_licence;
+        $this->broj_licenci = $data->broj_licenci;
+        $this->broj_terminala = $data->broj_terminala;
     }
 
     /**
@@ -157,6 +162,10 @@ class Distributeri extends Component
     public function read() 
     {
        return LicencaDistributerTip::select('licenca_distributer_tips.*')
+            ->where('distributer_naziv', 'like', '%'.$this->searchName.'%')
+            ->where('distributer_mesto', 'like', '%'.$this->searchMesto.'%')
+            ->where('distributer_pib', 'like', '%'.$this->searchPib.'%')
+            ->orderBy($this->orderBy)
             ->paginate(Config::get('global.paginate'), ['*'], 'lokacije'); 
     }
 
@@ -179,9 +188,24 @@ class Distributeri extends Component
      */
     public function delete()
     {
-        //LicencaDistributerTip::destroy($this->modelId);
-        $this->modalConfirmDeleteVisible = false;
-        $this->resetPage();
+        if($this->deletePosible()){
+            LicencaDistributerTip::destroy($this->modelId);
+            $this->modalConfirmDeleteVisible = false;
+            $this->resetPage();
+        }else{
+           
+        }
+        
+    }
+
+    /**
+     * The delete check function.
+     *
+     * @return boolean
+     */
+    private function deletePosible()
+    {
+        return false;
     }
 
     /**
@@ -222,7 +246,10 @@ class Distributeri extends Component
      */
     public function deleteShowModal($id)
     {
+        $this->resetModel();
         $this->modelId = $id;
+        $this->loadModel();
+        $this->delete_possible = ($this->broj_licenci == 0 && $this->broj_terminala == 0) ? true : false;
         $this->modalConfirmDeleteVisible = true;
     }    
 
@@ -232,4 +259,13 @@ class Distributeri extends Component
             'data' => $this->read(),
         ]);
     }
+
+    //DODAVANJE TERMINALA MTS-u
+    /* INSERT INTO `licenca_distributer_terminals` (`id`, `distributerId`, `terminal_lokacijaId`,  `datum_pocetak`, `datum_kraj`, `created_at`, `updated_at`) 
+    SELECT '4', tl.id, '2023-03-01', '2023-04-01', '2023-03-13 06:50:40', '2023-03-13 06:50:40'
+    FROM terminal_lokacijas as tl 
+    LEFT JOIN lokacijas as l ON tl.lokacijaId = l.id
+    LEFT JOIN lokacija_tips as lt ON l.lokacija_tipId = lt.id
+    WHERE lt.id = 3; */
+
 }

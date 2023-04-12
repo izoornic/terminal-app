@@ -72,6 +72,7 @@ class Tiketview extends Component
     public $kreiranOlineInfo;
 
     private $mailToUser;
+    
     /**
      * mount
      *

@@ -55,15 +55,15 @@ class SelectedTerminalInfo
     }
 
     public function terminalInfo($id, $typeOf)
-    {
+    { 
         return TerminalLokacija::select('terminal_lokacijas.*', 'terminals.sn', 'terminals.terminal_tipId as tid', 'terminal_status_tips.ts_naziv', 'lokacijas.l_naziv', 'lokacijas.adresa', 'lokacijas.mesto', 'lokacija_kontakt_osobas.name', 'lokacija_kontakt_osobas.tel', 'regions.r_naziv', 'regions.id as rid')
-                    ->when($typeOf == "terminal_lokacija", function ($rtval){
+                    ->when($typeOf == "terminal_lokacija", function ($rtval) use($id){
                         return $rtval->where('terminal_lokacijas.id',  $id);
                     })
-                    ->when($typeOf == "terminalID", function ($rtval){
+                    ->when($typeOf == "terminalID", function ($rtval) use($id){
                         return $rtval->where('terminalId', $id);
                     })
-                    ->when($typeOf == "terminalSN", function ($rtval){
+                    ->when($typeOf == "terminalSN", function ($rtval) use($id){
                         return $rtval->where('terminals.sn', $id);
                     })
                     ->leftJoin('terminals', 'terminal_lokacijas.terminalId', '=', 'terminals.id')

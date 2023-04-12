@@ -41,6 +41,7 @@ class MailToUser
     
     public function sendEmails($subject, $comentari = null)
     {
+
         foreach ($this->email_primaoci as $mail_address) {
             try {
                 Mail::to($mail_address)->send(new NotyfyMail($this->tiketData($subject), $comentari));
@@ -56,7 +57,7 @@ class MailToUser
     /**
      * setEmailPrimaoce
      *
-     * @return void
+     * @return object
      */
     private function setEmailPrimaoce()
     {
@@ -138,7 +139,7 @@ class MailToUser
     /**
      * userInfo
      *
-     * @return void
+     * @return object
      */
     private function userInfo($id)
     {
@@ -210,7 +211,7 @@ class MailToUser
      * sef Servisa za izabrani Terminal 
      *
      * @param  mixed $terminalLokacijaId
-     * @return void
+     * @return object
      */
     public static function sefServisaTerminal($terminalLokacijaId)
     {

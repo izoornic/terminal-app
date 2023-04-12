@@ -49,7 +49,5 @@ class LicenceController extends Controller
             'len' => strlen($signature),
             'data'  => $terminal
         ]);
-        
-        return $encryptedData;
     }
 }

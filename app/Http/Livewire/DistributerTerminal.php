@@ -2,8 +2,14 @@
 
 namespace App\Http\Livewire;
 
+use App\Http\Helpers;
+use App\Ivan\SelectedTerminalInfo;
+use App\Models\LicencaDistributerCena;
 use App\Models\LicencaDistributerTerminal;
+use App\Models\LicencaDistributerTip;
+use App\Models\LicencaParametarTerminal;
 use App\Models\TerminalLokacija;
+use App\Models\LicencaParametar;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -16,13 +22,20 @@ class DistributerTerminal extends Component
     
     public $modalFormVisible;
     public $modalConfirmDeleteVisible;
-    public $modelId;
+    public $modelId; //ID u tabeli terminal_lokacias
 
+    //set on MOUNT
     public $distId;
-
-    public $isUpdate;
+    public $osnovna_licenca_id;
+    public $osnovna_licenca_naziv;
+    
+    //SEARCH MAIN
+    public $searchTerminalSn;
+    public $searchMesto;
+    public $searchTipLicence;
 
     //dodaj terminal MODAL
+    public $isUpdate;
     public $allInPage;
     public $selectAllValue = 1;
     public $selectAll;
@@ -30,8 +43,38 @@ class DistributerTerminal extends Component
     public $searchBK;
     public $selsectedTerminals = [];
 
-    public $licenca_tip_id;
+    public $datum_kraja_licence;
+    public $datum_pocetka_licence;
     
+    public $licence_za_dodavanje = [];
+    public $dani_trajanja;
+
+    public $parametri = [];
+
+    //DODAJ LICENCU MODAL
+    public $dodajLicencuModalVisible;
+    //public $terminal_info;
+    public $licence_dodate_terminalu = [];
+    public $distrib_terminal_id;
+
+    //DELETE MODAL
+    public $deleteAction;
+    public $canDelete;
+    public $briseSe;
+
+    //terminal info modal
+    public $modalTerminalInfoVisible;
+    public $terminalInfo;
+    public $licenceNaziviInfo;
+
+    public $licparams;
+
+    //PARAMETRI LICENCE MODAL
+    public $parametriModalVisible;
+    public $pm_licenca_tip_id;
+    //niz sa globalno dodeljenim parametrima za licencu
+    public $licenca_tip_parametri;
+    public $pm_licenca_naziv;
 
    /**
      * mount
@@ -41,6 +84,9 @@ class DistributerTerminal extends Component
     public function mount()
     {
         $this->distId = request()->query('id');
+        $lic_ar = LicencaDistributerCena::OsnovnaLicencaDistributera($this->distId);
+        $this->osnovna_licenca_id =  $lic_ar[0];
+        $this->osnovna_licenca_naziv = $lic_ar[1];
     }
 
     /**
@@ -50,79 +96,43 @@ class DistributerTerminal extends Component
      */
     public function rules()
     {
-        return [            
+        return [
+            'datum_pocetka_licence' => ['required', 'date_format:"Y-m-d"'],
+            'datum_kraja_licence' => ['required', 'date_format:"Y-m-d"']       
         ];
     }
 
     /**
-     * Loads the model data
-     * of this component.
+     * The reset form for new teminal
      *
      * @return void
      */
-    public function loadModel()
+    public function resetTerm()
     {
-        $data = LicencaDistributerTerminal::find($this->modelId);
-        // Assign the variables here
+        $this->allInPage = [];
+        $this->selectAllValue = 0;
+        $this->selectAll = null;
+        $this->selsectedTerminals = [];
+        $this->datum_pocetka_licence = Helpers::datumKalendarNow();
+        $this->datum_kraja_licence = Helpers::firstDayOfMounth(Helpers::addMonthsToDate($this->datum_pocetka_licence, 1));
+        //$this->datum_kraja_licence = Helpers::lastDayOfManth($this->datum_pocetka_licence, 1);
+        $this->licence_za_dodavanje = [];
+        $this->distrib_terminal_id = 0;
+        $this->dani_trajanja = 1;
+        $this->parametri = [];
     }
 
-    /**
-     * The data for the model mapped
-     * in this component.
+   /**
+     * Koliko terminala ima distributer function.
      *
-     * @return void
+     * @return object
      */
-    public function modelData()
+    public function prebrojTerminaleDistributera()
     {
-        return [          
-        ];
-    }
-
-    /**
-     * The create function.
-     *
-     * @return void
-     */
-    public function create()
-    {
-        $this->validate();
-        LicencaDistributerTerminal::create($this->modelData());
-        $this->modalFormVisible = false;
-        $this->reset();
-    }
-
-    /**
-     * The read function.
-     *
-     * @return void
-     */
-    public function read()
-    {
-        return LicencaDistributerTerminal::paginate(5);
-    }
-
-    /**
-     * The update function
-     *
-     * @return void
-     */
-    public function update()
-    {
-        $this->validate();
-        LicencaDistributerTerminal::find($this->modelId)->update($this->modelData());
-        $this->modalFormVisible = false;
-    }
-
-    /**
-     * The delete function.
-     *
-     * @return void
-     */
-    public function delete()
-    {
-        LicencaDistributerTerminal::destroy($this->modelId);
-        $this->modalConfirmDeleteVisible = false;
-        $this->resetPage();
+        return LicencaDistributerTerminal::select()
+        ->where('distributerId', '=', $this->distId)
+        ->distinct('terminal_lokacijaId')
+        ->count();
     }
 
     /**
@@ -133,25 +143,240 @@ class DistributerTerminal extends Component
     public function createShowModal()
     {
         $this->resetValidation();
-        //$this->reset();
+        $this->resetTerm();
         $this->modalFormVisible = true;
     }
 
-    /**
-     * Shows the form modal
-     * in update mode.
+     /**
+     * The create function. 
      *
-     * @param  mixed $id
      * @return void
      */
-    public function updateShowModal($id)
+    public function create()
     {
-        dd($this->terminalsToAdd());
-        $this->resetValidation();
-        $this->reset();
-        $this->modalFormVisible = true;
-        $this->modelId = $id;
-        $this->loadModel();
+        $ima_licenci = count($this->licence_za_dodavanje);
+        if($ima_licenci){
+            $this->validate();
+            $this->dani_trajanja = Helpers::numberOfDaysBettwen($this->datum_pocetka_licence, $this->datum_kraja_licence);
+            if(!$this->dani_trajanja){
+                return;
+            }
+
+            //parametri
+            $parametriAll = $this->parametersAll();
+        }
+        if( count($this->selsectedTerminals)){
+            $model_data = [
+                'distributerId' => $this->distId,
+                'licenca_distributer_cenaId' => null,
+                'datum_pocetak' => ($ima_licenci) ? $this->datum_pocetka_licence : null,
+                'datum_kraj' => ($ima_licenci) ? $this->datum_kraja_licence : null,
+                'licenca_broj_dana' => ($ima_licenci) ? $this->dani_trajanja : 0,
+            ];
+
+            foreach($this->selsectedTerminals as $tre_loc_id){
+                $model_data['terminal_lokacijaId'] = $tre_loc_id;
+                if($ima_licenci){
+                    foreach ($this->licence_za_dodavanje as $licenca_id){
+                        $licenca_tip_id = LicencaDistributerCena::where('id', '=', $licenca_id)->first()->licenca_tipId;
+                        $model_data['licenca_distributer_cenaId'] = $licenca_id;
+                        $new_licence = LicencaDistributerTerminal::create($model_data);
+                        $this->addParametersToLicence($new_licence->id, $parametriAll, $licenca_tip_id);
+                    }
+                }else{
+                    LicencaDistributerTerminal::create($model_data);
+                }
+            }
+            $this->updateBrTerminalaDistributeru();
+        }
+        $this->modalFormVisible = false;
+       $this->resetTerm();
+    }
+
+    private function parametersAll()
+    {
+        $parametriAll = [];
+        foreach ($this->licence_za_dodavanje as $licencaa_id){
+            $licenca_tip_id = LicencaDistributerCena::where('id', '=', $licencaa_id)->first()->licenca_tipId;
+            $parametri_licence = LicencaParametar::where('licenca_tipId', '=', $licenca_tip_id)->pluck('id')->all();
+            $parametriAll[$licenca_tip_id] = $parametri_licence;
+        }
+        return $parametriAll;
+    }
+
+    private function addParametersToLicence($lic_dist_termId, $parametriAll, $licenca_tip_id)
+    {
+        foreach($parametriAll[$licenca_tip_id] as $parametarJedneLicence){
+            if(in_array($parametarJedneLicence, $this->parametri)){
+                LicencaParametarTerminal::create(['licenca_distributer_terminalId' => $lic_dist_termId, 'licenca_parametarId' => $parametarJedneLicence]);
+            }
+        }
+        $this->updateBrojParametaraLicence($lic_dist_termId);
+    }
+
+    private function updateBrojParametaraLicence($lic_dist_termId)
+    {
+        $br_parametara = LicencaParametarTerminal::where('licenca_distributer_terminalId', '=', $lic_dist_termId)->count();
+        LicencaDistributerTerminal::find($lic_dist_termId)->update(['broj_parametara' => $br_parametara]);
+    }
+
+    private function updateBrTerminalaDistributeru()
+    {
+        LicencaDistributerTip::where('id', '=', $this->distId) ->update(['broj_terminala' => $this->prebrojTerminaleDistributera()]);
+    }
+
+    /**
+     * Shows dodaj Licenca modal.
+     *
+     * @return void
+     */
+    public function dodajLicencaShowModal($tre_loc_id, $ldtidd)
+    {
+        $this->resetTerm();
+        $this->distrib_terminal_id = $ldtidd;
+        $this->modelId = $tre_loc_id;
+        $this->licence_za_dodavanje = [];
+        //$this->terminal_info = SelectedTerminalInfo::selectedTerminalInfoTerminalLokacijaId( $this->modelId);
+        $this->licence_dodate_terminalu = $this->licenceDodateTerminalu();
+        if ($this->licence_dodate_terminalu[0] == null) $this->licence_dodate_terminalu = [];
+        $this->dodajLicencuModalVisible = true;
+    }
+
+    private function licenceDodateTerminalu()
+    {
+        return LicencaDistributerTerminal::where('terminal_lokacijaId', '=', $this->modelId)
+                    ->pluck('licenca_distributer_cenaId')->all();
+    }
+
+    /**
+     * Dodaj licence function.
+     *
+     * @return void
+     */
+    public function dodajLicenceTerminalu()
+    {
+        $this->validate();
+        //parametri
+        $parametriAll = $this->parametersAll();
+
+        $this->dani_trajanja = Helpers::numberOfDaysBettwen($this->datum_pocetka_licence, $this->datum_kraja_licence);
+        if($this->dani_trajanja){
+            if(count($this->licence_za_dodavanje)){
+                $model_data = [
+                    'distributerId' => $this->distId,
+                    'terminal_lokacijaId' => $this->modelId,
+                    'datum_pocetak' => $this->datum_pocetka_licence,
+                    'datum_kraj' => $this->datum_kraja_licence,
+                    'licenca_broj_dana' => $this->dani_trajanja
+                ];
+
+                foreach($this->licence_za_dodavanje as $lc){
+                    $licenca_tip_id = LicencaDistributerCena::where('id', '=', $lc)->first()->licenca_tipId;
+
+                    $model_data['licenca_distributer_cenaId'] = $lc;
+                    if($lc == $this->osnovna_licenca_id){
+                        $new_licence = $this->distrib_terminal_id;
+                        LicencaDistributerTerminal::where('id', '=', $this->distrib_terminal_id)
+                            ->update([
+                                'licenca_distributer_cenaId' =>  $lc,
+                                'datum_pocetak' => $this->datum_pocetka_licence,
+                                'datum_kraj' => $this->datum_kraja_licence,
+                                'licenca_broj_dana' => $this->dani_trajanja
+                            ]);
+                    }else{
+                        $new_licence = LicencaDistributerTerminal::create($model_data)->id; 
+                    } 
+                    $this->addParametersToLicence($new_licence, $parametriAll, $licenca_tip_id);
+                }
+                $this->updateBrTerminalaDistributeru();
+            }
+            $this->resetTerm();
+            $this->dodajLicencuModalVisible = false;
+        }        
+    }
+
+    public function deleteLicencuShowModal($tre_loc_id, $ldtidd)
+    {
+        $this->licence_dodate_terminalu = [];
+        $this->deleteAction = 'licenca';
+        $this->modelId = $tre_loc_id;
+        $this->distrib_terminal_id = $ldtidd;
+        $this->briseSe = '';
+        
+
+        // 1. provera, da li brise osnovnu licencu
+        if(LicencaDistributerTerminal::select('licenca_distributer_cenaId')->where('id', '=', $ldtidd)->first()->licenca_distributer_cenaId == $this->osnovna_licenca_id){
+            //2. provera, da li ima jos licenci sem osnovne
+            $this->licence_dodate_terminalu = $this->licenceDodateTerminalu();
+            if(count($this->licence_dodate_terminalu) > 1){
+                //ima vise licnci
+                $this->briseSe = 'osnovnaIdodatne';
+            }else{
+                $this->briseSe = 'osnovna';
+            }
+        }else{
+            $this->briseSe = 'dodatna';
+        }
+        $this->modalConfirmDeleteVisible = true;
+    }
+
+    public function delteLicenca()
+    {
+        switch($this->briseSe){
+            case 'osnovnaIdodatne':
+                $rows = LicencaDistributerTerminal::select('id', 'licenca_distributer_cenaId')->where('terminal_lokacijaId', '=', $this->modelId)->get();
+                foreach($rows as $row){
+                    if($row->licenca_distributer_cenaId == $this->osnovna_licenca_id){
+                        //update
+                        LicencaDistributerTerminal::where('id', '=', $row->id)->update(['licenca_distributer_cenaId' => null, 'datum_pocetak' => null, 'datum_kraj' => null]);
+                    }else{
+                        //delete
+                        LicencaDistributerTerminal::destroy($row->id);
+                    }
+                    $this->deleteParams($row->id);
+                }
+                break;
+            case 'osnovna':
+                LicencaDistributerTerminal::where('id', '=', $this->distrib_terminal_id)->update(['licenca_distributer_cenaId' => null, 'datum_pocetak' => null, 'datum_kraj' => null]);
+                $this->deleteParams($this->distrib_terminal_id);
+                break;
+            case 'dodatna':
+                LicencaDistributerTerminal::destroy($this->distrib_terminal_id);
+                $this->deleteParams($this->distrib_terminal_id);
+                break;
+        }
+        $this->modalConfirmDeleteVisible = false;
+        $this->resetPage();
+    }
+
+    private function deleteParams($distributer_terminal_licId)
+    {
+        LicencaParametarTerminal::where('licenca_distributer_terminalId', '=', $distributer_terminal_licId)->delete();
+    }
+
+    /**
+     * Returns id from tabe licenca_distributer_terminal.
+     *
+     * @param  integer $terminl_lokacija_id
+     * @return object
+     */
+    private function dodatneLicenceIdes($terminl_lokacija_id)
+    {
+        return LicencaDistributerTerminal::where('terminal_lokacijaId', '=', $this->modelId)
+                    ->pluck('id')->all();
+    }
+
+    /**
+     * Shows terminal info modal.
+     *
+     * @return void
+     */
+    public function terminalInfoShowModal($terminal_lokacija_id)
+    {
+        $this->modelId = $terminal_lokacija_id;
+        $this->licenceNaziviInfo = LicencaDistributerCena::naziviDodatihLicenci($this->licenceDodateTerminalu());
+        $this->terminalInfo = SelectedTerminalInfo::selectedTerminalInfoTerminalLokacijaId($terminal_lokacija_id);
+        $this->modalTerminalInfoVisible = true;
     }
 
     /**
@@ -160,19 +385,35 @@ class DistributerTerminal extends Component
      * @param  mixed $id
      * @return void
      */
-    public function deleteShowModal($id)
+    public function deleteShowModal($id, $ldtidd)
     {
+        $this->deleteAction = 'terminal';
         $this->modelId = $id;
+        $this->distrib_terminal_id = $ldtidd;
+        $this->terminalInfo = SelectedTerminalInfo::selectedTerminalInfoTerminalLokacijaId($this->modelId);
         $this->modalConfirmDeleteVisible = true;
-    }    
+    }  
+    
+     /**
+     * The delete function.
+     *
+     * @return void
+     */
+    public function delete()
+    {
+        LicencaDistributerTerminal::destroy($this->distrib_terminal_id);
+        $this->updateBrTerminalaDistributeru();
+        $this->modalConfirmDeleteVisible = false;
+        $this->resetPage();
+    }
 
     /**
-     * The data for the model mapped
-     * in this component.
+     * Lista terminala koji imaju licencu 
+     * pa ne mogu biti dodati kao novi
      *
      * @return object
      */
-    public function tremninaliSaLicencom()
+    private function tremninaliSaLicencom()
     {
         $DodeljeneLicence = LicencaDistributerTerminal::select('terminal_lokacijaId')->distinct()->pluck('terminal_lokacijaId')->all();
 
@@ -191,13 +432,14 @@ class DistributerTerminal extends Component
     { 
         $this->allInPage = [];
         //->where('terminal_lokacijas.lokacijaId', $id)
-        $terms =  TerminalLokacija::select('terminal_lokacijas.*', 'terminals.sn', 'terminals.broj_kutije', 'terminal_status_tips.ts_naziv', 'terminals.id as tid', 'terminal_tips.model')
+        $terms =  TerminalLokacija::select('terminal_lokacijas.*', 'terminals.sn', 'terminals.broj_kutije', 'terminal_status_tips.ts_naziv', 'terminal_tips.model')
                                 ->leftJoin('terminals', 'terminal_lokacijas.terminalId', '=', 'terminals.id')
                                 ->leftJoin('terminal_tips', 'terminals.terminal_tipId', '=', 'terminal_tips.id')
                                 ->leftJoin('terminal_status_tips', 'terminal_lokacijas.terminal_statusId', '=', 'terminal_status_tips.id')
+                                ->whereNotIn('terminal_lokacijas.id', $this->tremninaliSaLicencom())
                                 ->where('terminals.sn', 'like', '%'.$sn.'%')
                                 ->where('terminals.broj_kutije', 'like', '%'.$bk.'%')
-                                ->paginate(Config::get('global.terminal_paginate'), ['*'], 'terminaliLokacija');
+                                ->paginate(Config::get('global.modal_search'), ['*'], 'terminaliLokacija');
         foreach($terms as $terminal){
             array_push($this->allInPage,  $terminal->id);
         }
@@ -205,7 +447,68 @@ class DistributerTerminal extends Component
         return $terms;
     }
 
+     
+
      /**
+     * The read function. searchTipLicence
+     *
+     * @return void
+     */
+    public function read()
+    {
+        return LicencaDistributerTerminal::select('terminal_lokacijas.id', 'terminals.sn', 'lokacijas.l_naziv', 'lokacijas.mesto', 'lokacijas.adresa', 'licenca_distributer_terminals.id as ldtid', 'licenca_distributer_terminals.datum_pocetak', 'licenca_distributer_terminals.datum_kraj', 'licenca_tips.licenca_naziv', 'licenca_tips.id as ltid', 'licenca_tips.broj_parametara_licence')
+                    ->leftJoin('terminal_lokacijas', 'licenca_distributer_terminals.terminal_lokacijaId', '=', 'terminal_lokacijas.id')
+                    ->leftJoin('terminals', 'terminal_lokacijas.terminalId', '=', 'terminals.id')
+                    ->leftJoin('lokacijas', 'terminal_lokacijas.lokacijaId', '=', 'lokacijas.id')
+                    ->leftJoin('licenca_distributer_cenas', 'licenca_distributer_terminals.licenca_distributer_cenaId', '=', 'licenca_distributer_cenas.id')
+                    ->leftJoin('licenca_tips', 'licenca_distributer_cenas.licenca_tipId', '=', 'licenca_tips.id')
+                    ->where('licenca_distributer_terminals.distributerId', '=', $this->distId)
+                    ->where('terminals.sn', 'like', '%'.$this->searchTerminalSn.'%')
+                    ->where('lokacijas.mesto', 'like', '%'.$this->searchMesto.'%')
+                    ->when($this->searchTipLicence > 0, function ($rtval){
+                        return $rtval->where('licenca_distributer_cenas.id', '=', ($this->searchTipLicence == 1000) ? null : $this->searchTipLicence);
+                    } )
+                    ->orderBy('terminal_lokacijas.id')
+                    ->orderBy('licenca_distributer_cenas.licenca_tipId')
+                    ->paginate(Config::get('terminal_paginate'), ['*'], 'terminali');
+    }
+
+    public function parametriLicenceShowModal($licencaDistributerTerminalid, $naziv)
+    {
+        $this->resetTerm();
+        $this->distrib_terminal_id = $licencaDistributerTerminalid;
+        $this->pm_licenca_tip_id = $this->licencaTipInfo();
+        $this->pm_licenca_naziv = $naziv;
+        
+        //PARAMETI ZA IZABRANU LICENCU
+        $this->parametri = LicencaParametarTerminal::where('licenca_distributer_terminalId', '=', $this->distrib_terminal_id)->pluck('licenca_parametarId')->all();
+
+        //GLOBALNO DODELJENI parametri za tip licence
+        $this->licenca_tip_parametri = LicencaParametar::where('licenca_tipId', '=', $this->pm_licenca_tip_id)->pluck('id')->all();
+        
+        $this->parametriModalVisible = true;
+    }
+
+    public function updateParametreLicence()
+    {
+        $this->deleteParams($this->distrib_terminal_id);
+        foreach($this->parametri as $parametarId){
+            if(in_array($parametarId, $this->licenca_tip_parametri)){
+                LicencaParametarTerminal::create(['licenca_distributer_terminalId' => $this->distrib_terminal_id, 'licenca_parametarId' => $parametarId]);
+            }  
+        }
+        
+        $this->parametriModalVisible = false;
+    }
+
+    private function licencaTipInfo(){
+        return LicencaDistributerTerminal::select('licenca_distributer_cenas.licenca_tipId')
+        ->leftJoin('licenca_distributer_cenas', 'licenca_distributer_cenas.id', '=', 'licenca_distributer_terminals.licenca_distributer_cenaId')
+        ->where('licenca_distributer_terminals.id', '=', $this->distrib_terminal_id )
+        ->first()
+        ->licenca_tipId;
+    }
+    /**
      * updated
      *
      * @param  mixed $key
@@ -214,7 +517,6 @@ class DistributerTerminal extends Component
      */
     public function updated($key, $value)
     {
-        
         $exp = Str::of($key)->explode(delimiter: '.');
         if($exp[0] === 'selectAll' && is_numeric($value)){
            foreach($this->allInPage as $termid){
@@ -225,12 +527,18 @@ class DistributerTerminal extends Component
         }elseif($exp[0] === 'selectAll' && empty($value)){
             $this->selsectedTerminals = array_diff($this->selsectedTerminals, $this->allInPage);
         }
+        if($this->modalFormVisible || $this->dodajLicencuModalVisible){
+            $this->datum_kraja_licence = Helpers::firstDayOfMounth($this->datum_kraja_licence);
+        }
+        /* if($this->parametriModalVisible){
+            $this->pm_licenca_tip_id = $this->licencaInfo();
+        } */
     }
 
     public function render()
     {
         return view('livewire.distributer-terminal', [
-            'data' => $this->read(),
+            'data' => $this->read(), 'br_terminala' => $this->prebrojTerminaleDistributera(),
         ]);
     }
 }

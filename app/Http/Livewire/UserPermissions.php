@@ -14,6 +14,8 @@ class UserPermissions extends Component
     public $modalConfirmDeleteVisible;
     public $modelId;
 
+    public $ruteName;
+
     /**
      * Put your custom public properties here!
      */

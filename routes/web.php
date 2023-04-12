@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ApiDataController;
 //use App\Http\Controllers\SendEmailController;
+use App\Http\Controllers\PredracunPdfControler;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -31,6 +32,8 @@ Route::get('/blacklist', function () {
 });
 
 Route::get('/apitest', [ApiDataController::class, 'index']);
+
+Route::get('pdf-predracun', [PredracunPdfControler::class, 'index']);
 
 //Route::get('send-email', [SendEmailController::class, 'index']);
 /* Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard', function () {
@@ -94,5 +97,25 @@ Route::group(['middleware' => [
     Route::get('/distributer-treminal', function(){
         return view('admin.distributer-treminali');
         })->name('distributer-treminal');
+
+    Route::get('/zaduzenje', function(){
+        return view('admin.zaduzenja');
+        })->name('zaduzenje');
+
+    Route::get('/zaduzenje-kurs', function(){
+        return view('admin.zaduzenje-srednji_kurs');
+        })->name('zaduzenje-kurs');
+
+    Route::get('/zaduzenje-distributeri', function(){
+        return view('admin.zaduzenje-distributeri');
+        })->name('zaduzenje-distributeri');
+
+    Route::get('/zaduzenje-distributer-mesec', function(){
+        return view('admin.zaduzenje-distributer-mesec');
+        })->name('zaduzenje-distributer-mesec');
+    
+    Route::get('/zaduzenje-pregled', function(){
+        return view('admin.zaduzenje-pregled');
+        })->name('zaduzenje-pregled');
 
 });

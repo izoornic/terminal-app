@@ -92,6 +92,8 @@ class Terminal extends Component
     public $tiketAkcija;
     public $userRegion;
 
+    private $mailToUser;
+
     public function newTiketShowModal($tid)
     {
         $this->zatvorioId = 0;
@@ -146,7 +148,6 @@ class Terminal extends Component
         $tik = Tiket::create($this->modelTiketData());
         
         //send email
-        //send email
         $this->mailToUser = new MailToUser($tik->id);
         $this->mailToUser->sendEmails('novi');
 
@@ -178,7 +179,7 @@ class Terminal extends Component
      /**
      * id Sefa Servisa
      *
-     * @return void
+     * @return object
      */
     private function sefServisa()
     {

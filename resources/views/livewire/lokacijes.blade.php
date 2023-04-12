@@ -260,7 +260,7 @@
                             <div>
                                 <p><span class="font-bold">{{ $odabranaLokacija->l_naziv}}</span>, Adresa: <span class="font-bold">{{ $odabranaLokacija->adresa}}</span></p>
                                 <p>Mesto: <span class="font-bold">{{ $odabranaLokacija->mesto }}</span>, Region: <span class="font-bold">{{ $odabranaLokacija->r_naziv }}</span></p>
-                                <p>PIB: <span class="font-bold">{{ $odabranaLokacija->pib }}</span>
+                                <p>PIB: <span class="font-bold">{{ $odabranaLokacija->pib }}</span></p>
                             </div>
                     </div>
                 </div> 

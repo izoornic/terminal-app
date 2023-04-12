@@ -20,7 +20,10 @@ class LicencaDistributerTerminal extends Model
         'licenca_distributer_cenaId',
         'datum_pocetak',
         'datum_kraj',
-        'nenaplativ'
+        'nenaplativ',
+        'licenca_broj_dana',
+        'auto_obnova',
+        'broj_parametara'
     ];
 
 }

@@ -3,6 +3,7 @@
 namespace App\Http\Livewire;
 
 use App\Models\LicencaDistributerCena;
+use App\Models\LicencaDistributerTerminal;
 use App\Models\LicencaDistributerTip;
 use App\Models\LicencaTip;
 use Illuminate\Support\Facades\Config;
@@ -24,6 +25,7 @@ class DistributerLicenca extends Component
     public $licenca_cena;
     public $licenca_tip_id;
 
+    public $prva_licenca;
     public $delete_error;
     public $delete_error_text;
 
@@ -45,7 +47,8 @@ class DistributerLicenca extends Component
     public function rules()
     {
         return [  
-            'licenca_cena' => ['required', 'numeric']          
+            'licenca_cena' => ['required', 'numeric'],
+            'licenca_tip_id'   =>    ['required', 'numeric']   
         ];
     }
 
@@ -101,7 +104,6 @@ class DistributerLicenca extends Component
     public function create()
     {
         $this->validate();
-        
         DB::transaction(function() {
             //Distributeri tabela
             $cuurent = LicencaDistributerTip::where('id', $this->distId) -> first();
@@ -166,18 +168,37 @@ class DistributerLicenca extends Component
             $this->resetPage();
         }else{
             $this->delete_error = true;
-            $this->delete_error_text = 'Licenca se ne može obrisati jer je vezana za jedan ili više terminala!';
         }
     }
 
     /**
-     * The delete function.
+     * Uslov za brisanje function.
      *
      * @return boolean
      */
     private function canDelete()
     {
-        return false;
+        //da li ima trminala sa tom licencom
+        if(LicencaDistributerTerminal::where('licenca_distributer_cenaId', '=', $this->modelId)->first()){
+           //ima
+           $this->delete_error_text = 'Licenca se ne može obrisati jer je vezana za jedan ili više terminala!';
+           return false;
+        }else{
+            // da li je osnovna licenca
+            $licenca = LicencaDistributerCena::select('licenca_tipId')->where('id', '=', $this->modelId)->first();
+            if($licenca->licenca_tipId == 1){
+                //jeste osnovna, da li ima jos licenci
+                if(LicencaDistributerCena::where('distributerId', '=', $this->distId)->where('licenca_tipId', '<>', 1)->first()){
+                    //ima jos licenci
+                    $this->delete_error_text = 'Da bi ste obrisali osnovnu licencu, prvo morate obrisati sve dodatne licence';
+                    return false;
+                }else{
+                    return true;
+                }
+            }else{
+                return true;
+            }
+        }
     }
 
     /**
@@ -190,6 +211,8 @@ class DistributerLicenca extends Component
         $this->resetLic();
         $this->isUpdate = false;
         $this->resetValidation();
+        //check if it's first
+        $this->prva_licenca = (LicencaDistributerCena::OsnovnaLicencaDistributera($this->distId)[0] == 0) ? true : false; 
         $this->modalFormVisible = true;
     }
 
