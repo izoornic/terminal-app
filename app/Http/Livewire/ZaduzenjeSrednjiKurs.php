@@ -3,8 +3,10 @@
 namespace App\Http\Livewire;
 
 use App\Models\LicencaDistributerMesec;
+use App\Models\LicencaDistributerTip;
 use Livewire\Component;
 use Livewire\WithPagination;
+
 
 class ZaduzenjeSrednjiKurs extends Component
 {
@@ -15,6 +17,7 @@ class ZaduzenjeSrednjiKurs extends Component
     public $mid;
 
     public $srednji_kurs;
+    public $dist_name;
 
     /**
      * mount
@@ -25,6 +28,7 @@ class ZaduzenjeSrednjiKurs extends Component
     {
         $this->did = request()->query('id');
         $this->mid = request()->query('mid');
+        $this->dist_name = LicencaDistributerTip::DistributerName($this->did);
     }
 
     /**

@@ -21,9 +21,7 @@ return new class extends Migration
             $table->integer('mesecId');
             $table->integer('broj_dana');
             $table->decimal('zaduzeno', 13, 2);
-            $table->date('datum_zaduzenja');
             $table->decimal('razduzeno', 13, 2)->nulable();
-            $table->date('datum_razduzenja')->nulable();
             $table->date('datum_isteka_prekoracenja')->nulable();
             $table->timestamps();
         });

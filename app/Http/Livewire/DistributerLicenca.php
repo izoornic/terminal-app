@@ -20,6 +20,7 @@ class DistributerLicenca extends Component
     public $modelId;
 
     public $distId;
+    public $dist_name;
     public $isUpdate;
     public $l_naziv;
     public $licenca_cena;
@@ -37,6 +38,7 @@ class DistributerLicenca extends Component
     public function mount()
     {
         $this->distId = request()->query('id');
+        $this->dist_name = LicencaDistributerTip::DistributerName($this->distId);
     }
 
     /**

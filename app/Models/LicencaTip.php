@@ -15,4 +15,10 @@ class LicencaTip extends Model
         'osnovna_licenca',
         'broj_parametara_licence'
     ];
+
+    public static function imeLicence($id)
+    {
+        $lic_obj = LicencaTip::where('id', '=', $id)->first();
+        return ($lic_obj) ? $lic_obj->licenca_naziv : 'N/A';
+    }
 }

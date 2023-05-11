@@ -13,18 +13,21 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('licenca_distributer_terminals', function (Blueprint $table) {
+        Schema::create('licence_za_terminals', function (Blueprint $table) {
             $table->id();
-            $table->integer('distributerId');
             $table->integer('terminal_lokacijaId');
-            $table->integer('licenca_distributer_cenaId')->nulable();
-            $table->date('datum_pocetak')->nulable();
-            $table->date('datum_kraj')->nulable();
-            $table->integer('nenaplativ')->default(0);
+            $table->integer('distributerId');
+            $table->integer('licenca_distributer_cenaId');
+            $table->integer('mesecId');
+            $table->string('terminal_sn', 24);
+            $table->date('datum_pocetak');
+            $table->date('datum_kraj');
+            $table->date('datum_prekoracenja');
+            $table->text('signature');
             $table->timestamps();
         });
     }
-
+    
     /**
      * Reverse the migrations.
      *
@@ -32,6 +35,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('licenca_distributer_terminals');
+        Schema::dropIfExists('licence_za_terminals');
     }
 };

@@ -8,13 +8,13 @@
             </h2>
             </div>
             <div class="mr-8">
-                    <a href="{{ route( 'distributeri' ) }}" :active="request()->routeIs('distributeri')"  class= "@if(request()->routeIs('distributeri')) border-b-2 border-sky-600 @else text-gray-500 @endif text-sm mr-8" >
+                    <!-- <a href="{{ route( 'distributeri' ) }}" :active="request()->routeIs('distributeri')"  class= "@if(request()->routeIs('distributeri')) border-b-2 border-sky-600 @else text-gray-500 @endif text-sm mr-8" >
                         {{ __('Distributeri') }}
                     </a>
 
                     <a href="{{ route( 'distributeri' ) }}" :active="request()->routeIs('distributeri')"  class= "@if(request()->routeIs('distributeri2')) border-b-2 border-sky-600 @else text-gray-500 @endif text-sm text-gray-500 mr-8" >
                          {{ __('Distributeri2') }}
-                    </a>
+                    </a> -->
             </div>
         </div>
     </x-slot>

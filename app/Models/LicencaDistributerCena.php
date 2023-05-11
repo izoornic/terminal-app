@@ -100,7 +100,6 @@ class LicencaDistributerCena extends Model
        * 
        * @param array $licence
        * 
-       * ->whereNotIn('licenca_distributer_cenas.id', $licence)
     */
     public static function naziviNeDodatihLicenci($licence, $distId, $ranije_dodate = [])
     {
@@ -109,7 +108,25 @@ class LicencaDistributerCena extends Model
         ->leftJoin('licenca_distributer_cenas', 'licenca_tips.id', '=', 'licenca_distributer_cenas.licenca_tipId')
         ->where('licenca_distributer_cenas.distributerId', '=', $distId)
         ->where('licenca_tips.osnovna_licenca', '=', 0)
+        ->whereNotIn('licenca_distributer_cenas.id', $licence)
         ->get();
+    }
+
+    /**
+     * [Description for nazivLicence]
+     *
+     * @param mixed $licencaCenaId
+     * 
+     * @return [type]
+     * 
+     */
+    public static function nazivLicence($licencaCenaId)
+    {
+        $naziv_obj = LicencaDistributerCena::select('licenca_tips.licenca_naziv')
+                        ->join('licenca_tips', 'licenca_distributer_cenas.licenca_tipId', '=', 'licenca_tips.id')
+                        ->where('licenca_distributer_cenas.id', '=', $licencaCenaId)
+                        ->first();
+        return ($naziv_obj) ?  $naziv_obj->licenca_naziv : 'N/A';
     }
 
 }

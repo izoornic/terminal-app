@@ -4,6 +4,7 @@ namespace App\Http\Livewire;
 
 use App\Http\Helpers;
 use App\Models\LicencaMesec;
+use App\Models\LicencaDistributerMesec;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Illuminate\Support\Facades\Config;
@@ -15,10 +16,11 @@ class Zaduzenje extends Component
     //Create Update
     public $modalFormVisible;
     public $modelId;
-    public $isUpdate;
     public $mesec;
     public $mesecZaduzenjaDisplay;
     public $isError;
+
+    public $mesecModel;
 
     //Delete
     public $modalConfirmDeleteVisible;
@@ -46,14 +48,19 @@ class Zaduzenje extends Component
         ];
     }
 
+    
     /**
-     * The read function.
+     * The read function
      *
-     * @return void
+     * @return colection
+     * 
      */
     public function read()
     {
-        return LicencaMesec::orderBy('mesec_datum', 'DESC')
+        return LicencaMesec::selectRaw('licenca_mesecs.*, COUNT(licenca_distributer_mesecs.distributerId) as distCount, sum(licenca_distributer_mesecs.sum_zaduzeno) as sumZaduzeno')
+            ->leftJoin('licenca_distributer_mesecs', 'licenca_distributer_mesecs.mesecId', '=', 'licenca_mesecs.id' )
+            ->groupBy('licenca_distributer_mesecs.mesecId')
+            ->orderBy('licenca_mesecs.mesec_datum', 'DESC')
             ->paginate(Config::get('global.paginate'));
     }
 
@@ -96,7 +103,6 @@ class Zaduzenje extends Component
         $this->mesec = Helpers::firstDayOfMounth(Helpers::datumKalendarNow());
         $this->resetValidation();
         $this->mesecGodinaDisplay();
-        $this->isUpdate = false;
         $this->modalFormVisible = true;
     }
 
@@ -123,34 +129,6 @@ class Zaduzenje extends Component
     }
 
     /**
-     * Shows the form modal
-     * in update mode.
-     *
-     * @param  mixed $id
-     * @return void
-     */
-    public function updateShowModal($id)
-    {
-        $this->resetValidation();
-        $this->isUpdate = true;
-        $this->modalFormVisible = true;
-        $this->modelId = $id;
-        $this->loadModel();
-    }
-
-    /**
-     * The update function
-     *
-     * @return void
-     */
-    public function update()
-    {
-        $this->validate();
-        LicencaMesec::find($this->modelId)->update($this->modelData());
-        $this->modalFormVisible = false;
-    }
-
-    /**
      * Shows the delete confirmation modal.
      *
      * @param  mixed $id
@@ -158,7 +136,9 @@ class Zaduzenje extends Component
      */
     public function deleteShowModal($id)
     {
+        $this->isError = false;
         $this->modelId = $id;
+        $this->mesecModel = LicencaMesec::where('id', '=', $this->modelId)->first();
         $this->modalConfirmDeleteVisible = true;
     }    
 
@@ -169,6 +149,11 @@ class Zaduzenje extends Component
      */
     public function delete()
     {
+        if(LicencaDistributerMesec::where('mesecId', '=', $this->modelId)->first()){
+            $this->isError = true;
+            return;
+        }
+        
         LicencaMesec::destroy($this->modelId);
         $this->modalConfirmDeleteVisible = false;
         $this->resetPage();

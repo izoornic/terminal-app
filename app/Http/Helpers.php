@@ -92,6 +92,23 @@ class Helpers
         return $sDate->eq($eDate);
     }
 
+    /**
+     * [Description for dateGratherThan]
+     * Koristi se samo u funkciji razduziDistributera() / RazduzenjeDistributerMesec
+     *
+     * @param mixed $startDate
+     * @param mixed $endDate
+     * 
+     * @return [boolean]
+     * 
+     */
+    public static function dateGratherOrEqualThan($startDate, $endDate)
+    {
+        $sDate = Carbon::parse($startDate);
+        $eDate = Carbon::parse($endDate); //->startOfDay();
+        return $sDate->gt($eDate) || $sDate->eq($eDate);
+    }
+
     public static function equalGraterOrLessThan($startDate, $endDate)
     {
         $sDate = Carbon::parse($startDate);

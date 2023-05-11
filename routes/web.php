@@ -117,5 +117,29 @@ Route::group(['middleware' => [
     Route::get('/zaduzenje-pregled', function(){
         return view('admin.zaduzenje-pregled');
         })->name('zaduzenje-pregled');
+    
+    Route::get('/razduzenje', function(){
+        return view('admin.razduzenje');
+        })->name('razduzenje');
+
+    Route::get('/razduzenje-distributeri', function(){
+        return view('admin.razduzenje-distributer');
+        })->name('razduzenje-distributeri');
+    
+    Route::get('/razduzenje-distributer-mesec', function(){
+        return view('admin.razduzenje-distributer-mesec');
+        })->name('razduzenje-distributer-mesec');
+
+    Route::get('/razduzenje-pregled', function(){
+        return view('admin.razduzenje-pregled');
+        })->name('razduzenje-pregled');
+
+    Route::get('/licence', function(){
+        return view('admin.licenca');
+        })->name('licence');
+    
+    Route::get('/licenca-parametri', function(){
+        return view('admin.licenca-parametri');
+        })->name('licenca-parametri');
 
 });

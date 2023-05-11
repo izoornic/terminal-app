@@ -2,17 +2,20 @@
 
 namespace App\Http\Livewire;
 
-use App\Models\LicencaDistributerCena;
 use App\Models\LicencaDistributerTerminal;
-use App\Models\LicencaMesec;
-use Livewire\Component;
-use Livewire\WithPagination;
-use App\Helpers\PaginationHelper;
-use Illuminate\Support\Facades\Config;
-use App\Http\Helpers;
 use App\Models\LicencaDistributerMesec;
+use App\Models\LicencaDistributerCena;
 use App\Models\LicencaDistributerTip;
 use App\Models\LicencaNaplata;
+use App\Models\LicencaMesec;
+
+use Livewire\WithPagination;
+use Livewire\Component;
+
+use Illuminate\Support\Facades\Config;
+use App\Helpers\PaginationHelper;
+use App\Http\Helpers;
+
 
 class ZaduzenjeDistributerMesec extends Component
 {
@@ -22,6 +25,7 @@ class ZaduzenjeDistributerMesec extends Component
      * Public properties
      */
     private $dataAll;
+    private $nenaplativi;
     public $ukupno_zaduzenje;
     public $ne_zaduzuju_se = [];
     
@@ -35,11 +39,17 @@ class ZaduzenjeDistributerMesec extends Component
     public $mesecRow;
     public $ceneLicenci;
     public $srednjiKurs;
+    public $dnevneCeneLicenci;
 
     //SEARCH
     public $searchTerminalSn;
     public $searchMesto;
     public $searchTipLicence;
+
+    //SEARCH NENAPLATIVE
+    public $searchTerminalSnNpl;
+    public $searchMestoNpl;
+    public $searchTipLicenceNpl;
 
     //Confirm zaduzenje modal
     public $zaduzenjeConfirmVisible;
@@ -50,6 +60,10 @@ class ZaduzenjeDistributerMesec extends Component
     public $p_datumPocetak;
     public $p_datumKraj;
     public $brojDana;
+
+    //Nenaplativ MODAL
+    public $nenaplativRow;
+    public $neModalVisible;
 
      /**
      * mount
@@ -65,6 +79,7 @@ class ZaduzenjeDistributerMesec extends Component
         $this->osnovna_licenca_id =  LicencaDistributerCena::OsnovnaLicencaDistributera($this->did)[0];
         $this->mesecRow = LicencaMesec::where('id', '=', $this->mid)->first();
         $this->ceneLicenci = $this->ceneLicenciDistributera($this->srednjiKurs);
+        $this->dnevneCeneLicenci = $this->dnevneCeneLicenciDistributera($this->mesecRow->m_broj_dana);
 
         $this->distributer_info = LicencaDistributerTip::where('id', '=', $this->did)->first();
         //dd($this->ceneLicenci);
@@ -102,6 +117,20 @@ class ZaduzenjeDistributerMesec extends Component
     }
 
     /**
+     * Set dnevnu cenu licenci za zaduzenje
+     *
+     * @return void
+     */
+    public function dnevneCeneLicenciDistributera($brojDana)
+    {
+        $retval = [];
+        foreach($this->ceneLicenci as $key => $value){
+            $retval[$key] = $value / $brojDana;
+        }
+        return  $retval;
+    }
+
+    /**
      * Koliko terminala ima distributer function.
      *
      * @return object
@@ -116,7 +145,7 @@ class ZaduzenjeDistributerMesec extends Component
 
     /**
      * Priprema podatke za prikaz.
-     * Dodaje cene licenci u objekat ivu;en iz baze
+     * Dodaje cene licenci u objekat ivuzen iz baze koristeci each metodu Laravel collection-a
      *
      * @return void
      */
@@ -131,7 +160,8 @@ class ZaduzenjeDistributerMesec extends Component
                         'lokacijas.adresa', 
                         'licenca_distributer_terminals.id as ldtid', 
                         'licenca_distributer_terminals.datum_pocetak', 
-                        'licenca_distributer_terminals.datum_kraj', 
+                        'licenca_distributer_terminals.datum_kraj',
+                        'licenca_distributer_terminals.nenaplativ',
                         'licenca_tips.licenca_naziv', 
                         'licenca_tips.id as ltid',
                         'licenca_distributer_terminals.licenca_broj_dana',
@@ -143,33 +173,32 @@ class ZaduzenjeDistributerMesec extends Component
                 ->leftJoin('licenca_distributer_cenas', 'licenca_distributer_terminals.licenca_distributer_cenaId', '=', 'licenca_distributer_cenas.id')
                 ->leftJoin('licenca_tips', 'licenca_distributer_cenas.licenca_tipId', '=', 'licenca_tips.id')
                 ->where('licenca_distributer_terminals.distributerId', '=', $this->did)
+                ->where('licenca_distributer_terminals.nenaplativ', '<', 1)
                 ->whereNotNull('licenca_distributer_terminals.licenca_distributer_cenaId')
-                ->where('terminals.sn', 'like', '%'.$this->searchTerminalSn.'%')
-                ->where('lokacijas.mesto', 'like', '%'.$this->searchMesto.'%')
-                ->when($this->searchTipLicence > 0, function ($rtval){
-                    return $rtval->where('licenca_distributer_cenas.id', '=', $this->searchTipLicence);
-                } )
                 ->orderBy('terminal_lokacijas.id')
                 ->orderBy('licenca_distributer_cenas.licenca_tipId')
                 ->get();
         
-        $counter = 0;
-        
+        //############################## EACH ITEM CHECK #######################################//
         $nextMounth = Helpers::addMonthsToDate($this->mesecRow->mesec_datum, 1);
 
-        foreach($this->dataAll as $row){
+        $this->dataAll->each(function ($item, $key)use($nextMounth) {
 
-            $cena = $this->ceneLicenci[$row->ltid];
-            $this->dataAll[$counter]->iskljucen = false;
+            $cena = $this->ceneLicenci[$item->ltid];
+            $cena_dnevno = $this->dnevneCeneLicenci[$item->ltid];
+
+            $item->iskljucen = false;
+            $markPocetak = 'ok';
             $markKraj = 'ok';
 
-            if(in_array($this->dataAll[$counter]->ldtid, $this->ne_zaduzuju_se)){
-                $this->dataAll[$counter]->iskljucen = true;
+            //ISKJUCEN rucno
+            if(in_array($item->ldtid, $this->ne_zaduzuju_se)){
+                $item->iskljucen = true;
                 $cena = 0;
                 $markPocetak = 'Cecked';
             }else{
-                $pocetak_licence = Helpers::equalGraterOrLessThan($row->datum_pocetak, $this->mesecRow->mesec_datum);
-                //provera datuma licence
+                $pocetak_licence = Helpers::equalGraterOrLessThan($item->datum_pocetak, $this->mesecRow->mesec_datum);
+                //provera datuma pocetka licence
                 switch ($pocetak_licence){
                     case 'eq' :
                         // equal all ok
@@ -178,8 +207,7 @@ class ZaduzenjeDistributerMesec extends Component
                     case 'gt' :
                         // veci od pocetka meseca
                         //mora provera dali je licenca iz tog meseca
-                        $p_diff = Helpers::equalGraterOrLessThan($row->datum_pocetak, $nextMounth);
-                        //dd($row->datum_pocetak, $nextMounth, $p_diff);
+                        $p_diff = Helpers::equalGraterOrLessThan($item->datum_pocetak, $nextMounth);
                         if($p_diff == 'gt' || $p_diff ==  'eq'){
                             //licenca pocinje sledeceg meseca
                             $markPocetak = 'errGt';
@@ -187,16 +215,14 @@ class ZaduzenjeDistributerMesec extends Component
                         }else{
                             //cena broj dana koliko je zaduzen
                             $markPocetak = 'lessDays';
-                            $cena = round(($cena / $this->mesecRow->m_broj_dana) * $row->licenca_broj_dana, 2);
+                            $cena = round($cena_dnevno * $item->licenca_broj_dana, 2);
                         }
                     break;
                     case 'lt' :
                         //less than 
                         // licenca iz meseca ranije
-                        
-                        $row->licenca_broj_dana = Helpers::numberOfDaysBettwen($row->datum_pocetak, $nextMounth);
-                        $cena = round(($cena / $this->mesecRow->m_broj_dana) * $row->licenca_broj_dana, 2);
-                        $this->dataAll[$counter]->licenca_broj_dana = $row->licenca_broj_dana;
+                        $item->licenca_broj_dana = Helpers::numberOfDaysBettwen($item->datum_pocetak, $nextMounth);
+                        $cena = round($cena_dnevno * $item->licenca_broj_dana, 2);
                         $markPocetak = 'errLt';
                     break;
                     case 'err' :
@@ -206,7 +232,7 @@ class ZaduzenjeDistributerMesec extends Component
                 }
 
                 //kraj LICENCE
-                $kraj_licence = Helpers::equalGraterOrLessThan($row->datum_kraj, $nextMounth);
+                $kraj_licence = Helpers::equalGraterOrLessThan($item->datum_kraj, $nextMounth);
                 
                 switch($kraj_licence){
                     case 'eq' :
@@ -216,38 +242,42 @@ class ZaduzenjeDistributerMesec extends Component
                     case 'gt' :
                         // kraj licence veci od pocetka sledeceg meseca
                         $markKraj = 'errGt';
+                        if($markPocetak != 'errGt') $cena = round($cena_dnevno * $item->licenca_broj_dana, 2);
                     break;
                     case 'lt' :
                         //less than 
                         // licenca se zavrsava pre kraja meseca
                         //produzuje se do kraja meseca
-                        $this->dataAll[$counter]->datum_kraj = $nextMounth;
-                        $row->licenca_broj_dana = Helpers::numberOfDaysBettwen($row->datum_pocetak, $nextMounth);
+                        $item->datum_kraj = $nextMounth;
+                        $item->licenca_broj_dana = Helpers::numberOfDaysBettwen($item->datum_pocetak, $nextMounth);
 
-                        $cena = round(($cena / $this->mesecRow->m_broj_dana) * $row->licenca_broj_dana, 2);
-                        $this->dataAll[$counter]->licenca_broj_dana = $row->licenca_broj_dana;
-
+                        $cena = round($cena_dnevno * $item->licenca_broj_dana, 2);
                         $markKraj = 'errLt';
                     break;
                     case 'err' :
                         $markKraj = 'errDt';
                         $cena = 0;
                     break;
-
                 }
-
-
             }
-            $this->dataAll[$counter]->markKraj = $markKraj;
-            $this->dataAll[$counter]->markPocetak = $markPocetak;
-            $this->dataAll[$counter]->cenaLicence =  $cena;
+            $item->markKraj = $markKraj;
+            $item->markPocetak = $markPocetak;
+            $item->cenaLicence = $cena;
 
-            $this->ukupno_zaduzenje += $cena;
-            
+            $this->ukupno_zaduzenje += $cena;            
+        });
 
-            $counter ++;
-        }
+    }
 
+    public function readNenaplative()
+    {
+        $filter = [
+            'searchTerminalSnNpl'   =>  $this->searchTerminalSnNpl,
+            'searchMestoNpl'        =>  $this->searchMestoNpl,
+            'searchTipLicenceNpl'   =>  $this->searchTipLicenceNpl
+        ];
+
+        return LicencaDistributerTerminal::nenaplativeLicenceDistributera($this->did, $filter);
     }
 
     public function showZaduzenjeConfirmModal()
@@ -259,24 +289,26 @@ class ZaduzenjeDistributerMesec extends Component
     {
         $datum_zaduzenja = Helpers::datumKalendarNow();
         $this->prepareData();
-        $counter = 0;
-        foreach($this->dataAll as $row){
-            if(!in_array($this->dataAll[$counter]->ldtid, $this->ne_zaduzuju_se) && $row->cenaLicence > 0){ 
+
+        $this->dataAll->each(function ($item, $key){
+            if(!in_array($item->ldtid, $this->ne_zaduzuju_se) && $item->cenaLicence > 0){ 
                 $model_data = [
-                    'terminal_lokacijaId' => $row->id,
+                    'terminal_lokacijaId' => $item->id,
                     'distributerId' => $this->did,
-                    'licenca_distributer_cenaId' => $row->licenca_distributer_cenaId,
+                    'licenca_distributer_cenaId' => $item->licenca_distributer_cenaId,
                     'mesecId' => $this->mid,
-                    'broj_dana' => $row->licenca_broj_dana,
-                    'zaduzeno' => $row->cenaLicence,
-                    'datum_pocetka_licence' => $row->datum_pocetak,
-                    'datum_kraj_licence' => $row->datum_kraj,
-                    'datum_isteka_prekoracenja' => Helpers::addDaysToDate($row->datum_kraj, $this->distributer_info->dani_prekoracenja_licence)
+                    'broj_dana' => $item->licenca_broj_dana,
+                    'zaduzeno' => $item->cenaLicence,
+                    'datum_pocetka_licence' => $item->datum_pocetak,
+                    'datum_kraj_licence' => $item->datum_kraj,
+                    'datum_isteka_prekoracenja' => Helpers::addDaysToDate($item->datum_kraj, $this->distributer_info->dani_prekoracenja_licence)
                 ];
                 LicencaNaplata::create($model_data);
+            }elseif(in_array($item->ldtid, $this->ne_zaduzuju_se)){
+                LicencaDistributerTerminal::find($item->ldtid)->update(['nenaplativ' => 1]);
             }
-            $counter ++;
-        }
+
+        });
 
         //ins
         $ldm_model = [
@@ -289,8 +321,6 @@ class ZaduzenjeDistributerMesec extends Component
         ];
         LicencaDistributerMesec::create($ldm_model);
         
-        
-
        return redirect('/zaduzenje-pregled?id='.$this->did.'&mid='.$this->mid.'&acc=ins');
     }
 
@@ -315,6 +345,21 @@ class ZaduzenjeDistributerMesec extends Component
         }
     }
 
+    public function nenaplativShovModal($ldtid)
+    {
+        
+        $this->nenaplativRow = $ldtid;
+       $this->neModalVisible = true;
+    }
+
+    public function promeniStatusNenaplativojLicenci()
+    {
+        $neVal = LicencaDistributerTerminal::where('licenca_distributer_terminals.id', '=', $this->nenaplativRow['ldtid'])->first()->nenaplativ;
+        $neNew = ($neVal) ? 0 : 1;
+        LicencaDistributerTerminal::where('licenca_distributer_terminals.id', '=', $this->nenaplativRow['ldtid'])->update(['nenaplativ' => $neNew]);
+        $this->neModalVisible = false;
+    }
+
     /**
      * The update function
      *
@@ -325,24 +370,75 @@ class ZaduzenjeDistributerMesec extends Component
         if($this->changeDatesShowModal){
             $this->p_datumKraj = Helpers::firstDayOfMounth($this->p_datumKraj);
         }
+        if($this->neModalVisible){
+            $this->nenaplativaRow = $this->singleLicenceInfo();
+        }
+    }
+
+    /**
+     * Prikaz kolekcije sa filterima
+     *
+     * @return collection
+     * 
+     */
+    public function displayData()
+    {
+        $retval = $this->dataAll->filter(function ($value, $key) {
+            return $this->filterFields($value->sn, $value->mesto, $value->licenca_distributer_cenaId);
+        });
+
+        return $retval;
+    }
+
+    /**
+     * Rucno napravljeni filteri na starnici
+     *
+     * @param mixed $sn
+     * @param mixed $mesto
+     * @param mixed $licenca
+     * 
+     * @return boolean
+     * 
+     */
+    private function filterFields($sn, $mesto, $licenca)
+    {
+        $filter_sn = ($this->searchTerminalSn != '') ? true : false;
+        $filter_mesto = ($this->searchMesto != '') ? true : false;
+        $filter_licenca = ($this->searchTipLicence > 0) ? true : false;
+
+        $sn_retval = true;
+        $mest_retval = true;
+        $lic_retval = true;
         
+        if($filter_sn){
+            $sn_retval = preg_match("/".$this->searchTerminalSn."/i", $sn);
+        }
+        if($filter_mesto){
+            $mest_retval = preg_match("/".$this->searchMesto."/i", $mesto);
+        }
+        if($filter_licenca){
+            $lic_retval = ($this->searchTipLicence == $licenca) ? true : false;
+        }
+
+        return ($sn_retval && $mest_retval &&  $lic_retval) ? true : false;
     }
 
     /**
      * The read function.
      *
-     * @return void
+     * @return collection
      */
     public function read()
     {
         $this->prepareData();
-        return PaginationHelper::paginate($this->dataAll, Config::get('global.paginate')); //$this->dataAll; //->paginate(Config::get('terminal_paginate'), ['*'], 'terminali');
+        return PaginationHelper::paginate($this->displayData(), Config::get('global.paginate'));
     }
 
     public function render()
     {
         return view('livewire.zaduzenje-distributer-mesec', [
             'data' => $this->read(), 
+            'ndata' => $this->readNenaplative(),
             'br_terminala' => $this->prebrojTerminaleDistributera(),
         ]);
     }
