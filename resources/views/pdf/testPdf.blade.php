@@ -17,16 +17,6 @@
             border-top: 1px solid black;
             margin: 20px 0 20px 0;
         }
-        .flex-container {
-            display: flex;
-            flex-wrap: nowrap;
-            background-color: DodgerBlue;
-        }
-        .flex-container > div {
-            background-color: #f1f1f1;
-            width: 50%;
-        }
-
         table, th, td {
             /* border-bottom: 1px solid; */
             border-style: none;
@@ -83,11 +73,11 @@
                 </tr>
                 <tr class="rowbotom">
                     <td>Za uplatu (RSD): </td>
-                    <td style="text-align: right"><span class="boldd">@money($zaduzenjerow->sum_zaduzeno)</span> RSD</td>
+                    <td style="text-align: right"><span class="boldd">@money($zaduzenjerow->sum_zaduzeno)</span></td>
                 </tr>
                 <tr class="rowbotom">
                     <td>Datum dospeća: </td>
-                    <td style="text-align: right"><span class="boldd">???</span>
+                    <td style="text-align: right"><span class="boldd">{{$distributerrow->datum_dospeca}}</span>
                 </td>
                 </tr>
             </table>
@@ -173,6 +163,43 @@
             </tr>
         @endif
     </table>
-    
+    <p>&nbsp;</p>
+    <div style="width: 400px; float: left">
+    <table>
+        <tr>
+            <td colspan="4" class="boldd"  style="background-color: #e6e6e6; padding-left: 10px">Poreske stope</td>
+        </tr>
+        <tr class="rowbotom">
+            <td>Oznaka</td>
+            <td>Ime</td>
+            <td>Stopa</td>
+            <td>Porez</td>
+        </tr>
+        <tr class="rowbotom">
+            <td>Đ</td>
+            <td>PDV</td>
+            <td>20%</td>
+            <td>Porez</td>
+        </tr>
+    </table>
+    </div>
+    <div style="width: 240px; background-color: #e6e6e6; float: right; padding: 10px; font-size: 0.875em;" >
+        <span class="boldd">Napomena: </span>Prilikom uplate u polje poziv na broj unesite broj predračuna, {{ App\Http\Helpers::yearNumber($mesecrow->mesec_datum) }}/{{ $zaduzenjerow->id }}
+    </div>
+
+    <script type="text/php">
+        if (isset($pdf)) {
+            $x = 460;
+            $y = 800;
+            $text = "Strana {PAGE_NUM} od {PAGE_COUNT}";
+            $font = null;
+            $size = 10;
+            $color = array(255,0,0);
+            $word_space = 0.0;  //  default
+            $char_space = 0.0;  //  default
+            $angle = 0.0;   //  default
+            $pdf->page_text($x, $y, $text, $font, $size, $color, $word_space, $char_space, $angle);
+        }
+    </script>
 </body>
 </html>

@@ -3,14 +3,17 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+
+use App\Models\LicencaMesec;
 use App\Models\LicencaNaplata;
 use App\Models\LicencaDistributerTip;
-use App\Models\LicencaMesec;
 use App\Models\LicencaDistributerMesec;
- 
+
+use App\Http\Helpers;
+
 use PDF;
 use File;
-use Illuminate\Support\Facades\Storage;
 use Response;
 
 
@@ -21,6 +24,8 @@ class PredracunPdfControler extends Controller
     public $mid;
     public $did;
 
+    //
+
     /**
      * Display a listing of the resource.
      *
@@ -30,9 +35,17 @@ class PredracunPdfControler extends Controller
     {
         $this->did = request()->query('did');
         $this->mid = request()->query('mid');
+
+        $distributerrow = $this->distributer();
+        $mesecrow = $this->mesecrow();
+
+        $dospece_mnth = Helpers::addMonthsToDate($mesecrow->mesec_datum, 1);
+        $distributerrow->datum_dospeca = Helpers::datumFormatDanFullYear(Helpers::addDaysToDate($dospece_mnth, $distributerrow->dani_prekoracenja_licence));
         
         //******************  CUVANJE PDF FAJLA    */
-        $pdf = PDF::loadView('pdf/testPdf', ['data' => $this->read(), 'distributerrow' => $this->distributer(), 'mesecrow' => $this->mesecrow(), 'zaduzenjerow' => $this->zaduzenjerow()]); 
+        $pdf = app('dompdf.wrapper');
+        $pdf->getDomPDF()->set_option("enable_php", true);
+        $pdf ->loadView('pdf/testPdf', ['data' => $this->read(), 'distributerrow' => $distributerrow, 'mesecrow' => $mesecrow, 'zaduzenjerow' => $this->zaduzenjerow()]); 
         //$pdf->save(base_path().'/public/predracuni/predracun.pdf');
        
         return $pdf->stream('predracun.pdf');
@@ -103,11 +116,11 @@ class PredracunPdfControler extends Controller
 
     public function distributer()
     {
-        return LicencaDistributerTip::find($this->did)->first();
+        return LicencaDistributerTip::where('id', '=', $this->did)->first();
     }
     public function mesecrow()
     {
-        return LicencaMesec::find($this->mid)->first();
+        return LicencaMesec::where('id', '=', $this->mid)->first();
     }
     public function zaduzenjerow()
     {
