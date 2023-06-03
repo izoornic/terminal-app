@@ -1,7 +1,7 @@
 /node_modules
 /public/hot
 /public/storage
-/public/bl/blacklist.txt
+/public/bl
 /storage/*.key
 #/vendor
 .env
