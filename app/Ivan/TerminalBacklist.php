@@ -25,7 +25,7 @@ class TerminalBacklist
             DB::transaction(function()use($tlid){
                 $cutren = TerminalLokacija::where('id', $tlid) -> first();
                 $bl = ($cutren->blacklist == 1) ? null : 1;
-                //insert to history table ZA SAD NE MOZDA DABUDE POSEBNA TABELA?!?
+                //insert to history table ZA SAD NE MOZDA DA BUDE POSEBNA TABELA?!?
                 //TerminalLokacijaHistory::create(['terminal_lokacijaId' => $cuurent['id'], 'terminalId' => $cuurent['terminalId'], 'lokacijaId' => $cuurent['lokacijaId'], 'terminal_statusId' => $cuurent['terminal_statusId'], 'korisnikId' => $cuurent['korisnikId'], 'korisnikIme' => $cuurent['korisnikIme'], 'created_at' => $cuurent['created_at'], 'updated_at' => $cuurent['updated_at'], 'blacklist' => $cuurent['blacklist']]);
                 //update current
                 TerminalLokacija::where('id', $tlid)->update(['blacklist'=> $bl, 'korisnikId'=>auth()->user()->id, 'korisnikIme'=>auth()->user()->name]);
