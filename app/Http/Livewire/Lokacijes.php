@@ -3,18 +3,20 @@
 namespace App\Http\Livewire;
 
 use Auth;
-use App\Models\Lokacija;
+
 use App\Models\User;
+use App\Models\Terminal;
+use App\Models\Lokacija;
 use App\Models\TerminalLokacija;
-use App\Models\TerminalLokacijaHistory;
 use App\Models\LokacijaKontaktOsoba;
-//use App\Models\TerminalStatusTip;
-//use App\Models\Tiket;
+use App\Models\TerminalLokacijaHistory;
+
 use Livewire\Component;
 use Livewire\WithPagination;
-use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Facades\DB;
+
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Config;
 
 use App\Http\Helpers;
 
@@ -36,6 +38,8 @@ class Lokacijes extends Component
     public $lokacija_tipId;
 
     public $isUpdate;
+
+    public $validation_modal;
 
     //pretraga
     public $searchName;
@@ -76,6 +80,12 @@ class Lokacijes extends Component
     public $lokacijaSaKojeUzima;
     public $datum_dodavanja_terminala;
 
+    //dodaj novi terminal
+    public $noviSN;
+    public $noviKutijaNO;
+    public $new_terminal_tip;
+
+
     //kontakt osoba u prodavnici
     public $kontaktOsobaVisible;
     public $kontaktOsobaInfo;
@@ -92,14 +102,22 @@ class Lokacijes extends Component
      */
     public function rules()
     {
-        return [   
-            'l_naziv' => 'required',  
-            'regionId' => ['required', 'not_in:0'],
-            'lokacija_tipId' => 'required',
-            'latitude' => ['regex:/^[-]?(([0-8]?[0-9])\.(\d+))|(90(\.0+)?)$/', 'nullable'],             
-            'longitude' => ['regex:/^[-]?((((1[0-7][0-9])|([0-9]?[0-9]))\.(\d+))|180(\.0+)?)$/', 'nullable'],
-            'pib' => ['digits_between:8,16']      
-        ];
+        if($this->validation_modal == 'new_terminal'){
+            return [
+                'noviSN' => 'required',
+                'noviKutijaNO' => 'required'
+            ];
+        }else{
+            return [   
+                'l_naziv' => 'required',  
+                'regionId' => ['required', 'not_in:0'],
+                'lokacija_tipId' => 'required',
+                'latitude' => ['regex:/^[-]?(([0-8]?[0-9])\.(\d+))|(90(\.0+)?)$/', 'nullable'],             
+                'longitude' => ['regex:/^[-]?((((1[0-7][0-9])|([0-9]?[0-9]))\.(\d+))|180(\.0+)?)$/', 'nullable'],
+                'pib' => ['digits_between:8,16']      
+            ];
+        }
+        
     }
 
 
@@ -169,6 +187,7 @@ class Lokacijes extends Component
      */
     public function createShowModal()
     {
+        $this->validation_modal = 'new_location';
         $this->isUpdate = false;
         $this->resetValidation();
         $this->loc_reset();
@@ -401,6 +420,11 @@ class Lokacijes extends Component
      */
     public function addTerminalShowModal($id)
     {
+        $this->validation_modal = 'new_terminal';
+        $this->noviSN = '';
+        $this->noviKutijaNO = '';
+        $this->new_terminal_tip = 0;
+
         $this->modelId = $id;
         $this->odabranaLokacija = $this->lokacijaInfo();
         $this->errAddMsg = '';
@@ -494,33 +518,56 @@ class Lokacijes extends Component
      */
     public function addTerminal()
     {
-        if(!(bool)strtotime($this->datum_dodavanja_terminala)) $this->datum_dodavanja_terminala = Helpers::datumKalendarNow();
-        $this->datum_dodavanja_terminala.= ' '.Helpers::vremeKalendarNow();
+        /* if(!(bool)strtotime($this->datum_dodavanja_terminala)) $this->datum_dodavanja_terminala = Helpers::datumKalendarNow();*/
         
-        //dd($this->datum_dodavanja_terminala);
-        //ima li izabranih terminala
-        if($this->t_status){
-            if(count($this->selsectedTerminals)){
-                $this->errAddMsg = '';
-                foreach($this->selsectedTerminals as $tid){
-                    DB::transaction(function() use($tid){
-                        //terminal
-                       $cuurent = TerminalLokacija::where('terminalId', $tid) -> first();
-                        //insert to history table
-                        TerminalLokacijaHistory::create(['terminal_lokacijaId' => $cuurent['id'], 'terminalId' => $cuurent['terminalId'], 'lokacijaId' => $cuurent['lokacijaId'], 'terminal_statusId' => $cuurent['terminal_statusId'], 'korisnikId' => $cuurent['korisnikId'], 'korisnikIme' => $cuurent['korisnikIme'], 'created_at' => $cuurent['created_at'], 'updated_at' => $cuurent['updated_at'], 'blacklist' => $cuurent['blacklist']]);
-                        //update current
-                        TerminalLokacija::where('terminalId', $tid)->update(['lokacijaId'=> $this->modelId, 'terminal_statusId'=> $this->t_status, 'korisnikId'=>auth()->user()->id, 'korisnikIme'=>auth()->user()->name, 'updated_at'=>$this->datum_dodavanja_terminala ]);
-                    });
-                    $this->modalAddTerminalVisible = false;
-                }
-            }else{
+        if($this->addingType == 'location'){
+            //ima li izabranih terminala
+            if(!count($this->selsectedTerminals)){
                 $this->errAddMsg = 'Niste izabrali terminal';
+                return;
             }
-        }else{
-            $this->errAddMsg = 'Niste izabrali status terminal';
+
+            if($this->t_status < 1){
+                $this->errAddMsg = 'Niste izabrali status terminal';
+                return;
+            }
+            
+            $this->errAddMsg = '';
+            foreach($this->selsectedTerminals as $tid){
+                DB::transaction(function() use($tid){
+                    //terminal
+                    $cuurent = TerminalLokacija::where('terminalId', $tid) -> first();
+                    //insert to history table
+                    TerminalLokacijaHistory::create(['terminal_lokacijaId' => $cuurent['id'], 'terminalId' => $cuurent['terminalId'], 'lokacijaId' => $cuurent['lokacijaId'], 'terminal_statusId' => $cuurent['terminal_statusId'], 'korisnikId' => $cuurent['korisnikId'], 'korisnikIme' => $cuurent['korisnikIme'], 'created_at' => $cuurent['created_at'], 'updated_at' => $cuurent['updated_at'], 'blacklist' => $cuurent['blacklist']]);
+                    //update current
+                    TerminalLokacija::where('terminalId', $tid)->update(['lokacijaId'=> $this->modelId, 'terminal_statusId'=> $this->t_status, 'korisnikId'=>auth()->user()->id, 'korisnikIme'=>auth()->user()->name, 'updated_at'=>$this->datum_dodavanja_terminala ]);
+                });
+                $this->modalAddTerminalVisible = false;
+            }
+                   
+        }elseif($this->addingType == 'addNew'){
+            // ADDING NEW TERMINAL
+            $this->validate();
+            
+            if($this->t_status < 1 || $this->new_terminal_tip < 1){
+                $this->errAddMsg = 'Niste izabrali status ili tip terminala';
+                return;
+            }
+            
+            if(Terminal::where('sn', 'like', $this->noviSN)->first()){
+                $this->errAddMsg = 'Terminal sa serijskim brojem koji ste uneli već postoji!';
+                return;
+            }
+            
+            $this->errAddMsg = '';
+            DB::transaction(function(){
+                //add to terminal table
+                $newTerminal = Terminal::create(['sn' => $this->noviSN, 'terminal_tipId' => $this->new_terminal_tip, 'broj_kutije' => $this->noviKutijaNO]);
+                TerminalLokacija::create(['terminalId' => $newTerminal->id, 'lokacijaId' => $this->modelId, 'terminal_statusId'=> $this->t_status, 'korisnikId'=>auth()->user()->id, 'korisnikIme'=>auth()->user()->name, 'updated_at'=>$this->datum_dodavanja_terminala ]);
+            });
+            $this->modalAddTerminalVisible = false;
+            
         }
-       
-       // dd($this->t_status);
     }
     
     /**
@@ -573,6 +620,5 @@ class Lokacijes extends Component
         if($this->modalAddTerminalVisible && $this->p_lokacijaId){
             $this->lokacijaSaKojeUzima = $this->lokacjaSaKojeUzimaInfo();
         }
-        
     }
 }
