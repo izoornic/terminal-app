@@ -82,7 +82,8 @@ class LicenceController extends Controller
                 
                 //$item->parametars = [];
                 //da li licenca ima parametre_
-                /* if(LicencaParametar::where('id', '=', $item->ltid)->firstOrFail()){
+                try{
+                    $ima_parametre = LicencaParametar::where('id', '=', $item->ltid)->firstOrFail();
                     $licenca_distibuter_terminal_row = LicencaDistributerTerminal::where('terminal_lokacijaId', '=', $item->terminal_lokacijaId)
                                                         ->where('licenca_distributer_cenaId', '=', $item->licenca_distributer_cenaId)
                                                         ->first();
@@ -92,15 +93,17 @@ class LicenceController extends Controller
                                                         ->pluck('licenca_parametars.param_opis')
                                                         ->all();
                     }
-                } */
+                }catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+                    $message = 'Invalid id.';
+                }
                 array_push($this->terminal_data, $each_data);
             });
-            dd($this->terminal_data);
+            //dd($this->terminal_data);
             $retval['data'] = $this->terminal_data;
         }else{
             $retval['status'] = false;
             $retval['data'] = [];
         }
-        //return response()->json($retval);
+        return response()->json($retval);
     }
 }
