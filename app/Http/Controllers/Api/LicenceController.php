@@ -47,8 +47,10 @@ class LicenceController extends Controller
         'licence_za_terminals.licenca_distributer_cenaId', */
         $this->terminal_data = [];
 
+        $str_snn = strval( $snn );
+
         $termina_licence = LicenceZaTerminal::select(
-                            'licence_za_terminalss.licenca_distributer_cenaId',
+                            'licence_za_terminals.licenca_distributer_cenaId',
                             'licence_za_terminals.terminal_lokacijaId',
                             'licence_za_terminals.naziv_licence',
                             'licence_za_terminals.terminal_sn',
@@ -59,7 +61,7 @@ class LicenceController extends Controller
                         )
                         ->leftJoin('licenca_distributer_cenas', 'licenca_distributer_cenas.id', '=', 'licence_za_terminals.licenca_distributer_cenaId')
                         ->leftJoin('licenca_tips', 'licenca_tips.id', '=', 'licenca_distributer_cenas.licenca_tipId')
-                        ->where('licence_za_terminals.terminal_sn', '=', $snn)
+                        ->where('licence_za_terminals.terminal_sn', '=', $str_snn)
                         ->get();
         $retval = [
             'status' => true, 
