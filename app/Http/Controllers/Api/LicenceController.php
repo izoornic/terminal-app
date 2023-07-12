@@ -48,7 +48,7 @@ class LicenceController extends Controller
         $this->terminal_data = [];
 
         $termina_licence = LicenceZaTerminal::select(
-                            'licence_za_terminals.licenca_distributer_cenaId',
+                            'licence_za_terminalss.licenca_distributer_cenaId',
                             'licence_za_terminals.terminal_lokacijaId',
                             'licence_za_terminals.naziv_licence',
                             'licence_za_terminals.terminal_sn',
