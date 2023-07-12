@@ -68,7 +68,7 @@ class LicenceController extends Controller
             'data' => []
         ];
        
-        //dd($termina_licence);
+        dd($termina_licence);
         if(count($termina_licence)){
             $termina_licence->each(function ($item, $key){
                 $each_data = [
@@ -95,7 +95,7 @@ class LicenceController extends Controller
                 }
                 array_push($this->terminal_data, $each_data);
             });
-            print_r($this->terminal_data);
+            //print_r($this->terminal_data);
             $retval['data'] = $this->terminal_data;
         }else{
             $retval['status'] = false;
