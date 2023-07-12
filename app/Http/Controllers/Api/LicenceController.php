@@ -79,7 +79,7 @@ class LicenceController extends Controller
                     'signature' => $item->signature,
                     'parametars' =>[]
                 ];
-                print_r($each_data);
+                
                 //$item->parametars = [];
                 //da li licenca ima parametre_
                 if(LicencaParametar::where('id', '=', $item->ltid)->firstOrFail()){
@@ -95,7 +95,7 @@ class LicenceController extends Controller
                 }
                 array_push($this->terminal_data, $each_data);
             });
-
+            print_r($this->terminal_data);
             $retval['data'] = $this->terminal_data;
         }else{
             $retval['status'] = false;
