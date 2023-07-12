@@ -67,7 +67,7 @@ class LicenceController extends Controller
             'status' => true, 
             'data' => []
         ];
-
+        print_r($termina_licence);
         //dd($termina_licence);
         if(count($termina_licence)){
             $termina_licence->each(function ($item, $key){
