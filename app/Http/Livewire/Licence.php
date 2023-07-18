@@ -61,7 +61,7 @@ class Licence extends Component
         // Assign the variables here
         $this->naziv_licence = $data->licenca_naziv;
         $this->opis_licence = $data->licenca_opis;
-        $this->is_osnovna = $data->osnovna_licenca;
+        $this->is_osnovna = ($data->osnovna_licenca) ? 1 : 0; 
     }
 
     /**
@@ -75,7 +75,7 @@ class Licence extends Component
         return [  
             'licenca_naziv' => $this->naziv_licence,
             'licenca_opis' => $this->opis_licence,
-            'osnovna_licenca' =>  ($this->is_osnovna) ? 1 : 0 
+            'osnovna_licenca' =>  ($this->is_osnovna) ? 1 : 0
         ];
     }
 
