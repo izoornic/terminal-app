@@ -86,6 +86,7 @@ class LicencaParametars extends Component
     {
         $this->is_update = false;
         $this->resetValidation();
+        $this->p_naziv = '';
         //$this->reset();
         $this->modalFormVisible = true;
     }
@@ -99,6 +100,7 @@ class LicencaParametars extends Component
     {
         $this->validate();
         LicencaParametar::create($this->modelData());
+        $this->updateParamasInLicTable();
         $this->modalFormVisible = false;
        // $this->reset();
     }
@@ -129,6 +131,7 @@ class LicencaParametars extends Component
     {
         $this->validate();
         LicencaParametar::find($this->modelId)->update($this->modelData());
+        $this->updateParamasInLicTable();
         $this->modalFormVisible = false;
     }
 
@@ -156,10 +159,19 @@ class LicencaParametars extends Component
             LicencaParametar::destroy($this->modelId);
             LicencaParametarTerminal::where('licenca_parametarId', '=', $this->modelId)->delete();
         });
+        $this->updateParamasInLicTable();
         $this->modalConfirmDeleteVisible = false;
         $this->resetPage();
     }
 
+    private function updateParamasInLicTable()
+    {
+        $no_of_params = LicencaParametar::selectRaw('COUNT(licenca_tipId) as params_no')
+                        ->where('licenca_tipId', '=', $this->lid)
+                        ->first();
+        LicencaTip::find($this->lid)->update(['broj_parametara_licence' => $no_of_params->params_no]);
+    }
+    
     /**
      * The read function.
      *

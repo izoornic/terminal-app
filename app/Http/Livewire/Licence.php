@@ -3,12 +3,16 @@
 namespace App\Http\Livewire;
 
 use App\Models\LicencaTip;
+use App\Models\LicencaParametar;
 use App\Models\LicencaDistributerCena;
 
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Config;
 
 use Livewire\Component;
 use Livewire\WithPagination;
+
+use Illuminate\Validation\Rule;
 
 class Licence extends Component
 {
@@ -40,7 +44,8 @@ class Licence extends Component
     public function rules()
     {
         return [  
-            'naziv_licence' => 'required'          
+            'naziv_licence' => 'required',
+            'naziv_licence'  => Rule::unique('licenca_tips', 'licenca_naziv')     
         ];
     }
 
@@ -162,7 +167,10 @@ class Licence extends Component
      */
     public function delete()
     {
-        LicencaTip::destroy($this->modelId);
+        DB::transaction(function(){
+            LicencaParametar::where('licenca_tipId', '=', $this->modelId)->delete();
+            LicencaTip::destroy($this->modelId);
+        });
         $this->modalConfirmDeleteVisible = false;
         $this->resetPage();
     }
