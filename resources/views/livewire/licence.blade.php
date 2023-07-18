@@ -98,9 +98,6 @@
             </div>  
             <div class="mt-4">
                 <div class="">
-                   @php
-                    print_r($is_osnovna);
-                   @endphp
                     <input id="{{ $is_osnovna }}" type="checkbox" value="1" wire:model="is_osnovna" class="form-checkbox h-6 w-6 text-blue-500 my-2">
                     <label class="ml-2" for="is_osnovna"> Osnovna licenca</label>
                 </div>
