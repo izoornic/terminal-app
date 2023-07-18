@@ -556,7 +556,6 @@ class DistributerTerminal extends Component
         
         //PARAMETI ZA IZABRANU LICENCU
         $this->parametri = LicencaParametarTerminal::where('licenca_distributer_terminalId', '=', $this->distrib_terminal_id)->pluck('licenca_parametarId')->all();
-
         //GLOBALNO DODELJENI parametri za tip licence
         $this->licenca_tip_parametri = LicencaParametar::where('licenca_tipId', '=', $this->pm_licenca_tip_id)->pluck('id')->all();
         

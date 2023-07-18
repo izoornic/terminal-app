@@ -43,7 +43,7 @@ class Licence extends Component
      */
     public function rules()
     {
-        return [  
+        return ($this->modelId > 0) ? ['naziv_licence' => 'required'] : [  
             'naziv_licence' => 'required',
             'naziv_licence'  => Rule::unique('licenca_tips', 'licenca_naziv')     
         ];
@@ -86,6 +86,7 @@ class Licence extends Component
      */
     public function createShowModal()
     {
+        $this->modelId = 0;
         $this->is_update = false;
         $this->resetValidation();
         $this->reset();
