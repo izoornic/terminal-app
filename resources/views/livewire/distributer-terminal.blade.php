@@ -93,7 +93,7 @@
                                             @endif   
                                         </td>
                                         <td class="px-2 py-2">
-                                            @if($item->ltid > 1) 
+                                            @if($item->isDuplicate) 
                                                 <span class="float-left pr-2"><svg class="fill-red-400 w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Pro 6.3.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. --><path d="M240 80c0-17.7-14.3-32-32-32s-32 14.3-32 32V224H32c-17.7 0-32 14.3-32 32s14.3 32 32 32H176V432c0 17.7 14.3 32 32 32s32-14.3 32-32V288H384c17.7 0 32-14.3 32-32s-14.3-32-32-32H240V80z"/></svg></span>
                                             @endif
                                             {{ $item->licenca_naziv }}
@@ -108,7 +108,7 @@
                                         <td class="px-2 py-2">@if($item->datum_pocetak != '') {{ App\Http\Helpers::datumFormatDan($item->datum_pocetak) }} @endif</td>
                                         <td class="px-2 py-2">@if($item->datum_kraj != '') {{ App\Http\Helpers::datumFormatDan($item->datum_kraj) }} @endif</td>                                       
                                         <td class="px-1 py-1">
-                                            @if($osnovna_licenca_id > 0 && !$item->isDuplicate)
+                                            @if(!$item->isDuplicate)
                                                 <a class="cursor-pointer hover:text-green-400" wire:click="dodajLicencaShowModal('{{$item->id}}', '{{$item->ldtid}}')" title="Dodaj licencu">
                                                     <svg class="fill-current w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" enable-background="new 0 0 384 512"><g id="Layer_1_1_" display="none"><path display="inline" d="M320,464c8.8,0,16-7.2,16-16V160h-80c-17.7,0-32-14.3-32-32V48H64c-8.8,0-16,7.2-16,16v384c0,8.8,7.2,16,16,16H320z M0,64C0,28.7,28.7,0,64,0h165.5c17,0,33.3,6.7,45.3,18.7l90.5,90.5c12,12,18.7,28.3,18.7,45.3V448c0,35.3-28.7,64-64,64H64c-35.3,0-64-28.7-64-64V64z"/></g><g><path d="M373.1,134.6L253.4,15.3C243.5,5.5,230.2,0,216.3,0H59C26.5,0,0,26.5,0,59v394c0,32.5,26.5,59,59,59h266c32.5,0,59-26.5,59-59V160.9C384,151,380.1,141.5,373.1,134.6z M228.4,27.8c2.7,1.3,5.1,3,7.3,5.2l119.1,118.7h-61.4c-35.8,0-65-29.2-65-65V27.8z M359,453c0,9-3.6,17.5-10,24c-6.5,6.5-15,10-24,10H59c-9,0-17.5-3.6-24-10c-6.5-6.5-10-15-10-24V59c0-9,3.6-17.5,10-24c6.5-6.5,15-10,24-10h144.4v61.8c0,49.6,40.4,90,90,90H359V453z"/><polygon points="207,208.3 177,208.3 177,284.8 100.5,284.8 100.5,314.8 177,314.8 177,391.3 207,391.3 207,314.8 283.5,314.8 283.5,284.8 207,284.8"/></g></svg>
                                                 </a>
@@ -217,16 +217,15 @@
                 </div>
                 
                 <!-- DA LI DISTRIBUTER IMA OSNOVNU LICENCU -->
-                @if($osnovna_licenca_id > 0)
+           
                     <div class="my-4 pl-4">
                         <svg class="fill-current w-5 h-5 float-left mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M373.1,134.6L253.4,15.3C243.5,5.5,230.2,0,216.3,0H59C26.5,0,0,26.5,0,59v394c0,32.5,26.5,59,59,59h266 c32.5,0,59-26.5,59-59V160.9C384,151.1,380.1,141.6,373.1,134.6z M354.9,151.8h-61.5c-35.8,0-65-29.2-65-65v-59 c2.7,1.3,5.1,3.1,7.3,5.2L354.9,151.8z M359,453c0,9-3.6,17.5-10,24c-6.5,6.5-15,10-24,10H59c-9,0-17.5-3.6-24-10 c-6.5-6.5-10-15-10-24V59c0-9,3.6-17.5,10-24c6.5-6.5,15-10,24-10h144.4v61.8c0,49.6,40.4,90,90,90H359V453z"/><g><path d="M159.9,391.1h111.3v26.3h-141V197.8h29.7V391.1z"/></g></svg>
                         LICENCE:
                     </div>
-                    @if(count($licence_za_dodavanje))
                         <div>
                             @foreach( App\Models\LicencaDistributerCena::naziviNeDodatihLicenci($licence_za_dodavanje, $distId) as $licenca_dodatak)
                             <div class="my-4 border-y py-2">
-                                <input id="{{$licenca_dodatak->id}}" type="checkbox" value="{{ $licenca_dodatak->id }}" wire:model="licence_za_dodavanje"  class="form-checkbox h-6 w-6 text-blue-500">
+                                <input id="licAdd" type="checkbox" value="{{ $licenca_dodatak->id }}" wire:model="licence_za_dodavanje"  class="form-checkbox h-6 w-6 text-blue-500">
                                 <span class="font-bold pl-2">{{ $licenca_dodatak->licenca_naziv }}</span>
                             </div>
                             @endforeach
@@ -247,14 +246,6 @@
                                 </div>
                             @endforeach
                         </div>
-                    @else
-                        <div class="my-4 border-y py-2">
-                            <input id="{{$osnovna_licenca_id}}" type="checkbox" value="{{ $osnovna_licenca_id }}" wire:model="licence_za_dodavanje"  class="form-checkbox h-6 w-6 text-blue-500">
-                            <span class="font-bold pl-2">{{ $osnovna_licenca_naziv }}</span>
-                        </div>
-                    @endif
-                @endif
-                
                 @if(count($licence_za_dodavanje))
                     <div class="flex justify-between">
                         <div class="pl-4 my-4 flex">
@@ -318,11 +309,10 @@
         </x-slot>
         <x-slot name="content">
             <div class="my-4">
-                @if(count($licence_dodate_terminalu) || count($licence_za_dodavanje))
                     <div>
                         @foreach( App\Models\LicencaDistributerCena::naziviNeDodatihLicenci($licence_za_dodavanje, $distId, $licence_dodate_terminalu) as $licenca_dodatak)
                         <div class="my-4 border-y py-2">
-                            <input id="{{ $licenca_dodatak->id }}" type="checkbox" value="{{ $licenca_dodatak->id }}" wire:model="licence_za_dodavanje"  class="form-checkbox h-6 w-6 text-blue-500">
+                            <input id="licAddM" type="checkbox" value="{{ $licenca_dodatak->id }}" wire:model="licence_za_dodavanje"  class="form-checkbox h-6 w-6 text-blue-500">
                             <span class="font-bold pl-2">{{ $licenca_dodatak->licenca_naziv }}</span>
                         </div>
                         @endforeach
@@ -356,12 +346,6 @@
                             @endforeach
                     </div>
                     @endif
-                @else
-                    <div class="my-4 border-y py-2">
-                        <input type="checkbox" value="{{ $osnovna_licenca_id }}" wire:model="licence_za_dodavanje"  class="form-checkbox h-6 w-6 text-blue-500">
-                        <span class="font-bold pl-2">{{ $osnovna_licenca_naziv }}</span>
-                    </div>
-                @endif
 
                 @if(count($licence_za_dodavanje))
                     <div class="flex justify-between">
@@ -428,7 +412,7 @@
                 <div my-4>
                     Da li ste sigurni da želite da obišete licencu!
                 </div>
-                @if($briseSe == 'osnovnaIdodatne')
+                @if($briseSe == 'iosnovnaIdodatne')
                     <div class="bg-red-50 border border-red-500 text-red-500 px-4 py-3 rounded relative my-4 " role="alert">
                         <p class="">Upozorenje!<br />
                         <span class="font-bold block sm:inline">Brisanjem osnovne licence biće obrisane i sve ostale licence dodate terminalu!</span>

@@ -61,21 +61,21 @@ class Licence extends Component
         // Assign the variables here
         $this->naziv_licence = $data->licenca_naziv;
         $this->opis_licence = $data->licenca_opis;
-        $this->is_osnovna = ($data->osnovna_licenca) ? 1 : 0; 
+        //$this->is_osnovna = ($data->osnovna_licenca) ? 1 : 0; 
     }
 
     /**
      * The data for the model mapped
      * in this component.
      *
+     * 'osnovna_licenca' =>  ($this->is_osnovna) ? 1 : 0
      * @return void
      */
     public function modelData()
     {
         return [  
             'licenca_naziv' => $this->naziv_licence,
-            'licenca_opis' => $this->opis_licence,
-            'osnovna_licenca' =>  ($this->is_osnovna) ? 1 : 0
+            'licenca_opis' => $this->opis_licence
         ];
     }
 
@@ -91,7 +91,7 @@ class Licence extends Component
         $this->resetValidation();
         $this->reset();
         $this->modalFormVisible = true;
-        $this->is_osnovna = 0;
+        //$this->is_osnovna = 0;
     }
 
     /**

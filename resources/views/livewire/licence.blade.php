@@ -19,7 +19,7 @@
                                 <th class="px-2 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider"></th>
                                 <th class="px-2 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Naziv</th>
                                 <th class="px-2 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Opis</th>
-                                <th class="mx-auto px-2 py-3 bg-gray-50 text-center text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Osnovna</th>
+                                <th class="mx-auto px-2 py-3 bg-gray-50 text-center text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider"></th>
                                 <th class="px-2 py-3 bg-gray-50 text-center text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Parametri</th>
                                 <th class="px-2 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider"></th>
                             </tr>
@@ -36,9 +36,7 @@
                                         <td class="px-2 py-2">{{ $item->licenca_naziv }}</td>
                                         <td class="px-2 py-2">{{ $item->licenca_opis }}</td>
                                         <td class="px-2 py-2">
-                                            @if($item->osnovna_licenca)
-                                            <svg class="mx-auto fill-green-400 w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Pro 6.3.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. --><path d="M64 32C28.7 32 0 60.7 0 96V416c0 35.3 28.7 64 64 64H384c35.3 0 64-28.7 64-64V96c0-35.3-28.7-64-64-64H64zM337 209L209 337c-9.4 9.4-24.6 9.4-33.9 0l-64-64c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l47 47L303 175c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9z"/></svg>
-                                            @endif
+                                            <!-- if($item->osnovna_licenca) <svg class="mx-auto fill-green-400 w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M64 32C28.7 32 0 60.7 0 96V416c0 35.3 28.7 64 64 64H384c35.3 0 64-28.7 64-64V96c0-35.3-28.7-64-64-64H64zM337 209L209 337c-9.4 9.4-24.6 9.4-33.9 0l-64-64c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l47 47L303 175c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9z"/></svg>    endif -->
                                         </td> 
                                         <td class="mx-auto py-2 flex justify-center">
                                             <span class="mt-1">{{ $item->broj_parametara_licence }}</span>
@@ -98,8 +96,8 @@
             </div>  
             <div class="mt-4">
                 <div class="">
-                    <input id="{{ $is_osnovna }}" type="checkbox" value="1" wire:model="is_osnovna" class="form-checkbox h-6 w-6 text-blue-500 my-2">
-                    <label class="ml-2" for="is_osnovna"> Osnovna licenca</label>
+                   <!--  <input id="{{ $is_osnovna }}" type="checkbox" value="1" wire:model="is_osnovna" class="form-checkbox h-6 w-6 text-blue-500 my-2">
+                    <label class="ml-2" for="is_osnovna"> Osnovna licenca</label> -->
                 </div>
             </div>      
         </x-slot>

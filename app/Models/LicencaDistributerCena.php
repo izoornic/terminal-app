@@ -98,17 +98,18 @@ class LicencaDistributerCena extends Model
        * Nazivi licenci koje mogu da se dodaju novom terminalu
        * Niz sa id-jevima licenci u tabeli LicencaDistributerCena
        * 
+       * ->whereNotIn('licenca_distributer_cenas.id', $licence)
+       * 
        * @param array $licence
        * 
     */
     public static function naziviNeDodatihLicenci($licence, $distId, $ranije_dodate = [])
     {
-        if(count($ranije_dodate)) $licence = array_merge($licence, $ranije_dodate);
+        //if(count($ranije_dodate)) $licence = array_merge($licence, $ranije_dodate);
         return LicencaTip::select('licenca_distributer_cenas.id', 'licenca_tips.licenca_naziv', 'licenca_distributer_cenas.licenca_tipId')
         ->leftJoin('licenca_distributer_cenas', 'licenca_tips.id', '=', 'licenca_distributer_cenas.licenca_tipId')
         ->where('licenca_distributer_cenas.distributerId', '=', $distId)
-        ->where('licenca_tips.osnovna_licenca', '=', 0)
-        ->whereNotIn('licenca_distributer_cenas.id', $licence)
+        ->whereNotIn('licenca_distributer_cenas.id', $ranije_dodate)
         ->get();
     }
 
