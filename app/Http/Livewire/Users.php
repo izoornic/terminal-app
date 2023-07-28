@@ -9,14 +9,16 @@ use App\Models\KorisnikRadniStatus;
 use App\Models\KorisnikRadniStatusHistory;
 use App\Models\KorisnikRadniOdnos;
 use App\Models\KorisnikRadniOdnosHistory;
-use Illuminate\Support\Facades\DB;
+
 use Livewire\Component;
 use Livewire\WithPagination;
-use Illuminate\Support\Collection;
 
 use Illuminate\Validation\Rules\Password;
-use Illuminate\Support\Facades\Hash;
 
+use Illuminate\Support\Str;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Config;
 
 class Users extends Component 
@@ -89,8 +91,7 @@ class Users extends Component
 
         if($this->newUser){
             $retval['email'] = ['required', 'string', 'email', 'max:255', 'unique:users'];
-            $retval['password'] = ['required', Password::min(8)
-            ->letters(),
+            $retval['password'] = ['required', Password::min(8)->letters(),
              ];
         }
 
@@ -272,7 +273,6 @@ class Users extends Component
         try {
             DB::transaction(function(){
                 $user = User::find($this->modelId);
-               
                 UserHistory::create([
                     'korisnikId' => $this->modelId,
                     'pozicija_tipId' => $user->pozicija_tipId,
@@ -288,9 +288,9 @@ class Users extends Component
                     'profile_photo_path'  => $user->profile_photo_path,
                 ]);
                
-                KorisnikRadniOdnos::where('korisnikId', $this->modelId)->delete();
-                KorisnikRadniStatus::where('korisnikId', $this->modelId)->delete();
-                User::destroy($this->modelId);
+                //KorisnikRadniOdnos::where('korisnikId', $this->modelId)->delete();
+                //KorisnikRadniStatus::where('korisnikId', $this->modelId)->delete();
+                User::find($this->modelId)->update(['pozicija_tipId'=> 7, 'password' => Hash::make(Str::random(40))]);
             });
         } catch (\Throwable $th) {
             abort(403, 'Unauthorized action!.');

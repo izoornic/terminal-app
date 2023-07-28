@@ -26,7 +26,19 @@ class PozicijaTip extends Model
      */
     public static function userRoleList(){
         foreach(PozicijaTip::all() as $pozicija){
-            $pozicija_list[$pozicija->id] = $pozicija->naziv;
+            if($pozicija->naziv != 'Obrisan')  $pozicija_list[$pozicija->id] = $pozicija->naziv;
+        }
+        return  $pozicija_list;
+    }
+
+    /**
+     * vraca sve pozicije koje moze da ima user za search polje
+     *
+     * @return void
+     */
+    public static function userRoleListAll(){
+        foreach(PozicijaTip::all() as $pozicija){
+           $pozicija_list[$pozicija->id] = $pozicija->naziv;
         }
         return  $pozicija_list;
     }

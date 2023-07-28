@@ -43,7 +43,7 @@
                                 <td>
                                     <select wire:model="searchPozicija" id="" class="block appearance-none bg-orange-50 w-full border border-0 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
                                             <option value="">---</option>
-                                        @foreach (App\Models\PozicijaTip::userRoleList() as $key => $value)    
+                                        @foreach (App\Models\PozicijaTip::userRoleListAll() as $key => $value)    
                                             <option value="{{ $key }}">{{ $value }}</option>
                                         @endforeach
                                     </select>
@@ -63,24 +63,35 @@
                                 @foreach ($data as $item)
                                     <tr>
                                         <td class="px-6 py-2">
+                                            @if($item->naziv != 'Obrisan')
                                             <x-jet-secondary-button class="btn btn-blue" wire:click="updateShowModal({{ $item->id }})">
                                             <svg class="fill-current w-4 h-4 mr-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Pro 6.0.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M373.1 24.97C401.2-3.147 446.8-3.147 474.9 24.97L487 37.09C515.1 65.21 515.1 110.8 487 138.9L289.8 336.2C281.1 344.8 270.4 351.1 258.6 354.5L158.6 383.1C150.2 385.5 141.2 383.1 135 376.1C128.9 370.8 126.5 361.8 128.9 353.4L157.5 253.4C160.9 241.6 167.2 230.9 175.8 222.2L373.1 24.97zM440.1 58.91C431.6 49.54 416.4 49.54 407 58.91L377.9 88L424 134.1L453.1 104.1C462.5 95.6 462.5 80.4 453.1 71.03L440.1 58.91zM203.7 266.6L186.9 325.1L245.4 308.3C249.4 307.2 252.9 305.1 255.8 302.2L390.1 168L344 121.9L209.8 256.2C206.9 259.1 204.8 262.6 203.7 266.6zM200 64C213.3 64 224 74.75 224 88C224 101.3 213.3 112 200 112H88C65.91 112 48 129.9 48 152V424C48 446.1 65.91 464 88 464H360C382.1 464 400 446.1 400 424V312C400 298.7 410.7 288 424 288C437.3 288 448 298.7 448 312V424C448 472.6 408.6 512 360 512H88C39.4 512 0 472.6 0 424V152C0 103.4 39.4 64 88 64H200z"/></svg>
                                             </x-jet-button>
+                                            @endif
                                         </td> 
                                         <td class="px-6 py-2">{{ $item->name }}</td>
                                         <td class="px-6 py-2">{{ $item->l_naziv }} - {{ $item->mesto }}</td> 
                                         <td class="px-6 py-2">{{ $item->ro_naziv }}</td>
-                                        <td class="px-6 py-2">{{ $item->naziv }}</td>  
+                                        <td class="px-6 py-2">
+                                            @if($item->naziv == 'Obrisan')
+                                                <span class="text-red-600 font-bold"> {{ $item->naziv }}</span>
+                                            @else
+                                                {{ $item->naziv }}
+                                            @endif
+                                        </td>  
                                         
-                                        <td class="px-6 py-2"> 
-                                            <x-jet-secondary-button wire:click="updateShowRadniStatusModal({{ $item->id }})">
-                                                {{ $item->rs_naziv }}
-                                            </x-jet-button></td>                                        
+                                        <td class="px-6 py-2">
+                                            @if($item->naziv != 'Obrisan')
+                                                <x-jet-secondary-button wire:click="updateShowRadniStatusModal({{ $item->id }})">
+                                                    {{ $item->rs_naziv }}
+                                                </x-jet-button></td> 
+                                            @endif
                                         <td class="px-6 py-2 flex justify-end">
-                                           
-                                            <x-jet-danger-button class="ml-2" wire:click="deleteShowModal({{ $item->id }})">
-                                            <svg class="fill-current w-4 h-4 mr-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Pro 6.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M135.2 17.69C140.6 6.848 151.7 0 163.8 0H284.2C296.3 0 307.4 6.848 312.8 17.69L320 32H416C433.7 32 448 46.33 448 64C448 81.67 433.7 96 416 96H32C14.33 96 0 81.67 0 64C0 46.33 14.33 32 32 32H128L135.2 17.69zM31.1 128H416V448C416 483.3 387.3 512 352 512H95.1C60.65 512 31.1 483.3 31.1 448V128zM111.1 208V432C111.1 440.8 119.2 448 127.1 448C136.8 448 143.1 440.8 143.1 432V208C143.1 199.2 136.8 192 127.1 192C119.2 192 111.1 199.2 111.1 208zM207.1 208V432C207.1 440.8 215.2 448 223.1 448C232.8 448 240 440.8 240 432V208C240 199.2 232.8 192 223.1 192C215.2 192 207.1 199.2 207.1 208zM304 208V432C304 440.8 311.2 448 320 448C328.8 448 336 440.8 336 432V208C336 199.2 328.8 192 320 192C311.2 192 304 199.2 304 208z"/></svg>
-                                            </x-jet-button>
+                                            @if($item->naziv != 'Obrisan')
+                                                <x-jet-danger-button class="ml-2" wire:click="deleteShowModal({{ $item->id }})">
+                                                <svg class="fill-current w-4 h-4 mr-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Pro 6.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M135.2 17.69C140.6 6.848 151.7 0 163.8 0H284.2C296.3 0 307.4 6.848 312.8 17.69L320 32H416C433.7 32 448 46.33 448 64C448 81.67 433.7 96 416 96H32C14.33 96 0 81.67 0 64C0 46.33 14.33 32 32 32H128L135.2 17.69zM31.1 128H416V448C416 483.3 387.3 512 352 512H95.1C60.65 512 31.1 483.3 31.1 448V128zM111.1 208V432C111.1 440.8 119.2 448 127.1 448C136.8 448 143.1 440.8 143.1 432V208C143.1 199.2 136.8 192 127.1 192C119.2 192 111.1 199.2 111.1 208zM207.1 208V432C207.1 440.8 215.2 448 223.1 448C232.8 448 240 440.8 240 432V208C240 199.2 232.8 192 223.1 192C215.2 192 207.1 199.2 207.1 208zM304 208V432C304 440.8 311.2 448 320 448C328.8 448 336 440.8 336 432V208C336 199.2 328.8 192 320 192C311.2 192 304 199.2 304 208z"/></svg>
+                                                </x-jet-button>
+                                            @endif
                                         </td>
                                     </tr>
                                 @endforeach
