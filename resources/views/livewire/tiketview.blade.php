@@ -58,6 +58,7 @@
                     <div>
                         <p>Terminal: <span class="font-bold">{{$terminal->sn}}</span> </p>
                         <p>Staus: <span class="font-bold">{{ $terminal->ts_naziv }}</span></p>
+                        <p class="text-sm">Model: <span class="font-bold">{{ $terminal->treminal_model }}</span> | Proizvođač: <span class="font-bold">{{$terminal->treminal_proizvodjac}}</span></p>
                         <p>Lokacija:  <span class="font-bold">{{ $terminal->l_naziv }}</span></p>
                         <p>Adresa: <span class="font-bold">{{ $terminal->adresa }}</span>, {{$terminal->mesto}}</p>
                         <p>Region:  <span class="font-bold">{{ $terminal->r_naziv }}</span></p>
