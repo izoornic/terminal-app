@@ -8,3 +8,6 @@ V 0.4.3.1 (28.7.2023.)
 
 V 0.4.3.2 (11.8.2023.)
     - Dodat podatak o modelu i proizvodjaču na modalu HISTORY na stranicama: "licenca-terminali", "terminal", "tiketview"
+
+V 0.4.3.3 (12.10.2023.)
+    - Ispravljen bug kod dodavanja tiketa. Lista "Opis kvara" vis ne zavisi od tipa terminala. 

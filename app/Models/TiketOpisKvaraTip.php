@@ -11,8 +11,11 @@ class TiketOpisKvaraTip extends Model
 
     public static function opisList($id = 1)
     {
+        //ne bas tako sjajan hak
+        //Lista vise ne zavisi od ID-a tipa terminala
+        // where('termnal_tipId', '=', $id)
         $kvar_list =[];
-        foreach(TiketOpisKvaraTip::where('termnal_tipId', '=', $id)->orderBy('list_order')->get() as $kvar){
+        foreach(TiketOpisKvaraTip::orderBy('list_order')->get() as $kvar){
             $kvar_list[$kvar->id] = $kvar->tok_naziv;
         }
         return  $kvar_list;

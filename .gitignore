@@ -4,11 +4,12 @@
 /public/predracuni
 /public/bl
 /storage/*.key
-#/vendor
+/vendor
 .env
 .env.backup
 .phpunit.result.cache
 docker-compose.override.yml
+docker-compose-beckup.yml
 Homestead.json
 Homestead.yaml
 npm-debug.log
