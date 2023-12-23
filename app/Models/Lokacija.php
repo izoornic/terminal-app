@@ -24,9 +24,9 @@ class Lokacija extends Model
         'pib'
     ];
 
-    public static function userLokacijeList()
+    public static function userLokacijeList($tip_id = 1)
     {
-        foreach(Lokacija::where('lokacija_tipId', '=', 1)->get() as $lokacija){
+        foreach(Lokacija::where('lokacija_tipId', '=', $tip_id)->get() as $lokacija){
             $lokacija_list[$lokacija->id] = $lokacija->l_naziv." - ".$lokacija->mesto;
         }
         return  $lokacija_list;
@@ -38,7 +38,6 @@ class Lokacija extends Model
         foreach(Lokacija::where('lokacija_tipId', '=', $tipId)->get() as $lokacija){
             $lokacija_list[$lokacija->id] = $lokacija->l_naziv." - ".$lokacija->mesto;
         }
-        
         return  $lokacija_list;
     }
 

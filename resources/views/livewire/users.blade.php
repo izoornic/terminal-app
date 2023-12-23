@@ -75,13 +75,17 @@
                                         <td class="px-6 py-2">
                                             @if($item->naziv == 'Obrisan')
                                                 <span class="text-red-600 font-bold"> {{ $item->naziv }}</span>
+                                            @elseif($item->naziv == 'Distributer')
+                                                <span class="text-sky-600"> {{ $item->naziv }}</span>
                                             @else
                                                 {{ $item->naziv }}
                                             @endif
                                         </td>  
                                         
                                         <td class="px-6 py-2">
-                                            @if($item->naziv != 'Obrisan')
+                                            @if($item->naziv == 'Obrisan' || $item->naziv == 'Distributer')
+                                                ---
+                                            @else
                                                 <x-jet-secondary-button wire:click="updateShowRadniStatusModal({{ $item->id }})">
                                                     {{ $item->rs_naziv }}
                                                 </x-jet-button></td> 
@@ -159,17 +163,124 @@
             </div> 
                  
             <div class="mt-4">
-                <x-jet-label for="pozicijaId" value="{{ __('Pozicija') }}" />
-                <select wire:model="pozicijaId" id="pozicija" class="block appearance-none w-full bg-gray-100 border border-gray-200 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
-                        <option value="">-- Odaberi poziciju -- </option>
-                    @foreach (App\Models\PozicijaTip::userRoleList() as $key => $value)    
-                        <option value="{{ $key }}">{{ $value }}</option>
-                    @endforeach
-                </select>
-                @error('pozicijaId') <span class="error">{{ $message }}</span> @enderror
+                @if($modelId && $pozicijaId == 8)
+                    <label>Pozicija</label>
+                    <div class="bg-gray-100 mb-2 border-b-4 border-black-200 p-1.5">
+                        <p class="font-bold">Distributer</p>
+                    </div>
+                @else
+                    <x-jet-label for="pozicijaId" value="{{ __('Pozicija') }}" />
+                    <select wire:model="pozicijaId" id="pozicija" class="block appearance-none w-full bg-gray-100 border border-gray-200 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+                            <option value="">-- Odaberi poziciju -- </option>
+                        @foreach (App\Models\PozicijaTip::userRoleList() as $key => $value)    
+                            <option value="{{ $key }}">{{ $value }}</option>
+                        @endforeach
+                    </select>
+                    @error('pozicijaId') <span class="error">{{ $message }}</span> @enderror
+                @endif
             </div>
             <br />
+            
             <div class="mt-4">
+
+            @if($pozicijaId == 8)
+            @php
+                $radniOdnosId = 3;
+            @endphp
+            <label> Lokacija: </label>
+            @if(!$lokacijaId)
+                {{-- Novi korisnik je Ditributer  --}}
+
+                <table class="min-w-full divide-y divide-gray-200 mt-4" style="width: 100% !important">
+                    <thead>
+                        <tr>
+                            <th class="px-3 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider"></th>
+                            <th class="px-3 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Naziv</th> 
+                            <th class="px-3 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Mesto</th> 
+                            <th class="px-3 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Region</th> 
+                            <th class="px-3 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider"></th>  
+                        </tr>
+                        <tr class="bg-orange-50">
+                            <td><svg class="mx-auto fill-orange-600 w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Pro 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M3.853 54.87C10.47 40.9 24.54 32 40 32H472C487.5 32 501.5 40.9 508.1 54.87C514.8 68.84 512.7 85.37 502.1 97.33L320 320.9V448C320 460.1 313.2 471.2 302.3 476.6C291.5 482 278.5 480.9 268.8 473.6L204.8 425.6C196.7 419.6 192 410.1 192 400V320.9L9.042 97.33C-.745 85.37-2.765 68.84 3.854 54.87L3.853 54.87z"/></svg></td>
+                            <td><x-jet-input wire:model="searchPLokacijaNaziv" id="" class="block bg-orange-50 w-full" type="text" placeholder="Naziv" /></td>
+                            <td><x-jet-input wire:model="searchPlokacijaMesto" id="" class="block bg-orange-50 w-full" type="text" placeholder="Mesto" /></td>
+                            <td>
+                                    <select wire:model="searchPlokacijaRegion" id="" class="block appearance-none bg-orange-50 w-full border border-0 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+                                            <option value="">---</option>
+                                        @foreach (App\Models\Region::regioni() as $key => $value)    
+                                            <option value="{{ $key }}">{{ $value }}</option>
+                                        @endforeach
+                                </select>
+                            </td>
+                            <td></td>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200"> 
+                    @foreach ($this->lokacijeTipa() as $value)
+                    <tr class="hover:bg-gray-100" wire:click="$set('lokacijaId', {{ $value->id }})" >    
+                            <td></td>
+                            <td>{{ $value->l_naziv }}</td>
+                            <td>{{ $value->mesto}}</td>
+                            <td>{{ $value->r_naziv}}</td>
+                            <td></td>
+                    </tr>
+                    @endforeach
+                    </tbody>
+                <table>
+                <div class="mt-5">
+                    {{ $this->lokacijeTipa()->links() }}
+                </div>
+                @else
+                    {{-- IZABRAO LOKACIJU MENJAM PRIKAZ --}}
+                    <div class="bg-gray-100 mb-2 border-b-4 border-black-200 p-1.5">
+                    <p class="font-bold">{{ $this->izabranaLokacija()->l_naziv}}, {{ $this->izabranaLokacija()->mesto }}</p>
+                    <p class="text-sm">Region: {{ $this->izabranaLokacija()->r_naziv }}</p>
+                    
+                    </div>
+                    <p>&nbsp;</p>
+                    {{-- NOVA LISTA ZA VEZU SA DISTRIBUTEROM --}}
+                    <label> Distributer: </label>
+                    @if(!$distributerId)
+                    
+                    <table class="min-w-full divide-y divide-gray-200 mt-4" style="width: 100% !important">
+                        <thead>
+                            <tr>
+                                <th class="px-3 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider"></th>
+                                <th class="px-3 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Naziv</th> 
+                                <th class="px-3 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Mesto</th> 
+                                <th class="px-3 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider"></th>  
+                            </tr>
+                            <tr class="bg-orange-50">
+                                <td><svg class="mx-auto fill-orange-600 w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Pro 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M3.853 54.87C10.47 40.9 24.54 32 40 32H472C487.5 32 501.5 40.9 508.1 54.87C514.8 68.84 512.7 85.37 502.1 97.33L320 320.9V448C320 460.1 313.2 471.2 302.3 476.6C291.5 482 278.5 480.9 268.8 473.6L204.8 425.6C196.7 419.6 192 410.1 192 400V320.9L9.042 97.33C-.745 85.37-2.765 68.84 3.854 54.87L3.853 54.87z"/></svg></td>
+                                <td><x-jet-input wire:model="searchPDistNaziv" id="" class="block bg-orange-50 w-full" type="text" placeholder="Naziv" /></td>
+                                <td><x-jet-input wire:model="searchPDdistMesto" id="" class="block bg-orange-50 w-full" type="text" placeholder="Mesto" /></td>
+                                <td></td>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200"> 
+                        @foreach ($this->distributerCompany() as $value)
+                        <tr class="hover:bg-gray-100" wire:click="$set('distributerId', {{ $value->id }})" >    
+                                <td></td>
+                                <td>{{ $value->distributer_naziv }}</td>
+                                <td>{{ $value->distributer_mesto}}</td>
+                                <td></td>
+                        </tr>
+                        @endforeach
+                        </tbody>
+                    <table>
+                    <div class="mt-5">
+                        {{ $this->distributerCompany()->links() }}
+                    </div>
+                    @else
+                        {{-- IZABRAO DISTRIBUTERA MENJAM PRIKAZ --}}
+                        <div class="bg-gray-100 mb-2 border-b-4 border-black-200 p-1.5">
+                            <p class="font-bold">{{ $this->izabraniDistributer()->distributer_naziv}}, {{ $this->izabraniDistributer()->distributer_mesto }}</p>
+                            <p class="text-sm">Adresa: {{ $this->izabraniDistributer()->distributer_adresa  }}</p>
+                        </div>
+                    @endif
+
+                @endif
+            @else
                 <x-jet-label for="lokacijaId" value="{{ __('Lokacija') }}" />
                 <select wire:model="lokacijaId" id="lokacija" class="block appearance-none w-full bg-gray-100 border border-gray-200 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
                         <option value="">-- Odaberi lokaciju -- </option>
@@ -178,8 +289,10 @@
                     @endforeach
                 </select>
                 @error('lokacijaId') <span class="error">{{ $message }}</span> @enderror
+            @endif
             </div>
             <br />
+            @if($pozicijaId != 8)
             <div class="mt-4">
                 <x-jet-label for="radniOdnosId" value="{{ __('Radni odnos') }}" />
                 <select wire:model="radniOdnosId" id="radniodnos" class="block appearance-none w-full bg-gray-100 border border-gray-200 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
@@ -189,7 +302,8 @@
                     @endforeach
                 </select>
                 @error('radniOdnosId') <span class="error">{{ $message }}</span> @enderror
-            </div>    
+            </div> 
+            @endif   
         </x-slot>
 
         <x-slot name="footer">

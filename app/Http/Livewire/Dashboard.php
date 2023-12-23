@@ -10,6 +10,9 @@ class Dashboard extends Component
 
     public function render()
     {
+        //dd($userRole = auth()->user()->pozicija_tipId);
         return view('livewire.dashboard');
     }
+
+    
 }

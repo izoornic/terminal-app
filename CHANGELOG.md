@@ -11,3 +11,6 @@ V 0.4.3.2 (11.8.2023.)
 
 V 0.4.3.3 (12.10.2023.)
     - Ispravljen bug kod dodavanja tiketa. Lista "Opis kvara" vis ne zavisi od tipa terminala. 
+
+V 0.5.0 (23.12.2013.)
+    - Dodat novi tip usera "Distributer" i napravljena funkcionalonost za Admina da može da dodaje takve korisnike. Novog korisnika vezuje za lokaciju tipa "Distributer" a zatim i za firmu iz tabele "licenca_distributer_tips".

@@ -3,12 +3,15 @@
 namespace App\Http\Livewire;
 
 use App\Models\User;
+use App\Models\Lokacija;
 use App\Models\UserHistory;
 use App\Models\PozicijaTip;
 use App\Models\KorisnikRadniStatus;
 use App\Models\KorisnikRadniStatusHistory;
 use App\Models\KorisnikRadniOdnos;
 use App\Models\KorisnikRadniOdnosHistory;
+use App\Models\LicencaDistributerTip;
+use App\Models\DistributerUserIndex;
 
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -60,6 +63,16 @@ class Users extends Component
     //order
     public $orderBy;
 
+    //search DIsttributera
+    public $plokacijaTip;
+    public $searchPlokacijaRegion;
+    public $searchPLokacijaNaziv;
+    public $searchPlokacijaMesto;
+
+    //Info i predtraga tabele distributeri
+    public $distributerId;
+    public $searchPDistNaziv;
+    public $searchPDdistMesto;
     /**
      * Put your custom public properties here!
      */
@@ -165,9 +178,11 @@ class Users extends Component
         $this->newUser = false;
         $this->resetValidation();
         $this->reset();
-        $this->modalFormVisible = true;
         $this->modelId = $id;
         $this->loadModel();
+        //dd($this->distributerId);
+
+        $this->modalFormVisible = true;
     }
 
     /**
@@ -191,7 +206,70 @@ class Users extends Component
         $radniOdnos = KorisnikRadniOdnos::where('korisnikId', $this->modelId)->first();
         $this->radniOdnosId = $radniOdnos->radni_odnosId;
         $this->oldRadniOdnosId = $this->radniOdnosId;
+
+        if($this->pozicijaId == 8){
+            $this->distributerId = DistributerUserIndex::where('userId', '=', $this->modelId)->first()->licenca_distributer_tipsId;
+        }
     }
+
+    /**
+     * lokacijeTipa
+     *
+     * @param  mixed $tipId
+     * @return void
+     */
+    public function lokacijeTipa($tipId = 4)
+    {
+        return Lokacija::select('lokacijas.*', 'regions.r_naziv')
+            ->where('lokacija_tipId', '=', $tipId)
+            ->leftJoin('regions', 'lokacijas.regionId', '=', 'regions.id')
+            ->where('l_naziv', 'like', '%'.$this->searchPLokacijaNaziv.'%')
+            ->where('mesto', 'like', '%'.$this->searchPlokacijaMesto.'%')
+            ->where('lokacijas.regionId', ($this->searchPlokacijaRegion > 0) ? '=' : '<>', $this->searchPlokacijaRegion)
+            ->paginate(Config::get('global.modal_search'), ['*'], 'loc');
+    }
+
+    
+    /**
+     * Prikazuje naziv lokacije na koju se vezuje distributer
+     *
+     * @return void
+     */
+    public function izabranaLokacija()
+    {
+        return Lokacija::select('lokacijas.*', 'regions.r_naziv')
+                            ->leftJoin('lokacija_tips', 'lokacijas.lokacija_tipId', '=', 'lokacija_tips.id')
+                            ->leftJoin('regions', 'lokacijas.regionId', '=', 'regions.id')
+                            ->where('lokacijas.id', '=', $this->lokacijaId)
+                            ->first();
+    }
+
+    /**
+     * Distributer firma forma za pretragu distributera
+     *
+     * @param  mixed $tipId
+     * @return void
+     */
+    public function distributerCompany()
+    {
+        return LicencaDistributerTip::select('id', 'distributer_naziv', 'distributer_mesto')
+            ->where('distributer_naziv', 'like', '%'.$this->searchPDistNaziv.'%')
+            ->where('distributer_mesto', 'like', '%'.$this->searchPDdistMesto.'%')
+            ->paginate(Config::get('global.modal_search'), ['*'], 'dist');
+    }
+
+    /**
+     * Prikazuje podatke o firmi za koju se veyuje distributer
+     *
+     * @return void
+     */
+    public function izabraniDistributer()
+    {
+        return LicencaDistributerTip::where('id', '=', $this->distributerId)
+                            ->first();
+    }
+
+
 
     /**
      * The data for the model mapped
@@ -224,6 +302,10 @@ class Users extends Component
      */
     public function create()
     {
+        if($this->pozicijaId == 8){
+            //dodaje se novi distributer
+            $this->radniOdnosId = 3;
+        }
         $this->validate();
         DB::transaction(function(){
             $nUser = User::create($this->modelData());
@@ -235,9 +317,14 @@ class Users extends Component
                 'korisnikId' => $nUser->id,
                 'radni_odnosId' => $this->radniOdnosId,
             ]);
+            if($this->pozicijaId == 8){
+                DistributerUserIndex::create([
+                    'userId' => $nUser->id,
+                    'licenca_distributer_tipsId' => $this->distributerId
+                ]);
+            }
         });
         $this->modalFormVisible = false;
-        $this->reset();
     }
 
     /**
