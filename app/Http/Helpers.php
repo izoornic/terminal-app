@@ -32,6 +32,11 @@ class Helpers
         return Carbon::now()->format('H:i:s');
     }
 
+    public static function firstDayOfMounth($date)
+    {
+        return Carbon::parse($date)->startOfMonth()->toDateString();
+    }
+
     public static function lastDayOfManth($date)
     {
         return Carbon::parse($date)->endOfMonth()->toDateString();
@@ -45,11 +50,6 @@ class Helpers
     public static function addDaysToDate($date, $no_of_days)
     {
         return Carbon::parse($date)->addDays($no_of_days)->toDateString();
-    }
-    
-    public static function firstDayOfMounth($date)
-    {
-        return Carbon::parse($date)->startOfMonth()->toDateString();
     }
 
     public static function nameOfTheMounth($date)
@@ -83,6 +83,36 @@ class Helpers
         $eDate = Carbon::parse($endDate);
         
         return ($eDate > $sDate) ? $sDate->diffInDays($endDate) : false;
+    }
+
+    public static function numberOfMounthsBettwen($startDate, $endDate)
+    {
+        $sDate = Carbon::parse($startDate);
+        $eDate = Carbon::parse($endDate);
+        
+        return ($eDate > $sDate) ? $sDate->diffInMonths($endDate) : false;
+    }
+
+    public static function isMonthCurrent($startDate)
+    {
+        if ($startDate == null) return false;
+        $eDate = Carbon::parse($startDate);
+        $sDate = Carbon::now();
+        //dd($eDate, $sDate,  $sDate->diffInMonths($eDate));
+        return ($sDate->diffInMonths($eDate) > 0) ? false : true; 
+    }
+
+    public static function monthDifference($krajLicence)
+    {
+        if ($krajLicence == null) return false;
+        $eDate = Carbon::parse($krajLicence);
+        $sDate = Carbon::now();
+
+        $diff = $sDate->diffInMonths($eDate);
+        $dayPass = ($sDate->gt($eDate)) ? true : false;
+        
+        if($dayPass) return -1;
+        else return $diff;
     }
 
     public static function noOfDaysInMounth($date)
@@ -124,6 +154,5 @@ class Helpers
         if($sDate->lt($eDate)) return 'lt';
         else return 'err';
     }
-
 
 }

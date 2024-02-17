@@ -82,7 +82,59 @@ class RazduzenjeDistributerMesec extends Component
         $this->razduzenjeModalVisible = true;
     }
 
+
     public function razduziDistributera()
+    {
+        $this->validate();
+        $this->prepareData();
+
+        $this->dataAll->each(function ($item, $key){
+            
+            //LICENCE KOJE SE NE RAZDUZUJU
+            if(in_array($item->id, $this->ne_razduzuju_se)){
+                DB::transaction(function()use($item){
+                    LicencaNaplata::where('id', '=', $item->id)
+                            ->update(['razduzeno' => 0]);
+                    LicencaDistributerTerminal::where('distributerId', '=', $this->did)
+                            ->where('terminal_lokacijaId', '=', $item->terminal_lokacijaId)
+                            ->where('licenca_distributer_cenaId', '=', $item->licenca_distributer_cenaId)
+                            ->update(['nenaplativ' => 1]);
+                });
+            }else{
+                //RAZDUZENJE
+                DB::transaction(function()use($item){
+                    LicencaNaplata::where('id', '=', $item->id)
+                            ->update(['razduzeno' => $item->zaduzeno]);
+                    
+                    //update zapis u tabeli licenca_terminas 
+                    $key_arr = [
+                        'terminal_lokacijaId' =>        $item->terminal_lokacijaId,
+                        'distributerId' =>              $this->did,
+                        'licenca_distributer_cenaId' => $item->licenca_distributer_cenaId,
+                    ];
+                    
+                    $vals_ins = [
+                        'mesecId'=>             $this->mid,
+                        'terminal_sn' =>        $item->sn,
+                        'datum_pocetak' =>      $item->datum_pocetka_licence,
+                        'datum_kraj' =>         $item->datum_kraj_licence,
+                        'datum_prekoracenja' => $item->datum_isteka_prekoracenja,
+                        'naziv_licence' =>      $item->licenca_naziv
+                    ];
+
+                    $signature_cripted =  CryptoSign::criptSignature($vals_ins);
+                    $vals_ins['signature'] = $signature_cripted;
+
+                    LicenceZaTerminal::updateOrCreate( $key_arr, $vals_ins );
+                });
+            }
+        });
+
+        LicencaDistributerMesec::where('distributerId', '=', $this->did)->where('mesecId', '=', $this->mid)->update(['sum_razaduzeno' => $this->ukupno_zaduzenje, 'datum_razaduzenja' => $this->datumUplate]);
+        $this->razduzenjeModalVisible = false;
+        return redirect('/razduzenje-pregled?id='.$this->did.'&mid='.$this->mid.'&acc=ras');
+    }
+    public function razduziDistributera_()
     {
         $this->validate();
         $update_model = [

@@ -15,8 +15,8 @@ return new class extends Migration
     {
         Schema::table('licenca_naplatas', function (Blueprint $table) {
             //
-            $table->date('datum_pocetka_licence')->nulable();
-            $table->date('datum_kraj_licence')->nulable();
+            $table->date('datum_pocetka_licence')->nullable();
+            $table->date('datum_kraj_licence')->nullable();
         });
     }
 

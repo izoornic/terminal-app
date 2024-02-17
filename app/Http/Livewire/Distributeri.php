@@ -47,7 +47,6 @@ class Distributeri extends Component
     public $searchMesto;
     public $searchPib;
 
-
     /**
      * The validation rules
      *
@@ -88,10 +87,10 @@ class Distributeri extends Component
         $this->d_mb         = $data->distributer_mb;
         $this->broj_ugovora     = $data->broj_ugovora;
         $this->datum_ugovora    = $data->datum_ugovora;
-        $this->datum_kraj_ugovora       = $data->datum_kraj_ugovora;
-        $this->dani_prekoracenja_licence     = $data->dani_prekoracenja_licence;
-        $this->broj_licenci = $data->broj_licenci;
-        $this->broj_terminala = $data->broj_terminala;
+        $this->datum_kraj_ugovora           = $data->datum_kraj_ugovora;
+        $this->dani_prekoracenja_licence    = $data->dani_prekoracenja_licence;
+        $this->broj_licenci                 = $data->broj_licenci;
+        $this->broj_terminala               = $data->broj_terminala;
     }
 
     /**
@@ -102,7 +101,7 @@ class Distributeri extends Component
      */
     public function resetModel()
     {
-        $data = LicencaDistributerTip::find($this->modelId);
+        //$data = LicencaDistributerTip::find($this->modelId);
         
        $this->d_naziv = '';
        $this->d_adresa = '';
@@ -197,7 +196,19 @@ class Distributeri extends Component
         }
         
     }
-
+    /*
+                                SKYVORTEX
+    ______________________________      ________________________________
+    \_____--------------          \ -- /           --------------______/
+       \_____--------------       (o\/o)        --------------______/
+          \_____--------------   / \++/ \    --------------______/
+                \_\_\___        /   \/   \        ___/_/_/
+                    \_\_\___   |          |   ___/_/_/
+                          \_\_  \        /  _/_/  
+                                 uuu  uuu    
+                                 /  ||  \
+                                /________\                
+    */
     /**
      * The delete check function.
      *
@@ -251,7 +262,7 @@ class Distributeri extends Component
         $this->loadModel();
         $this->delete_possible = ($this->broj_licenci == 0 && $this->broj_terminala == 0) ? true : false;
         $this->modalConfirmDeleteVisible = true;
-    }    
+    }
 
     public function render()
     {

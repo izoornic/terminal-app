@@ -21,7 +21,9 @@ class Lokacija extends Model
         'adresa',
         'latitude',
         'longitude',
-        'pib'
+        'pib',
+        'distributerId',
+        'mb'
     ];
 
     public static function userLokacijeList($tip_id = 1)
@@ -36,6 +38,18 @@ class Lokacija extends Model
     {
         $lokacija_list = [];
         foreach(Lokacija::where('lokacija_tipId', '=', $tipId)->get() as $lokacija){
+            $lokacija_list[$lokacija->id] = $lokacija->l_naziv." - ".$lokacija->mesto;
+        }
+        return  $lokacija_list;
+    }
+
+    public static function lokacijeDistributera($distId)
+    {
+        $lokacija_list = [];
+        foreach(Lokacija::select('lokacijas.*')
+                ->join('distributer_lokacija_indices', 'distributer_lokacija_indices.lokacijaId', '=', 'lokacijas.id')
+                ->where('distributer_lokacija_indices.licenca_distributer_tipsId', '=', $distId)
+                ->get() as $lokacija){
             $lokacija_list[$lokacija->id] = $lokacija->l_naziv." - ".$lokacija->mesto;
         }
         return  $lokacija_list;

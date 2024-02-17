@@ -233,51 +233,25 @@
                 @else
                     {{-- IZABRAO LOKACIJU MENJAM PRIKAZ --}}
                     <div class="bg-gray-100 mb-2 border-b-4 border-black-200 p-1.5">
-                    <p class="font-bold">{{ $this->izabranaLokacija()->l_naziv}}, {{ $this->izabranaLokacija()->mesto }}</p>
-                    <p class="text-sm">Region: {{ $this->izabranaLokacija()->r_naziv }}</p>
-                    
+                        <p class="font-bold">{{ $this->izabranaLokacija()->l_naziv}}, {{ $this->izabranaLokacija()->mesto }}</p>
+                        <p class="text-sm">Region: {{ $this->izabranaLokacija()->r_naziv }}</p>
+                        <p>&nbsp;</p>
+                        <p>Distributer:</p>
+                        <p class="font-bold">{{ $this->izabranaLokacija()->distributer_naziv}}</p>
+                        <p class="text-sm">Mesto: {{ $this->izabranaLokacija()->distributer_mesto }}</p>
                     </div>
-                    <p>&nbsp;</p>
-                    {{-- NOVA LISTA ZA VEZU SA DISTRIBUTEROM --}}
-                    <label> Distributer: </label>
-                    @if(!$distributerId)
-                    
-                    <table class="min-w-full divide-y divide-gray-200 mt-4" style="width: 100% !important">
-                        <thead>
-                            <tr>
-                                <th class="px-3 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider"></th>
-                                <th class="px-3 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Naziv</th> 
-                                <th class="px-3 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Mesto</th> 
-                                <th class="px-3 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider"></th>  
-                            </tr>
-                            <tr class="bg-orange-50">
-                                <td><svg class="mx-auto fill-orange-600 w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Pro 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M3.853 54.87C10.47 40.9 24.54 32 40 32H472C487.5 32 501.5 40.9 508.1 54.87C514.8 68.84 512.7 85.37 502.1 97.33L320 320.9V448C320 460.1 313.2 471.2 302.3 476.6C291.5 482 278.5 480.9 268.8 473.6L204.8 425.6C196.7 419.6 192 410.1 192 400V320.9L9.042 97.33C-.745 85.37-2.765 68.84 3.854 54.87L3.853 54.87z"/></svg></td>
-                                <td><x-jet-input wire:model="searchPDistNaziv" id="" class="block bg-orange-50 w-full" type="text" placeholder="Naziv" /></td>
-                                <td><x-jet-input wire:model="searchPDdistMesto" id="" class="block bg-orange-50 w-full" type="text" placeholder="Mesto" /></td>
-                                <td></td>
-                            </tr>
-                        </thead>
-                        <tbody class="bg-white divide-y divide-gray-200"> 
-                        @foreach ($this->distributerCompany() as $value)
-                        <tr class="hover:bg-gray-100" wire:click="$set('distributerId', {{ $value->id }})" >    
-                                <td></td>
-                                <td>{{ $value->distributer_naziv }}</td>
-                                <td>{{ $value->distributer_mesto}}</td>
-                                <td></td>
-                        </tr>
-                        @endforeach
-                        </tbody>
-                    <table>
-                    <div class="mt-5">
-                        {{ $this->distributerCompany()->links() }}
+                    @if(!$this->izabranaLokacija()->distId)
+                    <div class="bg-red-50 border border-red-500 text-red-500 px-4 py-3 rounded relative my-4 " role="alert">
+                        <p class="">UPOZORENJE!<br />
+                            <span class="font-bold block sm:inline">Korisnik neće biti sačuvan!</span>
+                            <span><br />Lokacija koju ste izabrali nije povezana sa Distributerom! <br />Pre dodavanja korisnika potrebno je da Menadžer licenci poveže lokaciju sa Distributerom!  </span>
+                        <span class="absolute top-0 bottom-0 right-0 px-4 py-3">
+                            <svg class="fill-red-500 h-6 w-6 " xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Pro 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M506.3 417l-213.3-364c-16.33-28-57.54-28-73.98 0l-213.2 364C-10.59 444.9 9.849 480 42.74 480h426.6C502.1 480 522.6 445 506.3 417zM232 168c0-13.25 10.75-24 24-24S280 154.8 280 168v128c0 13.25-10.75 24-23.1 24S232 309.3 232 296V168zM256 416c-17.36 0-31.44-14.08-31.44-31.44c0-17.36 14.07-31.44 31.44-31.44s31.44 14.08 31.44 31.44C287.4 401.9 273.4 416 256 416z"/></svg>
+                        </span>
+                        </p>
                     </div>
-                    @else
-                        {{-- IZABRAO DISTRIBUTERA MENJAM PRIKAZ --}}
-                        <div class="bg-gray-100 mb-2 border-b-4 border-black-200 p-1.5">
-                            <p class="font-bold">{{ $this->izabraniDistributer()->distributer_naziv}}, {{ $this->izabraniDistributer()->distributer_mesto }}</p>
-                            <p class="text-sm">Adresa: {{ $this->izabraniDistributer()->distributer_adresa  }}</p>
-                        </div>
                     @endif
+                    <p>&nbsp;</p>
 
                 @endif
             @else

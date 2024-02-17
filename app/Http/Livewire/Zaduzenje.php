@@ -3,11 +3,17 @@
 namespace App\Http\Livewire;
 
 use App\Http\Helpers;
+
 use App\Models\LicencaMesec;
 use App\Models\LicencaDistributerMesec;
+
 use Livewire\Component;
 use Livewire\WithPagination;
+
+use App\Helpers\PaginationHelper;
+
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\DB;
 
 class Zaduzenje extends Component
 {
@@ -48,20 +54,41 @@ class Zaduzenje extends Component
         ];
     }
 
-    
     /**
-     * The read function
+     * The read function.
      *
-     * @return colection
-     * 
+     * @return void
      */
     public function read()
     {
-        return LicencaMesec::selectRaw('licenca_mesecs.*, COUNT(licenca_distributer_mesecs.distributerId) as distCount, sum(licenca_distributer_mesecs.sum_zaduzeno) as sumZaduzeno')
+
+        $dataPage =  DB::select('SELECT licenca_mesecs.*, 
+                                        LDM.distCount, 
+                                        LDM.sumZaduzeno, 
+                                        LDM.distRazduzeni, 
+                                        LDM.sumRazduzeno 
+                                FROM licenca_mesecs 
+                                LEFT JOIN(SELECT 
+                                            mesecId, 
+                                            COUNT(distributerId) as distCount, 
+                                            SUM(sum_zaduzeno) as sumZaduzeno, 
+                                            COUNT(sum_razaduzeno) as distRazduzeni, 
+                                            SUM(sum_razaduzeno) as sumRazduzeno 
+                                        FROM licenca_distributer_mesecs 
+                                        GROUP BY mesecId ) as LDM 
+                                        ON licenca_mesecs.id = LDM.mesecId 
+                                        ORDER BY licenca_mesecs.mesec_datum DESC');
+        return PaginationHelper::paginateArray($dataPage, Config::get('global.paginate'));
+        /* return LicencaMesec::selectRaw(
+                                'licenca_mesecs.*, 
+                                COUNT(licenca_distributer_mesecs.distributerId) as distCount, 
+                                SUM(licenca_distributer_mesecs.sum_zaduzeno) as sumZaduzeno, 
+                                COUNT(licenca_distributer_mesecs.sum_razaduzeno) as distRazduzeni, 
+                                SUM(licenca_distributer_mesecs.sum_razaduzeno) as sumRazduzeno')
             ->leftJoin('licenca_distributer_mesecs', 'licenca_distributer_mesecs.mesecId', '=', 'licenca_mesecs.id' )
             ->groupBy('licenca_distributer_mesecs.mesecId')
             ->orderBy('licenca_mesecs.mesec_datum', 'DESC')
-            ->paginate(Config::get('global.paginate'));
+            ->paginate(Config::get('global.paginate')); */
     }
 
     /**
@@ -173,6 +200,7 @@ class Zaduzenje extends Component
     }
     public function render()
     {
+        //dd($this->read());
         return view('livewire.zaduzenje', [
             'data' => $this->read(),
         ]);

@@ -12,6 +12,7 @@ use App\Models\KorisnikRadniOdnos;
 use App\Models\KorisnikRadniOdnosHistory;
 use App\Models\LicencaDistributerTip;
 use App\Models\DistributerUserIndex;
+use App\Models\DistributerLokacijaIndex;
 
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -104,8 +105,7 @@ class Users extends Component
 
         if($this->newUser){
             $retval['email'] = ['required', 'string', 'email', 'max:255', 'unique:users'];
-            $retval['password'] = ['required', Password::min(8)->letters(),
-             ];
+            $retval['password'] = ['required', Password::min(8)->letters()->numbers()->symbols()];
         }
 
         return $retval;
@@ -237,25 +237,15 @@ class Users extends Component
      */
     public function izabranaLokacija()
     {
-        return Lokacija::select('lokacijas.*', 'regions.r_naziv')
+        $retval = Lokacija::select('lokacijas.*', 'regions.r_naziv' , 'licenca_distributer_tips.distributer_naziv', 'licenca_distributer_tips.distributer_mesto', 'licenca_distributer_tips.id as distId')
                             ->leftJoin('lokacija_tips', 'lokacijas.lokacija_tipId', '=', 'lokacija_tips.id')
                             ->leftJoin('regions', 'lokacijas.regionId', '=', 'regions.id')
+                            ->leftJoin('distributer_lokacija_indices', 'lokacijas.id', '=', 'distributer_lokacija_indices.lokacijaId')
+                            ->leftJoin('licenca_distributer_tips', 'licenca_distributer_tips.id', '=', 'distributer_lokacija_indices.licenca_distributer_tipsId')
                             ->where('lokacijas.id', '=', $this->lokacijaId)
                             ->first();
-    }
-
-    /**
-     * Distributer firma forma za pretragu distributera
-     *
-     * @param  mixed $tipId
-     * @return void
-     */
-    public function distributerCompany()
-    {
-        return LicencaDistributerTip::select('id', 'distributer_naziv', 'distributer_mesto')
-            ->where('distributer_naziv', 'like', '%'.$this->searchPDistNaziv.'%')
-            ->where('distributer_mesto', 'like', '%'.$this->searchPDdistMesto.'%')
-            ->paginate(Config::get('global.modal_search'), ['*'], 'dist');
+        $this->distributerId = $retval->distId;
+        return $retval;
     }
 
     /**
@@ -305,6 +295,10 @@ class Users extends Component
         if($this->pozicijaId == 8){
             //dodaje se novi distributer
             $this->radniOdnosId = 3;
+            if(!$this->distributerId){
+                $this->modalFormVisible = false;
+                return;
+            }
         }
         $this->validate();
         DB::transaction(function(){

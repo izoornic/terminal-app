@@ -6,10 +6,13 @@ use App\Models\LicencaDistributerCena;
 use App\Models\LicencaDistributerTerminal;
 use App\Models\LicencaDistributerTip;
 use App\Models\LicencaTip;
+
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Config;
+
 use Livewire\Component;
 use Livewire\WithPagination;
-use Illuminate\Support\Facades\DB;
+
 
 class DistributerLicenca extends Component
 {
@@ -23,7 +26,7 @@ class DistributerLicenca extends Component
     public $dist_name;
     public $isUpdate;
     public $l_naziv;
-    public $licenca_cena;
+    public $licenca_zeta_cena;
     public $licenca_tip_id;
 
     public $prva_licenca;
@@ -49,7 +52,7 @@ class DistributerLicenca extends Component
     public function rules()
     {
         return [  
-            'licenca_cena' => ['required', 'numeric'],
+            'licenca_zeta_cena' => ['required', 'numeric'],
             'licenca_tip_id'   =>    ['required', 'numeric']   
         ];
     }
@@ -64,7 +67,7 @@ class DistributerLicenca extends Component
     {
         $this->isUpdate = false;
         $this->l_naziv = '';
-        $this->licenca_cena = '';
+        $this->licenca_zeta_cena = '';
         $this->licenca_tip_id = '';
         $this->modelId = '';
         $this->delete_error = false;
@@ -94,7 +97,7 @@ class DistributerLicenca extends Component
         return [ 
             'distributerId' => $this->distId,
             'licenca_tipId' => $this->licenca_tip_id,
-            'licenca_cena'  => $this->licenca_cena
+            'licenca_zeta_cena'  => $this->licenca_zeta_cena
         ];
     }
 
@@ -107,14 +110,10 @@ class DistributerLicenca extends Component
     {
         $this->validate();
         DB::transaction(function() {
-            //Distributeri tabela
-            $cuurent = LicencaDistributerTip::where('id', $this->distId) -> first();
-            $new_br = $cuurent->broj_licenci;
-            $new_br ++;
             //insert nova licenca
             LicencaDistributerCena::create($this->modelData());
             //update Distributeri tabela
-            LicencaDistributerTip::where('id', $this->distId)->update(['broj_licenci' => $new_br ]);
+            LicencaDistributerTip::find($this->distId)->increment('broj_licenci');
         });
         
         $this->modalFormVisible = false;
@@ -156,14 +155,10 @@ class DistributerLicenca extends Component
     {
         if($this->canDelete()){
             DB::transaction(function() {
-                //Distributeri tabela
-                $cuurent = LicencaDistributerTip::where('id', $this->distId) -> first();
-                $new_br = $cuurent->broj_licenci;
-                $new_br --;
                 //insert nova licenca
                 LicencaDistributerCena::destroy($this->modelId);
                 //update Distributeri tabela
-                LicencaDistributerTip::where('id', $this->distId)->update(['broj_licenci' => $new_br ]);
+                LicencaDistributerTip::find($this->distId)->decrement('broj_licenci');
             });
 
             $this->modalConfirmDeleteVisible = false;
@@ -231,7 +226,7 @@ class DistributerLicenca extends Component
         $this->isUpdate = true;
         $this->l_naziv = $naziv;
         $licencaCenaRow = LicencaDistributerCena::find($id);
-        $this->licenca_cena = $licencaCenaRow->licenca_cena;
+        $this->licenca_zeta_cena = $licencaCenaRow->licenca_zeta_cena;
         $this->licenca_tip_id = $licencaCenaRow->licenca_tipId;
         $this->resetValidation();
         $this->modalFormVisible = true;

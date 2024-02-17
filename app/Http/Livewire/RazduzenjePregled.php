@@ -100,7 +100,9 @@ class RazduzenjePregled extends Component
                         'licenca_naplatas.licenca_distributer_cenaId',
                         'licenca_tips.licenca_naziv', 
                         'licenca_tips.id as ltid',
+                        'licenca_distributer_terminals.nenaplativ'
                         )
+                        ->leftJoin('licenca_distributer_terminals', 'licenca_distributer_terminals.id', '=', 'licenca_naplatas.licenca_dist_terminalId')
                         ->leftJoin('terminal_lokacijas', 'licenca_naplatas.terminal_lokacijaId', '=', 'terminal_lokacijas.id')
                         ->leftJoin('terminals', 'terminal_lokacijas.terminalId', '=', 'terminals.id')
                         ->leftJoin('lokacijas', 'terminal_lokacijas.lokacijaId', '=', 'lokacijas.id')

@@ -22,11 +22,11 @@
                                     <button wire:click="$set('orderBy', 'distributer_naziv')">NAZIV<svg class="@if ($orderBy == 'distributer_naziv') {{ 'fill-orange-600' }}  @else {{ 'fill-current' }} @endif float-right w-4 h-4 mr-0 ml-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><!--! Font Awesome Pro 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M320 224H416c17.67 0 32-14.33 32-32s-14.33-32-32-32h-95.1c-17.67 0-32 14.33-32 32S302.3 224 320 224zM320 352H480c17.67 0 32-14.33 32-32s-14.33-32-32-32h-159.1c-17.67 0-32 14.33-32 32S302.3 352 320 352zM320 96h32c17.67 0 31.1-14.33 31.1-32s-14.33-32-31.1-32h-32c-17.67 0-32 14.33-32 32S302.3 96 320 96zM544 416h-223.1c-17.67 0-32 14.33-32 32s14.33 32 32 32H544c17.67 0 32-14.33 32-32S561.7 416 544 416zM192.4 330.7L160 366.1V64.03C160 46.33 145.7 32 128 32S96 46.33 96 64.03v302L63.6 330.7c-6.312-6.883-14.94-10.38-23.61-10.38c-7.719 0-15.47 2.781-21.61 8.414c-13.03 11.95-13.9 32.22-1.969 45.27l87.1 96.09c12.12 13.26 35.06 13.26 47.19 0l87.1-96.09c11.94-13.05 11.06-33.31-1.969-45.27C224.6 316.8 204.4 317.7 192.4 330.7z"/></svg></button>
                                 </th>
                                 <th class="px-6 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Adresa</th>
-                                <th class="px-6 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Broj ugovora</th>
                                 <th class="px-6 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Datum ugovora</th>
                                 <th class="px-6 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Datum isteka</th>
+                                <th class="px-6 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Lokacije</th>
                                 <th colspan="2" class="px-6 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Licence</th>
-                                <th colspan="2" class="px-6 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Br. terminala</th>
+                                <th colspan="2" class="px-6 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Terminali</th>
                                 <th class="px-6 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider"></th>
                                 
                             </tr>
@@ -62,9 +62,15 @@
                                         </td> 
                                         <td class="px-4 py-2">{{ $item->distributer_naziv }}</td>
                                         <td class="px-4 py-2">{{ $item->distributer_adresa }} <br /> {{ $item->distributer_zip }} {{ $item->distributer_mesto }}</td>                                         
-                                        <td class="px-4 py-2">{{ $item->broj_ugovora }}</td>
+                                        
                                         <td class="px-4 py-2">{{ App\Http\Helpers::datumFormatDan($item->datum_ugovora) }}</td>
                                         <td class="px-4 py-2">{{ App\Http\Helpers::datumFormatDan($item->datum_kraj_ugovora) }}</td>
+                                        <td class="px-4 py-2">
+                                            {{ $item->broj_lokacija }} &nbsp;
+                                            <x-jet-nav-link href="{{ route( 'licenca-lokacija', ['id' => $item->id] ) }}" :active="request()->routeIs('licenca-lokacija', ['id' => $item->id])" title="Dodaj / obriši lokacije">
+                                                <svg class="fill-current w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><path d="M168.3 499.2C116.1 435 0 279.4 0 192C0 85.96 85.96 0 192 0C298 0 384 85.96 384 192C384 279.4 267 435 215.7 499.2C203.4 514.5 180.6 514.5 168.3 499.2H168.3zM192 256C227.3 256 256 227.3 256 192C256 156.7 227.3 128 192 128C156.7 128 128 156.7 128 192C128 227.3 156.7 256 192 256z"/></svg>
+                                            </x-jet-nav-link>
+                                        </td>
                                         <td class="pl-2 pr-1 py-2 text-right">{{ $item->broj_licenci }}</td>
                                         <td class="pl-1 pr-2">
                                             <x-jet-nav-link href="{{ route( 'distributer-licenca', ['id' => $item->id] ) }}" :active="request()->routeIs('distributer-licenca', ['id' => $item->id])" title="Dodaj / obriši licence">
@@ -181,11 +187,11 @@
             @if ($isUpdate)
                 <x-jet-button class="ml-2" wire:click="update" wire:loading.attr="disabled">
                     {{ __('Izmeni podatke') }}
-                </x-jet-danger-button>
+                </x-jet-button>
             @else
                 <x-jet-button class="ml-2" wire:click="create" wire:loading.attr="disabled">
                     {{ __('Dodaj novog distributera') }}
-                </x-jet-danger-button>
+                </x-jet-button>
             @endif            
         </x-slot>
     </x-jet-dialog-modal>

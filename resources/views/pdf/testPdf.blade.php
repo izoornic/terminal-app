@@ -194,7 +194,7 @@
             $text = "Strana {PAGE_NUM} od {PAGE_COUNT}";
             $font = null;
             $size = 10;
-            $color = array(255,0,0);
+            $color = array(0.565, 0.565, 0.565);
             $word_space = 0.0;  //  default
             $char_space = 0.0;  //  default
             $angle = 0.0;   //  default

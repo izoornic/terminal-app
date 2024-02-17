@@ -33,11 +33,21 @@ class PredracunPdfControler extends Controller
      */
     public function index()
     {
+        //poziv stranice bez get varijabli
+        if(request()->query('did') == null || request()->query('mid') == null){
+            abort(403, 'Unauthorized action 203.');
+        }
+
         $this->did = request()->query('did');
         $this->mid = request()->query('mid');
 
         $distributerrow = $this->distributer();
         $mesecrow = $this->mesecrow();
+
+        //poziv stranice sa editovanim a pogresnim varijablama
+        if($distributerrow == null || $mesecrow == null){
+            abort(403, 'Unauthorized action 204.');
+        }
 
         $dospece_mnth = Helpers::addMonthsToDate($mesecrow->mesec_datum, 1);
         $distributerrow->datum_dospeca = Helpers::datumFormatDanFullYear(Helpers::addDaysToDate($dospece_mnth, $distributerrow->dani_prekoracenja_licence));

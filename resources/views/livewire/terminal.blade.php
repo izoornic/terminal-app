@@ -71,7 +71,12 @@
                                         <td class="px-1 py-2">{{ $item->broj_kutije }}</td>
                                         <td class="px-1 py-2">{{ $item->l_naziv }}</td>
                                         <td class="px-1 py-2">{{ $item->r_naziv }}</td> 
-                                        <td class="px-1 py-2">{{ $item->lt_naziv }}</td>
+                                        <td class="px-1 py-2">
+                                            @if($item->distributerId)
+                                            <svg class="float-left fill-current w-4 h-4 mr-1 pt-1" xmlns="http://www.w3.org/2000/svg" height="16" width="20" viewBox="0 0 640 512"><!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M0 48C0 21.5 21.5 0 48 0H336c26.5 0 48 21.5 48 48V232.2c-39.1 32.3-64 81.1-64 135.8c0 49.5 20.4 94.2 53.3 126.2C364.5 505.1 351.1 512 336 512H240V432c0-26.5-21.5-48-48-48s-48 21.5-48 48v80H48c-26.5 0-48-21.5-48-48V48zM80 224c-8.8 0-16 7.2-16 16v32c0 8.8 7.2 16 16 16h32c8.8 0 16-7.2 16-16V240c0-8.8-7.2-16-16-16H80zm80 16v32c0 8.8 7.2 16 16 16h32c8.8 0 16-7.2 16-16V240c0-8.8-7.2-16-16-16H176c-8.8 0-16 7.2-16 16zm112-16c-8.8 0-16 7.2-16 16v32c0 8.8 7.2 16 16 16h32c8.8 0 16-7.2 16-16V240c0-8.8-7.2-16-16-16H272zM64 112v32c0 8.8 7.2 16 16 16h32c8.8 0 16-7.2 16-16V112c0-8.8-7.2-16-16-16H80c-8.8 0-16 7.2-16 16zM176 96c-8.8 0-16 7.2-16 16v32c0 8.8 7.2 16 16 16h32c8.8 0 16-7.2 16-16V112c0-8.8-7.2-16-16-16H176zm80 16v32c0 8.8 7.2 16 16 16h32c8.8 0 16-7.2 16-16V112c0-8.8-7.2-16-16-16H272c-8.8 0-16 7.2-16 16zm96 256a144 144 0 1 1 288 0 144 144 0 1 1 -288 0zm140.7-67.3c-6.2 6.2-6.2 16.4 0 22.6L521.4 352H432c-8.8 0-16 7.2-16 16s7.2 16 16 16h89.4l-28.7 28.7c-6.2 6.2-6.2 16.4 0 22.6s16.4 6.2 22.6 0l56-56c6.2-6.2 6.2-16.4 0-22.6l-56-56c-6.2-6.2-16.4-6.2-22.6 0z"/></svg>
+                                            @endif
+                                            {{ $item->lt_naziv }}
+                                        </td>
                                         <td class="px-1 py-2">
                                             <x-jet-secondary-button wire:click="statusShowModal({{ $item->tid}}, {{ $item->statusid }})">
                                                 {{ $item->ts_naziv }}
@@ -230,8 +235,8 @@
                 @endforeach
             </select>
            
-                @if($plokacijaTip == 3)
-                    {{-- Korsnik terminala search by name --}}
+                @if($plokacijaTip == 3 || $plokacijaTip == 4)
+                    {{-- KORISNIK ili DISTRIBUTER terminala search by name --}}
                     <table class="min-w-full divide-y divide-gray-200 mt-4" style="width: 100% !important">
                         <thead>
                             <tr>
@@ -271,6 +276,7 @@
                     <div class="mt-5">
                         {{ $this->lokacijeTipa($plokacijaTip)->links() }}
                     </div>
+
                 @elseif($plokacijaTip != 0 && $plokacijaTip != 3)
                 {{-- MAGACIN ILI SEVIS --}}
                     <x-jet-label for="lokacija" value="{{ __('Izaberi lokaciju') }}" class="mt-4" />
@@ -344,6 +350,7 @@
                             <p class="text-sm">Lokacija: <span class="font-bold">{{ $selectedTerminal->l_naziv }}, {{$selectedTerminal->mesto}}</span></p>
                             <p class="text-sm">Model: <span class="font-bold">{{ $selectedTerminal->treminal_model }}</span> | Proizvođač: <span class="font-bold">{{$selectedTerminal->treminal_proizvodjac}}</span></p>
                             <p class="text-sm">PIB: <span class="font-bold">{{ $selectedTerminal->pib }}</span></p>
+                            <p class="text-sm">Distributer: <span class="font-bold">{{ $selectedTerminal->distributer_naziv }}</span></p>
                             <p class="text-sm">Poslednja promena: <span class="font-bold">{{ App\Http\Helpers::datumFormat($selectedTerminal->updated_at) }}</span></p>
                         </div>
                     </div>
@@ -362,7 +369,7 @@
                             @if($item->tabela == 'tlh')
                                 <h3 class="flex items-center mb-1 text-lg font-semibold text-gray-900 dark:text-white"> - <span class="bg-sky-100 text-sky-900 text-sm font-medium mr-2 px-2.5 py-0.5 rounded dark:bg-blue-200 dark:text-blue-800 ml-3">{{ App\Http\Helpers::datumFormat($item->updated_at) }}</span></h3>
                                 <p class="mb-0 text-base font-normal text-gray-500 dark:text-gray-400">Status: <span class="font-bold">{{ $item->status_naziv }}</span></p>
-                                <p class="mb-2 text-base font-normal text-gray-500 dark:text-gray-400">Lokacija: <span class="font-bold">{{ $item->lokacija }} , {{ $item->mesto }}</span></p>
+                                <p class="mb-2 text-base font-normal text-gray-500 dark:text-gray-400">Lokacija: <span class="font-bold">{{ $item->lokacija }} , {{ $item->mesto }}</span> @if($item->distributer != null) <br />Distributer: <span class="font-bold"> {{ $item->distributer }} </span> @endif</p>
                             @else
                                 <h3 class="flex items-center mb-1 text-lg font-semibold text-gray-900 dark:text-white"> - <span class="bg-sky-100 text-sky-900 text-sm font-medium mr-2 px-2.5 py-0.5 rounded dark:bg-blue-200 dark:text-blue-800 ml-3">{{ App\Http\Helpers::datumFormat($item->updated_at) }}</span></h3>
                                 <p class="mb-0 text-base font-normal text-gray-500 dark:text-gray-400"><span class="font-bold"><x-jet-nav-link href="{{ route( 'tiketview', ['id' => $item->lokacija] ) }}">Tiket #{{ $item->lokacija }}</span></x-jet-nav-link> , {{ $item->mesto }} : {{ $item->dodeljen }}</p>
@@ -410,6 +417,7 @@
                             <p>Terminal: <span class="font-bold">{{$newTerminalInfo->sn}}</span> &nbsp;&nbsp;&nbsp; Staus: <span class="font-bold">{{ $newTerminalInfo->ts_naziv }}</span></p>
                             <p>Lokacija: <span class="font-bold">{{ $newTerminalInfo->l_naziv }}, {{$newTerminalInfo->mesto}}</span></p>
                             <p>Region: <span class="font-bold">{{ $newTerminalInfo->r_naziv }}</span></p>
+                            <p>Distributer: <span class="font-bold">{{ $newTerminalInfo->distributer_naziv }}</span></p>
                             <p><svg class="fill-current float-left w-6 h-4 mr-2 mt-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 448"><defs><style>.a{fill:#fff;}</style></defs><path d="M512,0H64A64,64,0,0,0,0,64V384a64,64,0,0,0,64,64H512a64,64,0,0,0,64-64V64A64,64,0,0,0,512,0Z"/><circle class="a" cx="186.65" cy="137.79" r="86.21"/><path class="a" d="M382.28,317.58h133a25,25,0,0,0,24.94-24.94V76.51a25,25,0,0,0-24.94-24.94h-133a24.94,24.94,0,0,0-24.93,24.94V292.64A24.94,24.94,0,0,0,382.28,317.58Zm83.13-24.94H431.69c-4.1,0-7.84-3.74-7.84-8.31a8.34,8.34,0,0,1,8.31-8.32h33.25c4.57,0,8.31,3.74,8.31,7.85A8.45,8.45,0,0,1,465.41,292.64ZM390.6,84.82H507V251.08H390.6Z"/><path class="a" d="M57.33,396.43H316a21.61,21.61,0,0,0,21.55-21.55A107.77,107.77,0,0,0,229.76,267.11H143.54A107.76,107.76,0,0,0,35.77,374.88,21.59,21.59,0,0,0,57.33,396.43Z"/></svg> 
                             <span class="font-bold">{{ $newTerminalInfo->name }}</span> tel: <span class="font-bold">{{ $newTerminalInfo->tel }}</span></p>
                         </div>

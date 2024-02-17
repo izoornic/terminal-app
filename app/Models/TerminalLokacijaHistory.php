@@ -22,6 +22,8 @@ class TerminalLokacijaHistory extends Model
         'korisnikId',
         'korisnikIme',
         'created_at',
-        'updated_at'
+        'updated_at',
+        'blacklist',
+        'distributerId'
     ];
 }

@@ -13,11 +13,9 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('distributer_user_indices', function (Blueprint $table) {
-            $table->id();
-            $table->integer('userId');
-            $table->integer('licenca_distributer_tipsId');
-            $table->timestamps();
+        Schema::table('licenca_distributer_tips', function (Blueprint $table) {
+            //
+            $table->integer('broj_lokacija')->default(0);
         });
     }
 
@@ -28,6 +26,8 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('distributer_user_indices');
+        Schema::table('licenca_distributer_tips', function (Blueprint $table) {
+            //
+        });
     }
 };

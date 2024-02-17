@@ -18,7 +18,8 @@ class LicencaDistributerCena extends Model
     protected $fillable = [
         'distributerId',
         'licenca_tipId',
-        'licenca_cena'
+        'licenca_zeta_cena',
+        'licenca_dist_cena'
     ];
 
     /**
@@ -128,6 +129,11 @@ class LicencaDistributerCena extends Model
                         ->where('licenca_distributer_cenas.id', '=', $licencaCenaId)
                         ->first();
         return ($naziv_obj) ?  $naziv_obj->licenca_naziv : 'N/A';
+    }
+
+    public static function idLicenciDistributera($did)
+    {
+        return LicencaDistributerCena::where('distributerId', '=', $did)->pluck('id')->all();
     }
 
 }

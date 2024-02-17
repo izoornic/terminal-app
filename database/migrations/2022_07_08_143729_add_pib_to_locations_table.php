@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::table('lokacijas', function (Blueprint $table) {
             //
-            $table->string('pib', 16)->nulable();
+            $table->string('pib', 16)->nullable();
         });
     }
 

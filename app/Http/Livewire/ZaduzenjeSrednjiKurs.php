@@ -2,11 +2,12 @@
 
 namespace App\Http\Livewire;
 
-use App\Models\LicencaDistributerMesec;
+use App\Models\KursEvra;
 use App\Models\LicencaDistributerTip;
+use App\Models\LicencaDistributerMesec;
+
 use Livewire\Component;
 use Livewire\WithPagination;
-
 
 class ZaduzenjeSrednjiKurs extends Component
 {
@@ -19,6 +20,8 @@ class ZaduzenjeSrednjiKurs extends Component
     public $srednji_kurs;
     public $dist_name;
 
+    public $kurs_evra;
+
     /**
      * mount
      *
@@ -29,6 +32,8 @@ class ZaduzenjeSrednjiKurs extends Component
         $this->did = request()->query('id');
         $this->mid = request()->query('mid');
         $this->dist_name = LicencaDistributerTip::DistributerName($this->did);
+        $this->kurs_evra = KursEvra::latest()->first();
+        $this->srednji_kurs = round(floatval($this->kurs_evra->srednji_kurs), 2);
     }
 
     /**

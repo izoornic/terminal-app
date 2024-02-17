@@ -8,6 +8,7 @@ use App\Models\LicencaDistributerTip;
 use App\Models\LicencaDistributerMesec;
 
 use App\Http\Helpers;
+use App\Helpers\PaginationHelper;
 
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -47,18 +48,33 @@ class ZaduzenjeDistributeri extends Component
     {
         $this->mid = request()->query('id');
         $this->mesec_info = LicencaMesec::find($this->mid)->first();
-
-        //dd($this->read());
     }
 
     //public function 
+    //->leftJoin('licenca_naplatas', 'licenca_naplatas.distributerId', '=','licenca_distributer_tips.id') COUNT(licenca_naplatas.distributerId) as distCount
+                //->where('licenca_naplatas.licenca_dist_terminalId', '>', 0)
+                                //->groupBy('licenca_naplatas.distributerId')
+
+    public function read()
+    {
+        $dataPage =  DB::select('SELECT licenca_distributer_tips.*, lic_naplata.broj_zaduzenih_licenci, ldm.sum_zaduzeno, ldm.datum_zaduzenja, ldm.sum_razaduzeno, ldm.datum_razaduzenja
+                                FROM licenca_distributer_tips 
+                                LEFT JOIN(SELECT distributerId, COUNT(id) as broj_zaduzenih_licenci 
+                                    FROM licenca_naplatas WHERE zaduzeno IS NULL 
+                                    GROUP BY distributerId) AS lic_naplata 
+                                    ON licenca_distributer_tips.id = lic_naplata.distributerId
+                                LEFT JOIN licenca_distributer_mesecs AS ldm 
+                                    ON licenca_distributer_tips.id = ldm.distributerId AND ldm.mesecId ='. $this->mid);
+        
+        return PaginationHelper::paginateArray($dataPage, Config::get('global.paginate'));
+    }
 
     /**
      * The read function.
      *
      * @return void
      */
-    public function read()
+    public function read_()
     {
         return LicencaDistributerTip::select(
                         'licenca_distributer_tips.*', 

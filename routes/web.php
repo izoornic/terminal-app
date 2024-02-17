@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ApiDataController;
 //use App\Http\Controllers\SendEmailController;
 use App\Http\Controllers\PredracunPdfControler;
+use App\Http\Controllers\Distributer\DistPredracunControler;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -47,12 +48,8 @@ Route::group(['middleware' => [
 ]], function(){
 
     Route::get('/dashboard', function(){
-        return view('admin.dashboard');
+        return (auth()->user()->pozicija_tipId == 8) ?view('distributer.dashboard') : view('admin.dashboard');
         })->name('dashboard');
-
-    Route::get('/pages', function(){
-        return view('admin.pages');
-        })->name('pages');
 
     Route::get('/users', function(){
         return view('admin.users');
@@ -78,6 +75,7 @@ Route::group(['middleware' => [
         return view('admin.tiketview');
         })->name('tiketview');
 
+    //Rute za Menagera licenci
     Route::get('/licenca-lokacije', function(){
         return view('admin.licenca-lokacije');
         })->name('licenca-lokacije');
@@ -141,5 +139,28 @@ Route::group(['middleware' => [
     Route::get('/licenca-parametri', function(){
         return view('admin.licenca-parametri');
         })->name('licenca-parametri');
+    
+    Route::get('/licenca-lokacija', function(){
+        return view('admin.distributer-lokacija');
+        })->name('licenca-lokacija');
+
+    //RUTE za logovanog ditributera
+    Route::get('/dist-terminal', function(){
+        return view('distributer.distributer-terminal');
+        })->name('dist-terminal');
+
+    Route::get('/dist-lokacija', function(){
+        return view('distributer.distr-lokacije');
+        })->name('dist-lokacija');
+
+    Route::get('/dist-licence', function(){
+        return view('distributer.distr-licence');
+        })->name('dist-licence');
+
+    Route::get('/dist-poslovanje', function(){
+        return view('distributer.distr-poslovanje');
+        })->name('dist-poslovanje');
+
+    Route::get('/dist-pdf-predracun', [DistPredracunControler::class, 'index'])->name('dist-pdf-predracun');
 
 });

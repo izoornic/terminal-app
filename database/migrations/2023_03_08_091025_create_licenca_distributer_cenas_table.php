@@ -17,7 +17,7 @@ return new class extends Migration
             $table->id();
             $table->integer('distributerId');
             $table->integer('licenca_tipId');
-            $table->decimal('licenca_cena', 13, 2);
+            $table->decimal('licenca_zeta_cena', 13, 2);
             $table->timestamps();
         });
     }

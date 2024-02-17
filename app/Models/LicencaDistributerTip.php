@@ -25,12 +25,31 @@ class LicencaDistributerTip extends Model
         'broj_ugovora',
         'datum_ugovora',
         'datum_kraj_ugovora',
-        'dani_prekoracenja_licence'
+        'dani_prekoracenja_licence',
+        'broj_lokacija'
     ];
 
     public static function DistributerName($id)
     {
         return (string) LicencaDistributerTip::find($id)->distributer_naziv;
+    }
+
+    public static function DistributerNameByUserId($userid)
+    {
+        return (string) LicencaDistributerTip::select('distributer_naziv')
+            ->join('distributer_user_indices', 'distributer_user_indices.licenca_distributer_tipsId', '=', 'licenca_distributer_tips.id')
+            ->where('distributer_user_indices.userId', '=', $userid)
+            ->first()
+            ->distributer_naziv;
+    }
+
+    public static function distributerIdByUserId($userid)
+    {
+        return (string) LicencaDistributerTip::select('licenca_distributer_tips.id')
+            ->join('distributer_user_indices', 'distributer_user_indices.licenca_distributer_tipsId', '=', 'licenca_distributer_tips.id')
+            ->where('distributer_user_indices.userId', '=', $userid)
+            ->first()
+            ->id;
     }
 
 }

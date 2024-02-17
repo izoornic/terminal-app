@@ -38,4 +38,15 @@ class PaginationHelper
             'items', 'total', 'perPage', 'currentPage', 'options'
         ));
     }
+
+    public static function paginateArray($items, $perPage = 5, $page = null)
+    {
+        $page = $page ?: (Paginator::resolveCurrentPage() ?: 1);
+        $total = count($items);
+        $currentpage = $page;
+        $offset = ($currentpage * $perPage) - $perPage ;
+        $itemstoshow = array_slice($items , $offset , $perPage);
+        
+        return new LengthAwarePaginator($itemstoshow ,$total   ,$perPage);
+    }
 }
