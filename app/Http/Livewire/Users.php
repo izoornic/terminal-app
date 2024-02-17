@@ -177,7 +177,7 @@ class Users extends Component
     {
         $this->newUser = false;
         $this->resetValidation();
-        $this->reset();
+        //$this->reset();
         $this->modelId = $id;
         $this->loadModel();
         //dd($this->distributerId);

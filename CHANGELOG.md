@@ -37,3 +37,6 @@ V 0.5.1 (17.2.2024.)
     - Nova polja u tabeli "licenca_naplatas": 'datum_zaduzenja', 'dist_zaduzeno', 'dist_datum_zaduzenja', 'dist_razduzeno', 'dist_datum_razduzenja'
     
     - Kreiranje novog Usera dodata password rules (min(8)->letters()->numbers()->symbols())
+
+V 0.5.0.2  (17.2.2024.)
+    - Ispravljen bug na stranici user.php prilikom poziva modala updateShowModal($id)
