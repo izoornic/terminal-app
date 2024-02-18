@@ -161,6 +161,10 @@
         </div>
     </div>
 
+    <div class="mt-5">
+        {{ $data->links() }}
+    </div>
+
     {{--  Dodaj licencu Modal --}}
     <x-jet-dialog-modal wire:model="dodajLicencuModalVisible">
         <x-slot name="title">

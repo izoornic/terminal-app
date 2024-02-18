@@ -43,5 +43,10 @@ V 0.5.1 (17.2.2024.)
 V 0.5.0.2  (17.2.2024.)
     - Ispravljen bug na stranici user.php prilikom poziva modala updateShowModal($id)
 
-V 0.5.0.3  (.2.2024.)
+V 0.5.0.3  (18.2.2024.)
     - Ispravljen prikaz Terminal History na stranici Terminali za Menadžera licenci. Sada vidi naziv distributera kod koga je terminal.
+
+  UPDATE terminal_lokacijas SET distributerId = '1' WHERE terminal_lokacijas.terminalId = ( SELECT id FROM terminals WHERE sn LIKE 'A26-12RB-1K12746');  
+
+INFO o TerminalLokacija IDju
+  SELECT * FROM terminal_lokacijas tl WHERE tl.terminalId = (SELECT id FROM terminals WHERE sn LIKE '0500422040186607'); 
