@@ -74,9 +74,13 @@ class Users extends Component
     public $distributerId;
     public $searchPDistNaziv;
     public $searchPDdistMesto;
-    /**
-     * Put your custom public properties here!
-     */
+
+    //promena distributera za test usera
+    public $promeniDitributeraModalVisible;
+    public $testUserId;
+    public $testUserDistributer;
+
+    
 
     /**
      * The validation rules
@@ -153,6 +157,26 @@ class Users extends Component
             ->paginate(Config::get('global.paginate'));
     }
 
+    /**
+     * Modal koji menja distributera test useru
+     *
+     * @param mixed $id
+     * 
+     * @return [type]
+     * 
+     */
+    public function promeniDistirbuteraShowModal($id)
+    {
+        $this->testUserId = $id;
+        $this->testUserDistributer = DistributerUserIndex::where('userId', '=', $id)->first()->licenca_distributer_tipsId;
+        $this->promeniDitributeraModalVisible = true;
+    }
+
+    public function promeniDistributera()
+    {
+        DistributerUserIndex::where('userId', '=', $this->testUserId)->update(['licenca_distributer_tipsId' => $this->testUserDistributer] );
+        $this->promeniDitributeraModalVisible = false;
+    }
     /**
      * Shows the create NEW USER modal
      *

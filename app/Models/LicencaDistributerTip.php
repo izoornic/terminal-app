@@ -52,4 +52,16 @@ class LicencaDistributerTip extends Model
             ->id;
     }
 
+    /**
+     * Distributeri koji se dodeljuju test korisniku
+     *
+     * @return void
+     */
+    public static function testUserDistributerList(){
+        foreach(LicencaDistributerTip::all() as $dist){
+            $dist_list[$dist->id] = $dist->distributer_naziv;
+        }
+        return $dist_list;
+    }
+
 }

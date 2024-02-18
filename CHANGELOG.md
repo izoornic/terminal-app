@@ -46,6 +46,9 @@ V 0.5.0.2  (17.2.2024.)
 V 0.5.0.3  (18.2.2024.)
     - Ispravljen prikaz Terminal History na stranici Terminali za Menadžera licenci. Sada vidi naziv distributera kod koga je terminal.
 
+V 0.5.0.5  (18.2.2024.)
+    - Dodata funkcionalnost ya testUsera da moze da mu se menja Distributer
+
   UPDATE terminal_lokacijas SET distributerId = '1' WHERE terminal_lokacijas.terminalId = ( SELECT id FROM terminals WHERE sn LIKE 'A26-12RB-1K12746');  
 
 INFO o TerminalLokacija IDju

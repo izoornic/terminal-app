@@ -83,18 +83,26 @@
                                         </td>  
                                         
                                         <td class="px-6 py-2">
-                                            @if($item->naziv == 'Obrisan' || $item->naziv == 'Distributer')
+                                            @if($item->naziv == 'Obrisan')
                                                 ---
+                                            @elseif($item->naziv == 'Distributer')
+                                                @if($item->id == 29)
+                                                    <x-jet-secondary-button wire:click="promeniDistirbuteraShowModal({{ $item->id }})">
+                                                        Dist
+                                                    </x-jet-secondary-button>
+                                                @else
+                                                    ---
+                                                @endif
                                             @else
                                                 <x-jet-secondary-button wire:click="updateShowRadniStatusModal({{ $item->id }})">
                                                     {{ $item->rs_naziv }}
-                                                </x-jet-button></td> 
+                                                </x-jet-secondary-button></td> 
                                             @endif
                                         <td class="px-6 py-2 flex justify-end">
                                             @if($item->naziv != 'Obrisan')
                                                 <x-jet-danger-button class="ml-2" wire:click="deleteShowModal({{ $item->id }})">
                                                 <svg class="fill-current w-4 h-4 mr-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Pro 6.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M135.2 17.69C140.6 6.848 151.7 0 163.8 0H284.2C296.3 0 307.4 6.848 312.8 17.69L320 32H416C433.7 32 448 46.33 448 64C448 81.67 433.7 96 416 96H32C14.33 96 0 81.67 0 64C0 46.33 14.33 32 32 32H128L135.2 17.69zM31.1 128H416V448C416 483.3 387.3 512 352 512H95.1C60.65 512 31.1 483.3 31.1 448V128zM111.1 208V432C111.1 440.8 119.2 448 127.1 448C136.8 448 143.1 440.8 143.1 432V208C143.1 199.2 136.8 192 127.1 192C119.2 192 111.1 199.2 111.1 208zM207.1 208V432C207.1 440.8 215.2 448 223.1 448C232.8 448 240 440.8 240 432V208C240 199.2 232.8 192 223.1 192C215.2 192 207.1 199.2 207.1 208zM304 208V432C304 440.8 311.2 448 320 448C328.8 448 336 440.8 336 432V208C336 199.2 328.8 192 320 192C311.2 192 304 199.2 304 208z"/></svg>
-                                                </x-jet-button>
+                                                </x-jet-danger-button>
                                             @endif
                                         </td>
                                     </tr>
@@ -114,6 +122,35 @@
     <div class="mt-5">
     {{ $data->links() }}
     </div>
+
+
+    {{-- Promeni DISTRIDUTERA test useru --}}
+    <x-jet-dialog-modal wire:model="promeniDitributeraModalVisible">
+        <x-slot name="title">
+        </x-slot>
+        <x-slot name="content">
+            <div class="mt-4">
+                <x-jet-label for="testUserDistributer" value="{{ __('Radni status') }}" />
+                <select wire:model="testUserDistributer" id="" class="block appearance-none w-full bg-gray-100 border border-gray-200 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+                    @foreach (App\Models\LicencaDistributerTip::testUserDistributerList() as $key => $value)    
+                        <option value="{{ $key }}">{{ $value }}</option>
+                    @endforeach
+                </select>
+                @error('testUserDistributer') <span class="error">{{ $message }}</span> @enderror
+            </div>      
+        </x-slot>
+
+        <x-slot name="footer">
+            <x-jet-secondary-button wire:click="$toggle('promeniDitributeraModalVisible')" wire:loading.attr="disabled">
+                {{ __('Otkaži') }}
+            </x-jet-secondary-button>
+
+            <x-jet-danger-button class="ml-2" wire:click="promeniDistributera" wire:loading.attr="disabled">
+                {{ __('Promeni') }}
+            </x-jet-danger-button>    
+        </x-slot>
+    </x-jet-dialog-modal>
+
 
     {{-- Modal Form --}}
     <x-jet-dialog-modal wire:model="modalFormVisible">
@@ -270,7 +307,7 @@
             <div class="mt-4">
                 <x-jet-label for="radniOdnosId" value="{{ __('Radni odnos') }}" />
                 <select wire:model="radniOdnosId" id="radniodnos" class="block appearance-none w-full bg-gray-100 border border-gray-200 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
-                        <option value="">-- Odaberi radni odnos -- {{ $radniOdnosId }}</option>
+                        <option value="">-- Odaberi radni odnos --</option>
                     @foreach (App\Models\RadniOdnosTip::userRadniOdnosList() as $key => $value)    
                         <option value="{{ $key }}">{{ $value }}</option>
                     @endforeach
@@ -286,11 +323,11 @@
             </x-jet-secondary-button>
 
             @if ($modelId)
-                <x-jet-button class="ml-2" wire:click="update" wire:loading.attr="disabled">
+                <x-jet-danger-button class="ml-2" wire:click="update" wire:loading.attr="disabled">
                     {{ __('Update') }}
                 </x-jet-danger-button>
             @else
-                <x-jet-button class="ml-2" wire:click="create" wire:loading.attr="disabled">
+                <x-jet-danger-button class="ml-2" wire:click="create" wire:loading.attr="disabled">
                     {{ __('Sačuvaj') }}
                 </x-jet-danger-button>
             @endif            
