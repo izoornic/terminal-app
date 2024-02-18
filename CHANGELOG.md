@@ -38,5 +38,10 @@ V 0.5.1 (17.2.2024.)
     
     - Kreiranje novog Usera dodata password rules (min(8)->letters()->numbers()->symbols())
 
+    - Nova tabela "kurs_evras"
+
 V 0.5.0.2  (17.2.2024.)
     - Ispravljen bug na stranici user.php prilikom poziva modala updateShowModal($id)
+
+V 0.5.0.3  (.2.2024.)
+    - Ispravljen prikaz Terminal History na stranici Terminali za Menadžera licenci. Sada vidi naziv distributera kod koga je terminal.
