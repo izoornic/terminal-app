@@ -542,36 +542,38 @@ class DistributerTerminal extends Component
      */
     public function read()
     {
-        return LicencaDistributerTerminal::select(
-                            'terminal_lokacijas.id', 
-                            'terminals.sn', 
-                            'lokacijas.l_naziv', 
-                            'lokacijas.mesto', 
-                            'lokacijas.adresa', 
-                            'licenca_distributer_terminals.id as ldtid', 
-                            'licenca_distributer_terminals.datum_pocetak', 
-                            'licenca_distributer_terminals.datum_kraj',
-                            'licenca_distributer_terminals.nenaplativ', 
-                            'licenca_tips.licenca_naziv', 
-                            'licenca_tips.id as ltid', 
-                            'licenca_tips.broj_parametara_licence')
-                    ->leftJoin('terminal_lokacijas', 'licenca_distributer_terminals.terminal_lokacijaId', '=', 'terminal_lokacijas.id')
-                    ->leftJoin('terminals', 'terminal_lokacijas.terminalId', '=', 'terminals.id')
-                    ->leftJoin('lokacijas', 'terminal_lokacijas.lokacijaId', '=', 'lokacijas.id')
-                    ->leftJoin('licenca_distributer_cenas', 'licenca_distributer_terminals.licenca_distributer_cenaId', '=', 'licenca_distributer_cenas.id')
-                    ->leftJoin('licenca_tips', 'licenca_distributer_cenas.licenca_tipId', '=', 'licenca_tips.id')
-                    ->where('licenca_distributer_terminals.distributerId', '=', $this->distId)
-                    ->where('terminals.sn', 'like', '%'.$this->searchTerminalSn.'%')
-                    ->where('lokacijas.mesto', 'like', '%'.$this->searchMesto.'%')
-                    ->when($this->searchTipLicence > 0, function ($rtval){
-                        return $rtval->where('licenca_distributer_cenas.id', '=', ($this->searchTipLicence == 1000) ? null : $this->searchTipLicence);
-                    })
-                    ->when($this->searchNenaplativ > 0, function ($rtval){
-                        return $rtval->where('licenca_distributer_terminals.nenaplativ', '=', 1);
-                    })
-                    ->orderBy('terminal_lokacijas.id')
-                    ->orderBy('licenca_distributer_cenas.licenca_tipId')
-                    ->paginate(Config::get('terminal_paginate'), ['*'], 'terminali');
+        return TerminalLokacija::select(
+            'terminal_lokacijas.id', 
+            'terminals.sn', 
+            'lokacijas.l_naziv', 
+            'lokacijas.mesto', 
+            'lokacijas.adresa', 
+            'licenca_distributer_terminals.id as ldtid', 
+            'licenca_distributer_terminals.datum_pocetak', 
+            'licenca_distributer_terminals.datum_kraj',
+            'licenca_distributer_terminals.nenaplativ', 
+            'licenca_tips.licenca_naziv', 
+            'licenca_tips.id as ltid', 
+            'licenca_tips.broj_parametara_licence')
+    ->leftJoin('licenca_distributer_terminals', 'licenca_distributer_terminals.terminal_lokacijaId', '=', 'terminal_lokacijas.id')
+    ->leftJoin('terminals', 'terminal_lokacijas.terminalId', '=', 'terminals.id')
+    ->leftJoin('lokacijas', 'terminal_lokacijas.lokacijaId', '=', 'lokacijas.id')
+    ->leftJoin('licenca_distributer_cenas', 'licenca_distributer_terminals.licenca_distributer_cenaId', '=', 'licenca_distributer_cenas.id')
+    ->leftJoin('licenca_tips', 'licenca_distributer_cenas.licenca_tipId', '=', 'licenca_tips.id')
+    ->where('terminal_lokacijas.distributerId', '=', $this->distId)
+    ->where('terminals.sn', 'like', '%'.$this->searchTerminalSn.'%')
+    ->where('lokacijas.mesto', 'like', '%'.$this->searchMesto.'%')
+    ->when($this->searchTipLicence > 0, function ($rtval){
+        return $rtval->where('licenca_distributer_cenas.id', '=', ($this->searchTipLicence == 1000) ? null : $this->searchTipLicence);
+    })
+    ->when($this->searchNenaplativ > 0, function ($rtval){
+        return $rtval->where('licenca_distributer_terminals.nenaplativ', '=', 1);
+    })
+    ->orderBy(\DB::raw("COALESCE(licenca_distributer_terminals.datum_kraj, '9999-12-31')", 'ASC'))
+    ->orderBy('terminal_lokacijas.id')
+    ->orderBy('licenca_distributer_cenas.licenca_tipId')
+    ->paginate(Config::get('terminal_paginate'), ['*'], 'terminali');
+        
     }
 
     public function parametriLicenceShowModal($licencaDistributerTerminalid, $naziv)

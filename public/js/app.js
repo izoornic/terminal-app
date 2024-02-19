@@ -3,7 +3,7 @@
 
 /***/ "./node_modules/alpinejs/dist/module.esm.js":
 /*!**************************************************!*\
-  !*** ./node_modules/alpinejs/dist/module.esm.js ***! 
+  !*** ./node_modules/alpinejs/dist/module.esm.js ***!
   \**************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 

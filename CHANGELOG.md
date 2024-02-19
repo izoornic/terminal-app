@@ -51,6 +51,13 @@ V 0.5.0.5  (18.2.2024.)
 
 V 0.5.0.6 (19.2.2024.)
     - Update CSS i JS
+    - Menager licenci ne vidi dugmice za dodavanja, brisanje i parametre licence
+    - Menager licenci vidi sve terminale prebacene distributeru.
+
+
+
+
+
 
   UPDATE terminal_lokacijas SET distributerId = '5' WHERE terminal_lokacijas.terminalId = ( SELECT id FROM terminals WHERE sn LIKE 'A26-12RB-1K12746');  
 

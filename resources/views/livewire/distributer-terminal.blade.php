@@ -5,10 +5,10 @@
         <div class="text-red-600">{{ $dist_name }}</div>
         </div>
 
-        <x-jet-button wire:click="createShowModal">
-        <svg class="fill-current w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Pro 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M0 256C0 114.6 114.6 0 256 0C397.4 0 512 114.6 512 256C512 397.4 397.4 512 256 512C114.6 512 0 397.4 0 256zM256 368C269.3 368 280 357.3 280 344V280H344C357.3 280 368 269.3 368 256C368 242.7 357.3 232 344 232H280V168C280 154.7 269.3 144 256 144C242.7 144 232 154.7 232 168V232H168C154.7 232 144 242.7 144 256C144 269.3 154.7 280 168 280H232V344C232 357.3 242.7 368 256 368z"/></svg>
+        <!-- <x-jet-button wire:click="createShowModal">
+        <svg class="fill-current w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M0 256C0 114.6 114.6 0 256 0C397.4 0 512 114.6 512 256C512 397.4 397.4 512 256 512C114.6 512 0 397.4 0 256zM256 368C269.3 368 280 357.3 280 344V280H344C357.3 280 368 269.3 368 256C368 242.7 357.3 232 344 232H280V168C280 154.7 269.3 144 256 144C242.7 144 232 154.7 232 168V232H168C154.7 232 144 242.7 144 256C144 269.3 154.7 280 168 280H232V344C232 357.3 242.7 368 256 368z"/></svg>
             {{ __('Dodaj terminal') }}
-        </x-jet-button>
+        </x-jet-button> -->
     </div>
 
     {{-- The data table --}}
@@ -34,7 +34,7 @@
                         {{-- SEARCH ROW --}}
                             <tr class="bg-orange-50">
                                 <td>
-                                    <x-jet-input wire:model="searchTerminalSn" id="" class="block bg-orange-50 w-full" type="text" placeholder="Serijski broj" />
+                                    <x-jet-input wire:model="searchTerminalSn" id="" class="block bg-orange-50 w-48" type="text" placeholder="Serijski broj" />
                                 </td>
                                 <td>
                                     <x-jet-input wire:model="searchMesto" id="" class="block bg-orange-50 w-full" type="text" placeholder="Pretraži mesto" />
@@ -77,6 +77,10 @@
                                             $item->isDuplicate = false;
                                         @endphp
                                     @endif
+
+                                    @php
+                                        $item->month_diff = App\Http\Helpers::monthDifference($item->datum_kraj);
+                                    @endphp
                                     <tr>
                                         <td class="px-2 py-2">  
                                             @if($item->isDuplicate)
@@ -105,36 +109,47 @@
                                                 <!-- </a> -->
                                             @endif
                                         </td> 
+                                        
                                         <td class="px-2 py-2">@if($item->datum_pocetak != '') {{ App\Http\Helpers::datumFormatDan($item->datum_pocetak) }} @endif</td>
+                                        <td>
+                                            <div class="float-right">
+                                            @if($item->month_diff !='')
+                                                @if($item->month_diff == 0)
+                                                    <svg class="fill-red-300 w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><path d="M32 0C14.3 0 0 14.3 0 32S14.3 64 32 64V75c0 42.4 16.9 83.1 46.9 113.1L146.7 256 78.9 323.9C48.9 353.9 32 394.6 32 437v11c-17.7 0-32 14.3-32 32s14.3 32 32 32H64 320h32c17.7 0 32-14.3 32-32s-14.3-32-32-32V437c0-42.4-16.9-83.1-46.9-113.1L237.3 256l67.9-67.9c30-30 46.9-70.7 46.9-113.1V64c17.7 0 32-14.3 32-32s-14.3-32-32-32H320 64 32zM96 75V64H288V75c0 25.5-10.1 49.9-28.1 67.9L192 210.7l-67.9-67.9C106.1 124.9 96 100.4 96 75z"/></svg>
+                                                @elseif($item->month_diff < 0)
+                                                    <svg class="fill-red-600 w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M128 0c13.3 0 24 10.7 24 24V64H296V24c0-13.3 10.7-24 24-24s24 10.7 24 24V64h40c35.3 0 64 28.7 64 64v16 48V448c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V192 144 128C0 92.7 28.7 64 64 64h40V24c0-13.3 10.7-24 24-24zM400 192H48V448c0 8.8 7.2 16 16 16H384c8.8 0 16-7.2 16-16V192zm-95 89l-47 47 47 47c9.4 9.4 9.4 24.6 0 33.9s-24.6 9.4-33.9 0l-47-47-47 47c-9.4 9.4-24.6 9.4-33.9 0s-9.4-24.6 0-33.9l47-47-47-47c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l47 47 47-47c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9z"/></svg>
+                                                @endif
+                                            @endif
+                                            </div>
+                                        </td>
+                                        
                                         <td class="px-2 py-2">@if($item->datum_kraj != '') {{ App\Http\Helpers::datumFormatDan($item->datum_kraj) }} @endif</td>                                       
                                         <td class="px-1 py-1">
                                             @if(!$item->isDuplicate)
-                                                <a class="cursor-pointer hover:text-green-400" wire:click="dodajLicencaShowModal('{{$item->id}}', '{{$item->ldtid}}')" title="Dodaj licencu">
+                                                <!-- <a class="cursor-pointer hover:text-green-400" wire:click="dodajLicencaShowModal('{{$item->id}}', '{{$item->ldtid}}')" title="Dodaj licencu">
                                                     <svg class="fill-current w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" enable-background="new 0 0 384 512"><g id="Layer_1_1_" display="none"><path display="inline" d="M320,464c8.8,0,16-7.2,16-16V160h-80c-17.7,0-32-14.3-32-32V48H64c-8.8,0-16,7.2-16,16v384c0,8.8,7.2,16,16,16H320z M0,64C0,28.7,28.7,0,64,0h165.5c17,0,33.3,6.7,45.3,18.7l90.5,90.5c12,12,18.7,28.3,18.7,45.3V448c0,35.3-28.7,64-64,64H64c-35.3,0-64-28.7-64-64V64z"/></g><g><path d="M373.1,134.6L253.4,15.3C243.5,5.5,230.2,0,216.3,0H59C26.5,0,0,26.5,0,59v394c0,32.5,26.5,59,59,59h266c32.5,0,59-26.5,59-59V160.9C384,151,380.1,141.5,373.1,134.6z M228.4,27.8c2.7,1.3,5.1,3,7.3,5.2l119.1,118.7h-61.4c-35.8,0-65-29.2-65-65V27.8z M359,453c0,9-3.6,17.5-10,24c-6.5,6.5-15,10-24,10H59c-9,0-17.5-3.6-24-10c-6.5-6.5-10-15-10-24V59c0-9,3.6-17.5,10-24c6.5-6.5,15-10,24-10h144.4v61.8c0,49.6,40.4,90,90,90H359V453z"/><polygon points="207,208.3 177,208.3 177,284.8 100.5,284.8 100.5,314.8 177,314.8 177,391.3 207,391.3 207,314.8 283.5,314.8 283.5,284.8 207,284.8"/></g></svg>
-                                                </a>
+                                                </a> -->
                                             @endif
                                         </td>
                                         <td class="px-1 py-1">
                                             @if($item->licenca_naziv != '')
-                                                <a class="cursor-pointer text-red-500 hover:text-red-800" wire:click="deleteLicencuShowModal('{{$item->id}}', '{{$item->ldtid}}')" title="Obriši licencu">
+                                                <!-- <a class="cursor-pointer text-red-500 hover:text-red-800" wire:click="deleteLicencuShowModal('{{$item->id}}', '{{$item->ldtid}}')" title="Obriši licencu">
                                                     <svg class="fill-current w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><g display="none"><path display="inline" d="M320,464c8.8,0,16-7.2,16-16V160h-80c-17.7,0-32-14.3-32-32V48H64c-8.8,0-16,7.2-16,16v384 c0,8.8,7.2,16,16,16H320z M0,64C0,28.7,28.7,0,64,0h165.5c17,0,33.3,6.7,45.3,18.7l90.5,90.5c12,12,18.7,28.3,18.7,45.3V448 c0,35.3-28.7,64-64,64H64c-35.3,0-64-28.7-64-64V64z"/></g><path d="M373.1,134.6L253.4,15.3C243.5,5.5,230.2,0,216.3,0H59C26.5,0,0,26.5,0,59v394c0,32.5,26.5,59,59,59h266 c32.5,0,59-26.5,59-59V160.9C384,151,380.1,141.5,373.1,134.6z M354.8,151.7h-61.4c-35.8,0-65-29.2-65-65V27.8 c2.7,1.3,5.1,3,7.3,5.2L354.8,151.7z M359,453c0,9-3.6,17.5-10,24c-6.5,6.5-15,10-24,10H59c-9,0-17.5-3.6-24-10 c-6.5-6.5-10-15-10-24V59c0-9,3.6-17.5,10-24c6.5-6.5,15-10,24-10h144.4v61.8c0,49.6,40.4,90,90,90H359V453z"/><path d="M210.2,319l71.6-104c4.7-6.8,3-16.2-3.8-20.9c-6.8-4.7-16.2-3-20.9,3.8L192,292.6L126.9,198c-4.7-6.8-14-8.5-20.9-3.8 c-6.8,4.7-8.5,14-3.8,20.9l71.6,104l-71.6,104c-4.7,6.8-3,16.2,3.8,20.9c2.6,1.8,5.6,2.6,8.5,2.6c4.8,0,9.5-2.3,12.4-6.5l65.1-94.6 l65.1,94.6c2.9,4.2,7.6,6.5,12.4,6.5c2.9,0,5.9-0.9,8.5-2.6c6.8-4.7,8.5-14,3.8-20.9L210.2,319z"/></svg>
-                                                </a>
+                                                </a> -->
                                             @endif
                                         </td>
                                         <td td class="px-1 py-1">
                                             @if($item->licenca_naziv != '' && $item->broj_parametara_licence > 0)
-                                                <a class="cursor-pointer text-sky-500 hover:text-red-800" wire:click="parametriLicenceShowModal( '{{ $item->ldtid }}', '{{ $item->licenca_naziv }}')" title="Parametri licence">
+                                                <!-- <a class="cursor-pointer text-sky-500 hover:text-red-800" wire:click="parametriLicenceShowModal( '{{ $item->ldtid }}', '{{ $item->licenca_naziv }}')" title="Parametri licence">
                                                     <svg class="fill-current w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><g id="Layer_1_1_" display="none"><path display="inline" d="M320,464c8.8,0,16-7.2,16-16V160h-80c-17.7,0-32-14.3-32-32V48H64c-8.8,0-16,7.2-16,16v384 c0,8.8,7.2,16,16,16H320z M0,64C0,28.7,28.7,0,64,0h165.5c17,0,33.3,6.7,45.3,18.7l90.5,90.5c12,12,18.7,28.3,18.7,45.3V448 c0,35.3-28.7,64-64,64H64c-35.3,0-64-28.7-64-64V64z"/></g><g><path d="M373.1,134.6L253.4,15.3C243.5,5.5,230.2,0,216.3,0H59C26.5,0,0,26.5,0,59v394c0,32.5,26.5,59,59,59h266 c32.5,0,59-26.5,59-59V160.9C384,151,380.1,141.5,373.1,134.6z M228.4,27.8c2.7,1.3,5.1,3,7.3,5.2l119.1,118.7h-61.4 c-35.8,0-65-29.2-65-65V27.8z M359,453c0,9-3.6,17.5-10,24c-6.5,6.5-15,10-24,10H59c-9,0-17.5-3.6-24-10c-6.5-6.5-10-15-10-24V59 c0-9,3.6-17.5,10-24c6.5-6.5,15-10,24-10h144.4v61.8c0,21.2,7.4,40.8,19.8,56.2h-61.1v64h64v-60.5c8.6,9.7,19.2,17.5,31.2,22.8V207 h64v-30.2H359V453z"/><rect x="62.7" y="143" width="64" height="64"/><rect x="62.7" y="256" width="64" height="64"/><rect x="162.1" y="256" width="64" height="64"/><rect x="257.3" y="256" width="64" height="64"/><rect x="62.7" y="369" width="64" height="64"/><rect x="162.1" y="369" width="64" height="64"/><rect x="257.3" y="369" width="64" height="64"/></g></svg>
-                                                </a>
+                                                </a> -->
                                             @endif
-                                        </td>
                                         
-                                        <td class="px-1 py-2">
                                              {{-- Da li terminal ima licencu --}}
                                             @if($item->licenca_naziv == '')
-                                                <x-jet-danger-button class="ml-2" wire:click="deleteShowModal('{{$item->id}}', '{{$item->ldtid}}')" title="Obriši terminal">
-                                                    <svg class="fill-current w-4 h-4 mr-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Pro 6.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M135.2 17.69C140.6 6.848 151.7 0 163.8 0H284.2C296.3 0 307.4 6.848 312.8 17.69L320 32H416C433.7 32 448 46.33 448 64C448 81.67 433.7 96 416 96H32C14.33 96 0 81.67 0 64C0 46.33 14.33 32 32 32H128L135.2 17.69zM31.1 128H416V448C416 483.3 387.3 512 352 512H95.1C60.65 512 31.1 483.3 31.1 448V128zM111.1 208V432C111.1 440.8 119.2 448 127.1 448C136.8 448 143.1 440.8 143.1 432V208C143.1 199.2 136.8 192 127.1 192C119.2 192 111.1 199.2 111.1 208zM207.1 208V432C207.1 440.8 215.2 448 223.1 448C232.8 448 240 440.8 240 432V208C240 199.2 232.8 192 223.1 192C215.2 192 207.1 199.2 207.1 208zM304 208V432C304 440.8 311.2 448 320 448C328.8 448 336 440.8 336 432V208C336 199.2 328.8 192 320 192C311.2 192 304 199.2 304 208z"/></svg>
-                                                </x-jet-danger-button>
+                                                <!-- <x-jet-danger-button class="ml-2" wire:click="deleteShowModal('{{$item->id}}', '{{$item->ldtid}}')" title="Obriši terminal">
+                                                    <svg class="fill-current w-4 h-4 mr-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M135.2 17.69C140.6 6.848 151.7 0 163.8 0H284.2C296.3 0 307.4 6.848 312.8 17.69L320 32H416C433.7 32 448 46.33 448 64C448 81.67 433.7 96 416 96H32C14.33 96 0 81.67 0 64C0 46.33 14.33 32 32 32H128L135.2 17.69zM31.1 128H416V448C416 483.3 387.3 512 352 512H95.1C60.65 512 31.1 483.3 31.1 448V128zM111.1 208V432C111.1 440.8 119.2 448 127.1 448C136.8 448 143.1 440.8 143.1 432V208C143.1 199.2 136.8 192 127.1 192C119.2 192 111.1 199.2 111.1 208zM207.1 208V432C207.1 440.8 215.2 448 223.1 448C232.8 448 240 440.8 240 432V208C240 199.2 232.8 192 223.1 192C215.2 192 207.1 199.2 207.1 208zM304 208V432C304 440.8 311.2 448 320 448C328.8 448 336 440.8 336 432V208C336 199.2 328.8 192 320 192C311.2 192 304 199.2 304 208z"/></svg>
+                                                </x-jet-danger-button> -->
                                             @else
                                                 {{-- Da li je prvi red za terminal --}}
                                                 @if(!$item->isDuplicate)
