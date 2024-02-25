@@ -98,6 +98,14 @@
                 </div>
                 <div class="font-bold px-6 pt-8">EUR</div>
             </div>
+            <div class="mt-4 flex">
+                <div>
+                    <x-jet-label for="licenca_dist_cena" value="{{ __('Preporučena cena za distributera') }}" />
+                    <x-jet-input wire:model="licenca_dist_cena" id="" class="block mt-1 w-80" type="text" />
+                    @error('licenca_dist_cena') <span class="error">{{ $message }}</span> @enderror
+                </div>
+                <div class="font-bold px-6 pt-8">EUR</div>
+            </div>
         </x-slot>
 
         <x-slot name="footer">

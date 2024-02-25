@@ -29,6 +29,8 @@ class DistributerLicenca extends Component
     public $licenca_zeta_cena;
     public $licenca_tip_id;
 
+    public $licenca_dist_cena;
+
     public $prva_licenca;
     public $delete_error;
     public $delete_error_text;
@@ -53,7 +55,8 @@ class DistributerLicenca extends Component
     {
         return [  
             'licenca_zeta_cena' => ['required', 'numeric'],
-            'licenca_tip_id'   =>    ['required', 'numeric']   
+            'licenca_tip_id'   =>    ['required', 'numeric'],
+            'licenca_dist_cena' =>   ['required', 'numeric']
         ];
     }
 
@@ -72,6 +75,7 @@ class DistributerLicenca extends Component
         $this->modelId = '';
         $this->delete_error = false;
         $this->delete_error_text = '';
+        $this->licenca_dist_cena = '';
     }
 
     /**
@@ -83,6 +87,10 @@ class DistributerLicenca extends Component
     public function loadModel()
     {
         $data = LicencaDistributerCena::find($this->modelId);
+
+        $this->licenca_zeta_cena = $data->licenca_zeta_cena;
+        $this->licenca_tip_id = $data->licenca_tipId;
+        $this->licenca_dist_cena = $data->licenca_dist_cena;
         // Assign the variables here
     }
 
@@ -97,7 +105,8 @@ class DistributerLicenca extends Component
         return [ 
             'distributerId' => $this->distId,
             'licenca_tipId' => $this->licenca_tip_id,
-            'licenca_zeta_cena'  => $this->licenca_zeta_cena
+            'licenca_zeta_cena'  => $this->licenca_zeta_cena,
+            'licenca_dist_cena' => $this->licenca_dist_cena
         ];
     }
 
@@ -223,15 +232,13 @@ class DistributerLicenca extends Component
     public function updateShowModal($id, $naziv)
     {
         $this->resetLic();
+        $this->modelId = $id;
+        $this->loadModel();
         $this->isUpdate = true;
         $this->l_naziv = $naziv;
-        $licencaCenaRow = LicencaDistributerCena::find($id);
-        $this->licenca_zeta_cena = $licencaCenaRow->licenca_zeta_cena;
-        $this->licenca_tip_id = $licencaCenaRow->licenca_tipId;
         $this->resetValidation();
         $this->modalFormVisible = true;
-        $this->modelId = $id;
-       //$this->loadModel();
+       
     }
 
     /**

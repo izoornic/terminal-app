@@ -54,6 +54,11 @@ V 0.5.0.6 (19.2.2024.)
     - Menager licenci ne vidi dugmice za dodavanja, brisanje i parametre licence
     - Menager licenci vidi sve terminale prebacene distributeru.
 
+V 0.5.0.7 (25.2.2024.)
+    - Hardkodovanom useru "Zeta test user" - tipa distributer dodat modal za promenu distributera na dashboard stranici
+    - Menadger Licenci kada dodaje licencu distributeru unosi i preporucenu cenu za distributera
+    - Menadžer Licenci na stranici zaduzenje-distributeri ne vidi dugme "ZADUŽI" ako je već zadužio distributera za taj mesec
+
 
 
 

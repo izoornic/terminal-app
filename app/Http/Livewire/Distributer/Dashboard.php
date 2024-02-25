@@ -38,11 +38,36 @@ class Dashboard extends Component
     public $distributer_banka;
     public $distributer_tel;
 
+    public $is_user_zeta;
+    public $testUserDistributer;
+    public $promeniDitributeraModalVisible;
+
 
     public function mount()
     {
         $this->distId = DistributerUserIndex::select('licenca_distributer_tipsId')->where('userId', '=', auth()->user()->id)->first()->licenca_distributer_tipsId;
         $this->ditributerData = LicencaDistributerTip::where('id', '=', $this->distId)->first();
+        $this->is_user_zeta = auth()->user()->id == 29 ? true : false;
+    }
+
+    /**
+     * Modal koji menja distributera test useru
+     *
+     * @param mixed $id
+     * 
+     * @return [type]
+     * 
+     */
+    public function promeniDistirbuteraShowModal()
+    {
+        $this->testUserDistributer = DistributerUserIndex::where('userId', '=', auth()->user()->id)->first()->licenca_distributer_tipsId;
+        $this->promeniDitributeraModalVisible = true;
+    }
+
+    public function promeniDistributera()
+    {
+        DistributerUserIndex::where('userId', '=', auth()->user()->id)->update(['licenca_distributer_tipsId' => $this->testUserDistributer] );
+        $this->promeniDitributeraModalVisible = false;
     }
 
     /**
