@@ -59,6 +59,8 @@ V 0.5.0.7 (25.2.2024.)
     - Menadger Licenci kada dodaje licencu distributeru unosi i preporucenu cenu za distributera
     - Menadžer Licenci na stranici zaduzenje-distributeri ne vidi dugme "ZADUŽI" ako je već zadužio distributera za taj mesec
 
+V 0.5.0.8 (25.2.2024.)
+    - Ispravka par slovnih greski i prikay ikonice "Nenaplativa licenca" na nalogu Distributera
 
 
 

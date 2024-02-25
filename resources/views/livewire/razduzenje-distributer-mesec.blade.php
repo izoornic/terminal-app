@@ -129,11 +129,11 @@
                 <div class="py-1">
                     <p>Distributer: <span class="font-bold">{{ $distributer_info->distributer_naziv }} </span></p>
                         @if(count($ne_razduzuju_se))
-                        <p>Broj licenci koje se ne zadužuju: <span class="font-bold">{{ count($ne_razduzuju_se) }} </span></p>
+                        <p>Broj licenci koje se ne razadužuju: <span class="font-bold">{{ count($ne_razduzuju_se) }} </span></p>
                     @endif
                 </div>
                 <div class="py-1">
-                    <p>Ukupna suma zaduženja: <span class="font-bold">@money($ukupno_zaduzenje) </span> RSD</p>
+                    <p>Ukupna suma razaduženja: <span class="font-bold">@money($ukupno_zaduzenje) </span> RSD</p>
                     <p class="text-sm"><!-- Mozda jos neki info?!? --></p>
                 </div>
                 <div class="py-1">
