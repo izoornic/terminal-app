@@ -86,6 +86,13 @@ class DistLokacije extends Component
         ];        
     }
 
+    public function doajPostojecuLokacijuDistributeru()
+    {
+       // dd($this->lokacija_row);
+        Lokacija::where('id', '=', $this->lokacija_row->id)->update(['distributerId' => $this->distId]);
+        $this->modalSearchPIBFormVisible = false;
+    }
+
     /**
      * Reset forme posle edita ili nove lokacije
      *

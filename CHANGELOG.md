@@ -62,7 +62,8 @@ V 0.5.0.7 (25.2.2024.)
 V 0.5.0.8 (25.2.2024.)
     - Ispravka par slovnih greski i prikay ikonice "Nenaplativa licenca" na nalogu Distributera
 
-
+V 0.5.0.9 (26.2.2024.)
+    - Ispravljen BUG za dodavanje postojece lokacije distributeru.
 
 
 

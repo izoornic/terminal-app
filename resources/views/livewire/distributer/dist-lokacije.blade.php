@@ -158,7 +158,7 @@
                 {{ __('Otkaži') }}
             </x-jet-secondary-button>
             @if($nova_lokacija_postoji_u_bazi == 'da')
-                <x-jet-danger-button wire:click="">
+                <x-jet-danger-button wire:click="doajPostojecuLokacijuDistributeru">
                     Dodaj lokaciju
                 </x-jet-danger-button>   
             @elseif($nova_lokacija_postoji_u_bazi == 'ne')
