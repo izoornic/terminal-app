@@ -144,9 +144,9 @@ Route::group(['middleware' => [
         return view('admin.distributer-lokacija');
         })->name('licenca-lokacija');
 
-    //RUTE za logovanog ditributera
+    //RUTE za logovanog ditributera 2
     Route::get('/dist-terminal', function(){
-        return view('distributer.distributer-terminal');
+        return view('distributer.distr-terminal');
         })->name('dist-terminal');
 
     Route::get('/dist-lokacija', function(){

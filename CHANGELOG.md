@@ -65,6 +65,10 @@ V 0.5.0.8 (25.2.2024.)
 V 0.5.0.9 (26.2.2024.)
     - Ispravljen BUG za dodavanje postojece lokacije distributeru.
 
+V 0.5.1.0 (26.2.2024.)
+    - spravljen bug sa paginatorom na stranici dist-terminali
+    - preimenovan blade i controler distributer.dist-terminal (bio distributer.distributer-terminal)
+
 
 
   UPDATE terminal_lokacijas SET distributerId = '5' WHERE terminal_lokacijas.terminalId = ( SELECT id FROM terminals WHERE sn LIKE 'A26-12RB-1K12746');  

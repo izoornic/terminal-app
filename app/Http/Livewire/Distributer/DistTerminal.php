@@ -3,6 +3,7 @@
 namespace App\Http\Livewire\Distributer;
 
 use Livewire\Component;
+use Livewire\WithPagination;
 
 use App\Models\Lokacija;
 use App\Models\TerminalLokacija;
@@ -22,8 +23,10 @@ use App\Ivan\SelectedTerminalInfo;
 
 use App\Helpers\PaginationHelper;
 
-class DistributerTerminal extends Component
+class DistTerminal extends Component
 {
+    use WithPagination;
+
     public $distId;
     public $distData;
 
@@ -190,7 +193,8 @@ class DistributerTerminal extends Component
      */
     public function lokacijeTipa($tipId)
     {
-        $dataAll =  Lokacija::select('lokacijas.*', 'lokacija_tips.lt_naziv', 'regions.r_naziv', 'lokacija_kontakt_osobas.name as kontakt', 'lokacija_tips.id as tipid')
+        //$dataAll =  
+        return Lokacija::select('lokacijas.*', 'lokacija_tips.lt_naziv', 'regions.r_naziv', 'lokacija_kontakt_osobas.name as kontakt', 'lokacija_tips.id as tipid')
         ->leftJoin('regions', 'regions.id', '=', 'lokacijas.regionId')
         ->leftJoin('lokacija_tips', 'lokacijas.lokacija_tipId', '=', 'lokacija_tips.id')
         ->leftJoin('lokacija_kontakt_osobas', 'lokacijas.id', '=', 'lokacija_kontakt_osobas.lokacijaId')
@@ -200,37 +204,9 @@ class DistributerTerminal extends Component
                 ->where('terminal_lokacijas.distributerId', '=', $this->distId);
         })
         ->orWhere('lokacijas.distributerId', '=', $this->distId)
-        ->get();
+        ->paginate(Config::get('global.modal_search'), ['*'], 'loc');
 
-        return PaginationHelper::paginate($this->displayData($dataAll), Config::get('global.paginate'));
-        
-        
-        /* return Lokacija::select('lokacijas.*', 'regions.r_naziv')
-            ->leftJoin('regions', 'regions.id', '=', 'lokacijas.regionId')
-            ->leftJoin('lokacija_tips', 'lokacijas.lokacija_tipId', '=', 'lokacija_tips.id')
-            ->leftJoin('lokacija_kontakt_osobas', 'lokacijas.id', '=', 'lokacija_kontakt_osobas.lokacijaId')
-            ->whereIn('lokacijas.id', function($q){
-                $q->select('lokacijaId')
-                    ->from('terminal_lokacijas')
-                    ->where('terminal_lokacijas.distributerId', '=', $this->distId);
-            })
-            ->orWhere('lokacijas.distributerId', '=', $this->distId)
-            ->where('lokacijas.l_naziv', 'like', '%'.$this->searchPLokacijaNaziv.'%')
-            ->where('lokacijas.mesto', 'like', '%'.$this->searchPlokacijaMesto.'%')
-            ->when($this->searchPib, function ($rtval){
-                return $rtval->where('lokacijas.pib', 'like', '%'.$this->searchPlokacijaPib.'%');
-            } )
-            ->where('lokacijas.lokacija_tipId', '=', $tipId)
-            ->paginate(Config::get('global.paginate'), ['*'], 'lokacije'); */
-
-
-        /* return Lokacija::select('lokacijas.*', 'regions.r_naziv')
-            ->where('lokacija_tipId', '=', $tipId)
-            ->leftJoin('regions', 'lokacijas.regionId', '=', 'regions.id')
-            ->where('l_naziv', 'like', '%'.$this->searchPLokacijaNaziv.'%')
-            ->where('mesto', 'like', '%'.$this->searchPlokacijaMesto.'%')    
-            ->where('pib', 'like', '%'.$this->searchPlokacijaPib.'%')
-            ->paginate(Config::get('global.modal_search'), ['*'], 'loc'); */
+        //return PaginationHelper::paginate($this->displayData($dataAll), Config::get('global.paginate'));
     }
 
      /**
@@ -394,7 +370,7 @@ class DistributerTerminal extends Component
 
     public function render()
     {
-        return view('livewire.distributer.distributer-terminal' , [
+        return view('livewire.distributer.dist-terminal' , [
             'data' => $this->read(),
         ]);
     }
