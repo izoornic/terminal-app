@@ -96,6 +96,7 @@ class Lokacijes extends Component
 
     public $pib;
     public $mb;
+    public $email;
 
     /**
      * The validation rules
@@ -116,7 +117,8 @@ class Lokacijes extends Component
                 'lokacija_tipId' => ['required', 'not_in:0'],
                 'latitude' => ['regex:/^[-]?(([0-8]?[0-9])\.(\d+))|(90(\.0+)?)$/', 'nullable'],             
                 'longitude' => ['regex:/^[-]?((((1[0-7][0-9])|([0-9]?[0-9]))\.(\d+))|180(\.0+)?)$/', 'nullable'],
-                'pib' => ($this->isUpdate) ? ['digits_between:8,16'] : ['digits_between:8,16', 'unique:lokacijas']   
+                'pib' => ($this->isUpdate) ? ['digits_between:8,16'] : ['digits_between:8,16', 'unique:lokacijas'],
+                'email' => ['string', 'email', 'max:255', 'unique:lokacijas', 'nullable']   
             ];
         }
         
@@ -181,6 +183,7 @@ class Lokacijes extends Component
         $this->telKo = '';
         $this->pib = '';
         $this->mb = '';
+        $this->email = '';
     }
 
     /**
@@ -232,6 +235,7 @@ class Lokacijes extends Component
         $this->longitude = $data->longitude;
         $this->pib = $data->pib;
         $this->mb = $data->mb;
+        $this->email = $data->email;
 
         $this->regionId = $data->regionId;
         $this->lokacija_tipId = $data->lokacija_tipId;
@@ -264,6 +268,7 @@ class Lokacijes extends Component
             'lokacija_tipId'   => $this->lokacija_tipId,
             'pib'              => $this->pib, 
             'mb'               => $this->mb, 
+            'email'            => $this->email
         ];
     }
 

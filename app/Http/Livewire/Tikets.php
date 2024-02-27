@@ -40,7 +40,10 @@ class Tikets extends Component
     public $searchTerminalId;
     public $tiketStatusId;
     public $searchVrstaKvara;
-    
+
+    public $searchTxtOpisKvara;
+    public $searchOpis;
+   
     // UPDATE MODAL
     public $modalFormVisible;
 
@@ -150,6 +153,7 @@ class Tikets extends Component
             ->where('tikets.tiket_prioritetId', ($this->searchPrioritet > 0) ? '=' : '<>', $this->searchPrioritet)
             ->where('terminals.sn', 'like', '%'.$this->searchTerminalId.'%')
             ->where('tiket_opis_kvara_tips.id', ($this->searchVrstaKvara > 0) ? '=' : '<>', $this->searchVrstaKvara)
+            ->where('tikets.opis', 'like', '%'.$this->searchOpis.'%')
             ->when($this->searchStatus == 1, function ($rtval){
                 return $rtval->where('tikets.tiket_statusId', '<>', 3);
             } )
@@ -174,6 +178,12 @@ class Tikets extends Component
             ->orderBy($this->orderBy, ($this->orderBy=='tiket_prioritet_tips.id') ? 'asc' : 'desc')
             ->paginate(Config::get('global.paginate'), ['*'], 'tik');
     }
+
+    public function searchOpisKvara()
+    {
+        $this->searchOpis = $this->searchTxtOpisKvara;
+    }
+
     /**
      * Loads the model data
      * of this component.

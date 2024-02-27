@@ -173,6 +173,7 @@ class DistLicence extends Component
     public function produziLicencu()
     {
         $this->updated();
+        $this->produzenje_cena_licence = preg_replace('/[,]/', '.', $this->produzenje_cena_licence);
         if($this->produzenje_cena_licence <= 0 || !is_numeric($this->produzenje_cena_licence)){
             $this->produzenje_unete_cene_error = 'Greška! Cena licence mora biti broj veći od 0!';
             return;
@@ -329,6 +330,7 @@ class DistLicence extends Component
         foreach($this->unete_cene_licenci as $key => $value){
             if(in_array($key, $this->licence_za_dodavanje)){
                 //dd($value, floatval($value));
+                $value = preg_replace('/[,]/', '.', $value);
                 if($value <= 0 || !is_numeric($value)){
                     $this->unete_cene_error[$key] = 'Greška! Cena licence mora biti broj veći od 0!';
                     return;

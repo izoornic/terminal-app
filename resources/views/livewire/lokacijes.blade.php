@@ -181,6 +181,11 @@
                 @error('mb') <span class="error">{{ $message }}</span> @enderror
             </div>
             <div class="mt-4">
+                <x-jet-label for="email" value="{{ __('e-mail') }}" />
+                <x-jet-input wire:model="email" id="" class="block mt-1 w-full" type="text" />
+                @error('email') <span class="error">{{ $message }}</span> @enderror
+            </div>
+            <div class="mt-4">
                 <x-jet-label for="latitude" value="{{ __('Latitude') }}" />
                 <x-jet-input wire:model="latitude" id="" class="block mt-1 w-full" type="text" />
                 @error('latitude') <span class="error">{{ $message }}</span> @enderror
@@ -266,6 +271,7 @@
                                 <p><span class="font-bold">{{ $odabranaLokacija->l_naziv}}</span>, Adresa: <span class="font-bold">{{ $odabranaLokacija->adresa}}</span></p>
                                 <p>Mesto: <span class="font-bold">{{ $odabranaLokacija->mesto }}</span>, Region: <span class="font-bold">{{ $odabranaLokacija->r_naziv }}</span></p>
                                 <p>PIB: <span class="font-bold">{{ $odabranaLokacija->pib }}</span></p>
+                                <p>e-mail: <span class="font-bold">{{ $odabranaLokacija->email }}</span></p>
                             </div>
                     </div>
                 </div> 

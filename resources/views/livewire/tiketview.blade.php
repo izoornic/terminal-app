@@ -63,6 +63,7 @@
                         <p>Adresa: <span class="font-bold">{{ $terminal->adresa }}</span>, {{$terminal->mesto}}</p>
                         <p>Region:  <span class="font-bold">{{ $terminal->r_naziv }}</span></p>
                         <p>PIB:  <span class="font-bold">{{ $terminal->pib }}</span></p>
+                        <p>e-mail:  <span class="font-bold">{{ $terminal->email }}</span></p>
                         <p>Distributer:  <span class="font-bold">{{ $terminal->distributer_naziv}}</span></p>
                         <div class="mt-4">
                             <svg class="float-left fill-current w-6 h-4 mr-2 mt-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 448"><defs><style>.a{fill:#fff;}</style></defs><path d="M512,0H64A64,64,0,0,0,0,64V384a64,64,0,0,0,64,64H512a64,64,0,0,0,64-64V64A64,64,0,0,0,512,0Z"/><circle class="a" cx="186.65" cy="137.79" r="86.21"/><path class="a" d="M382.28,317.58h133a25,25,0,0,0,24.94-24.94V76.51a25,25,0,0,0-24.94-24.94h-133a24.94,24.94,0,0,0-24.93,24.94V292.64A24.94,24.94,0,0,0,382.28,317.58Zm83.13-24.94H431.69c-4.1,0-7.84-3.74-7.84-8.31a8.34,8.34,0,0,1,8.31-8.32h33.25c4.57,0,8.31,3.74,8.31,7.85A8.45,8.45,0,0,1,465.41,292.64ZM390.6,84.82H507V251.08H390.6Z"/><path class="a" d="M57.33,396.43H316a21.61,21.61,0,0,0,21.55-21.55A107.77,107.77,0,0,0,229.76,267.11H143.54A107.76,107.76,0,0,0,35.77,374.88,21.59,21.59,0,0,0,57.33,396.43Z"/></svg>

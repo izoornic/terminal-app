@@ -23,7 +23,8 @@ class Lokacija extends Model
         'longitude',
         'pib',
         'distributerId',
-        'mb'
+        'mb',
+        'email'
     ];
 
     public static function userLokacijeList($tip_id = 1)
