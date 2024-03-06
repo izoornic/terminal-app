@@ -268,7 +268,7 @@ class Lokacijes extends Component
             'lokacija_tipId'   => $this->lokacija_tipId,
             'pib'              => $this->pib, 
             'mb'               => $this->mb, 
-            'email'            => $this->email
+            'email'            => (filter_var($this->email, FILTER_VALIDATE_EMAIL)) ? $this->email : NULL
         ];
     }
 

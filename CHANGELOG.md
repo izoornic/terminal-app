@@ -74,6 +74,8 @@ V 0.5.1.1 (27.2.2024.)
     - Dodata pretraga tiketa po opisu kvara
     - Dodat zarez kao delimiter za decimalne brojeve prilikom unosa cene licence za ulogu "Distributer"
 
+V 0.5.1.2 (6.6.2024.)
+    - Dodata provera email adrese kada se menja ili dodaje da setuje NULL ako je los format
 
   UPDATE terminal_lokacijas SET distributerId = '5' WHERE terminal_lokacijas.terminalId = ( SELECT id FROM terminals WHERE sn LIKE 'A26-12RB-1K12746');  
 

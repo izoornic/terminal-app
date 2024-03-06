@@ -293,7 +293,7 @@ class DistLokacije extends Component
             'pib'              => $this->pib, 
             'mb'               => $this->mb, 
             'distributerId'    => $this->distId,
-            'email'            => $this->email
+            'email'            => (filter_var($this->email, FILTER_VALIDATE_EMAIL)) ? $this->email : NULL
         ];
     }
 
