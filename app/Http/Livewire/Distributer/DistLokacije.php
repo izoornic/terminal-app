@@ -73,6 +73,7 @@ class DistLokacije extends Component
 
     /**
      * The validation rules
+     * nono
      *
      * @return void
      */
