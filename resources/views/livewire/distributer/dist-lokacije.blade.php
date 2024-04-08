@@ -197,7 +197,7 @@
             </div>
             <div class="mt-4">
                 <x-jet-label for="pib" value="{{ __('PIB') }}" />
-                    <p>{{$pib}}</p>
+                <p class="pl-4 font-bold">{{$pib}}</p>
             </div>
             <div class="mt-4">
                 <x-jet-label for="mb" value="{{ __('Matični broj') }}" />
@@ -206,8 +206,12 @@
             </div>
             <div class="mt-4">
                 <x-jet-label for="email" value="{{ __('e-mail') }}" />
-                <x-jet-input wire:model="email" id="" class="block mt-1 w-full" type="text" />
-                @error('email') <span class="error">{{ $message }}</span> @enderror
+                @if ($email_is_set)
+                <p class="pl-4 font-bold">{{$email}}</p>
+                @else
+                    <x-jet-input wire:model="email" id="" class="block mt-1 w-full" type="text" />
+                    @error('email') <span class="error">{{ $message }}</span> @enderror
+                @endif
             </div>
             <div class="mt-4">
                 <x-jet-label for="latitude" value="{{ __('Latitude') }}" />
