@@ -21,6 +21,8 @@ use Illuminate\Support\Facades\Config;
 
 use App\Http\Helpers;
 
+use App\Ivan\SelectedTerminalInfo;
+
 class Lokacijes extends Component
 {
     use WithPagination;
@@ -80,6 +82,10 @@ class Lokacijes extends Component
 
     public $lokacijaSaKojeUzima;
     public $datum_dodavanja_terminala;
+
+    //Error licenca MODAL
+    public $licencaError;
+    public $modalErorLicencaVisible;
 
     //dodaj novi terminal
     public $noviSN;
@@ -428,6 +434,7 @@ class Lokacijes extends Component
         $this->p_lokacija_tipId = 0;
         $this->p_lokacijaId = 0;
         $this->datum_dodavanja_terminala = Helpers::datumKalendarNow();
+        $this->licencaError = '';
 
         $this->modalAddTerminalVisible = true;
     }
@@ -529,6 +536,17 @@ class Lokacijes extends Component
             
             $this->errAddMsg = '';
 
+            //Da li treminali imaju licencu?
+            foreach($this->selsectedTerminals as $item){
+                if(SelectedTerminalInfo::terminalImaLicencu($item)){
+                    $this->licencaError = 'multi';
+                    $this->modalErorLicencaVisible = true;
+                    $this->selsectedTerminals=[];
+                    $this->modalAddTerminalVisible = false;
+                    return;
+                }
+            }
+
             foreach($this->selsectedTerminals as $tid){
                 DB::transaction(function() use($tid, $distributer_tip_id){
                     //terminal
@@ -538,8 +556,8 @@ class Lokacijes extends Component
                     //update current
                     TerminalLokacija::where('terminalId', $tid)->update(['lokacijaId'=> $this->modelId, 'terminal_statusId'=> $this->t_status, 'korisnikId'=>auth()->user()->id, 'korisnikIme'=>auth()->user()->name, 'updated_at'=>$this->datum_dodavanja_terminala, 'distributerId' => $distributer_tip_id ]);
                 });
-                $this->modalAddTerminalVisible = false;
             }
+            $this->modalAddTerminalVisible = false;
                    
         }elseif($this->addingType == 'addNew'){
             // ADDING NEW TERMINAL
@@ -561,8 +579,7 @@ class Lokacijes extends Component
                 $newTerminal = Terminal::create(['sn' => $this->noviSN, 'terminal_tipId' => $this->new_terminal_tip, 'broj_kutije' => $this->noviKutijaNO]);
                 TerminalLokacija::create(['terminalId' => $newTerminal->id, 'lokacijaId' => $this->modelId, 'terminal_statusId'=> $this->t_status, 'korisnikId'=>auth()->user()->id, 'korisnikIme'=>auth()->user()->name, 'updated_at'=>$this->datum_dodavanja_terminala, 'distributerId' => $distributer_tip_id ]);
             });
-            $this->modalAddTerminalVisible = false;
-            
+            $this->modalAddTerminalVisible = false; 
         }
     }
     

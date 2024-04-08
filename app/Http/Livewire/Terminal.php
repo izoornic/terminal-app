@@ -47,6 +47,10 @@ class Terminal extends Component
     public $modalStatusPremesti;
     public $datum_premestanja_terminala;
 
+    //Error licenca MODAL
+    public $licencaError;
+    public $modalErorLicencaVisible;
+
     //select all
     public $selsectedTerminals = [];
     public $selectAll;
@@ -416,6 +420,7 @@ class Terminal extends Component
         $this->searchPLokacijaNaziv ='';
         $this->searchPlokacijaMesto ='';
         $this->searchPlokacijaRegion = 0;
+        $this->licencaError = '';
         //podaci o terminalu koji se premesta
         $this->selectedTerminal = SelectedTerminalInfo::selectedTerminalInfoTerminalId($this->modelId);
         //dd($this->selectedTerminal);
@@ -440,6 +445,7 @@ class Terminal extends Component
         $this->searchPLokacijaNaziv ='';
         $this->searchPlokacijaMesto ='';
         $this->searchPlokacijaRegion = 0;
+        $this->licencaError = '';
 
         $this->modalConfirmPremestiVisible = true;
 
@@ -491,7 +497,27 @@ class Terminal extends Component
 
         //da li se terminal dodaje Distributeru?
         $distributer_tip_id = ($this->plokacijaTip == 4) ? DistributerLokacijaIndex::where('lokacijaId', '=', $this->plokacija)->first()->licenca_distributer_tipsId : NULL;
-        //dd($distributer_tip_id);          
+        
+        //Da li terminal ima aktivnu licencu
+        if($this->multiSelected){
+            foreach($this->selsectedTerminals as $item){
+                if(SelectedTerminalInfo::terminalImaLicencu($item)){
+                    $this->licencaError = 'multi';
+                    $this->modalErorLicencaVisible = true;
+                    $this->selsectedTerminals=[];
+                    $this->modalConfirmPremestiVisible = false;
+                    return;
+                }
+            }
+        }else{
+            if(SelectedTerminalInfo::terminalImaLicencu($this->modelId)){
+                $this->licencaError = 'single';
+                $this->modalErorLicencaVisible  = true;
+                $this->selsectedTerminals=[];
+                $this->modalConfirmPremestiVisible = false;
+                return;
+            }
+        }         
 
         if($this->multiSelected){
             foreach($this->selsectedTerminals as $item){

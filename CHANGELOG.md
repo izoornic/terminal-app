@@ -74,14 +74,44 @@ V 0.5.1.1 (27.2.2024.)
     - Dodata pretraga tiketa po opisu kvara
     - Dodat zarez kao delimiter za decimalne brojeve prilikom unosa cene licence za ulogu "Distributer"
 
-V 0.5.1.2 (6.6.2024.)
+V 0.5.1.2 (6.3.2024.)
     - Dodata provera email adrese kada se menja ili dodaje da setuje NULL ako je los format
+
+V 0.5.1.3 ()
+    - Dodata funkcionalnost da Admin i Menager licenci ne mogu da premestaju terminale koji imaju dodatu licencu.
+    - Dodata dva nova plja u tabelu "licenca_naplatas": 'aktivna', 'nenaplativ'
+    
+        UPDATE licenca_naplatas SET aktivna = 1 WHERE licenca_dist_terminalId > 0
+
+        UPDATE licenca_naplatas ls, ( SELECT id, nenaplativ FROM licenca_distributer_terminals ) ldt
+        SET ls.nenaplativ = 1
+        WHERE ls.licenca_dist_terminalId = ldt.id
+        AND ldt.nenaplativ = 1;
+
+    - Dodato novo polje u tabelu "licenca_parametar_terminals" : 'licenca_naplataId'
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   UPDATE terminal_lokacijas SET distributerId = '5' WHERE terminal_lokacijas.terminalId = ( SELECT id FROM terminals WHERE sn LIKE 'A26-12RB-1K12746');  
 
 INFO o TerminalLokacija IDju
-  SELECT * FROM terminal_lokacijas tl WHERE tl.terminalId = (SELECT id FROM terminals WHERE sn LIKE '0500422040186607'); 
-
+    SELECT * FROM terminal_lokacijas tl WHERE tl.terminalId = (SELECT id FROM terminals WHERE sn LIKE '0500422040186607'); 
+    
+    
 
 INSERT INTO licenca_naplatas (id, terminal_lokacijaId, distributerId, licenca_distributer_cenaId, licenca_dist_terminalId, mesecId, broj_dana, zaduzeno, datum_zaduzenja, razduzeno, datum_razduzenja, datum_pocetka_licence, datum_kraj_licence, datum_isteka_prekoracenja, dist_zaduzeno, dist_datum_zaduzenja, dist_razduzeno, dist_datum_razduzenja, created_at, updated_at) 
 SELECT NULL, ldt.terminal_lokacijaId, ldt.distributerId, ldt.licenca_distributer_cenaId, ldt.id, NULL, ldt.licenca_broj_dana, NULL, NULL, NULL, NULL, ldt.datum_pocetak, ldt.datum_kraj, DATE_ADD(datum_kraj, INTERVAL dist.dani_prekoracenja_licence DAY) , '0', ldt.datum_pocetak, '0', ldt.datum_pocetak, NOW(), NOW()

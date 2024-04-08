@@ -2,6 +2,7 @@
 namespace App\Ivan;
 
 use App\Models\TerminalLokacija;
+use App\Models\LicenceZaTerminal;
 
 class SelectedTerminalInfo 
 {
@@ -78,6 +79,14 @@ class SelectedTerminalInfo
                     ->leftJoin('regions', 'lokacijas.regionId', '=', 'regions.id')
                     -> first();
         
+    }
+
+    //provera da li terminal ima na sebi aktivnu licencu 
+    public static function terminalImaLicencu($terminalId)
+    {
+        $tlid = TerminalLokacija::where('terminalId', $terminalId) -> first()->id;
+        
+        return LicenceZaTerminal::where('terminal_lokacijaId', $tlid) -> exists();
     }
 
 }

@@ -39,6 +39,10 @@ class LicencaTerminal extends Component
     public $datum_premestanja_terminala;
 
     public $selectedTerminal;
+
+    //LICENCA GRESKA MODAL
+    public $licencaError;
+    public $modalErorLicencaVisible;
    
     //BLACKLIST
     public $modalFormVisible;
@@ -153,6 +157,7 @@ class LicencaTerminal extends Component
         $this->plokacija = 0;
         $this->canMoveTerminal = 0;
         $this->modalStatusPremesti = $status;
+        $this->licencaError = '';
 
         $this->searchPLokacijaNaziv ='';
         $this->searchPlokacijaMesto ='';
@@ -181,6 +186,7 @@ class LicencaTerminal extends Component
         $this->searchPLokacijaNaziv ='';
         $this->searchPlokacijaMesto ='';
         $this->searchPlokacijaRegion = 0;
+        $this->licencaError = '';
 
         $this->modalConfirmPremestiVisible = true;
 
@@ -193,13 +199,34 @@ class LicencaTerminal extends Component
      * @return void
      */
     public function moveTerminal(){
-
+        //dodam datum ako ne valja
         if(!(bool)strtotime($this->datum_premestanja_terminala)) $this->datum_premestanja_terminala = Helpers::datumKalendarNow();
+        //zalepim vreme za timestamp
         $this->datum_premestanja_terminala.= ' '.Helpers::vremeKalendarNow();
 
         //da li se terminal dodaje Distributeru?
         $distributer_tip_id = ($this->plokacijaTip == 4) ? DistributerLokacijaIndex::where('lokacijaId', '=', $this->plokacija)->first()->licenca_distributer_tipsId : NULL;
-        //dd($distributer_tip_id);          
+        
+        //Da li terminal ima aktivnu licencu
+        if($this->multiSelected){
+            foreach($this->selsectedTerminals as $item){
+                if(SelectedTerminalInfo::terminalImaLicencu($item)){
+                    $this->licencaError = 'multi';
+                    $this->modalErorLicencaVisible = true;
+                    $this->selsectedTerminals=[];
+                    $this->modalConfirmPremestiVisible = false;
+                    return;
+                }
+            }
+        }else{
+            if(SelectedTerminalInfo::terminalImaLicencu($this->modelId)){
+                $this->licencaError = 'single';
+                $this->modalErorLicencaVisible  = true;
+                $this->selsectedTerminals=[];
+                $this->modalConfirmPremestiVisible = false;
+                return;
+            }
+        }
 
         if($this->multiSelected){
             foreach($this->selsectedTerminals as $item){
