@@ -2,8 +2,11 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\LicencaNaplata;
+use App\Models\TerminalLokacija;
+
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class LicencaDistributerTip extends Model
 {
@@ -26,7 +29,12 @@ class LicencaDistributerTip extends Model
         'datum_ugovora',
         'datum_kraj_ugovora',
         'dani_prekoracenja_licence',
-        'broj_lokacija'
+        'broj_licenci',
+        'broj_terminala',
+        'broj_lokacija',
+        'distributer_tr',
+        'distributer_banka',
+        'distributer_tel'
     ];
 
     public static function DistributerName($id)
@@ -62,6 +70,14 @@ class LicencaDistributerTip extends Model
             $dist_list[$dist->id] = $dist->distributer_naziv;
         }
         return $dist_list;
+    }
+
+    public static function prebrojUpdateTerminaleDistributera($distId)
+    {
+        //$br_licenci = LicencaNaplata::select()->where('distributerId', '=', $distId)->where('aktivna', '=', 1)->count();
+        $br_terminala = TerminalLokacija::select()->where('distributerId', '=', $distId)->count();
+
+        LicencaDistributerTip::where('id', '=', $distId)->update(['broj_terminala' => $br_terminala]);
     }
 
 }

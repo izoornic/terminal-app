@@ -2,10 +2,13 @@
 
 namespace App\Http\Livewire;
 
+use App\Models\LicencaTip;
+use App\Models\LicencaNaplata;
+use App\Models\LicencaDistributerTip;
 use App\Models\LicencaDistributerCena;
 use App\Models\LicencaDistributerTerminal;
-use App\Models\LicencaDistributerTip;
-use App\Models\LicencaTip;
+
+
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Config;
@@ -31,7 +34,6 @@ class DistributerLicenca extends Component
 
     public $licenca_dist_cena;
 
-    public $prva_licenca;
     public $delete_error;
     public $delete_error_text;
 
@@ -111,6 +113,19 @@ class DistributerLicenca extends Component
     }
 
     /**
+     * Shows the create modal
+     *
+     * @return void
+     */
+    public function createShowModal()
+    {
+        $this->resetLic();
+        $this->isUpdate = false;
+        $this->resetValidation();
+        $this->modalFormVisible = true;
+    }
+
+    /**
      * The create function.
      *
      * @return void
@@ -129,17 +144,23 @@ class DistributerLicenca extends Component
         $this->resetLic();
     }
 
-    /**
-     * The read function.
+     /**
+     * Shows the form modal
+     * in update mode.
      *
+     * @param  mixed $id
      * @return void
      */
-    public function read()
+    public function updateShowModal($id, $naziv)
     {
-        return LicencaDistributerCena::select('licenca_distributer_cenas.*', 'licenca_tips.licenca_naziv', 'licenca_tips.licenca_opis')
-                ->leftJoin('licenca_tips', 'licenca_tips.id', '=', 'licenca_distributer_cenas.licenca_tipId')
-                ->where('licenca_distributer_cenas.distributerId', '=', $this->distId)
-                ->paginate(Config::get('global.paginate'), ['*'], 'lokacije'); 
+        $this->resetLic();
+        $this->modelId = $id;
+        $this->loadModel();
+        $this->isUpdate = true;
+        $this->l_naziv = $naziv;
+        $this->resetValidation();
+        $this->modalFormVisible = true;
+       
     }
 
     /**
@@ -156,6 +177,20 @@ class DistributerLicenca extends Component
     }
 
     /**
+     * Shows the delete confirmation modal.
+     *
+     * @param  mixed $id
+     * @return void
+     */
+    public function deleteShowModal($id, $naziv)
+    {
+        $this->resetLic();
+        $this->modelId = $id;
+        $this->l_naziv = $naziv;
+        $this->modalConfirmDeleteVisible = true;
+    }
+    
+     /**
      * The delete function.
      *
      * @return void
@@ -185,75 +220,27 @@ class DistributerLicenca extends Component
     private function canDelete()
     {
         //da li ima trminala sa tom licencom
-        if(LicencaDistributerTerminal::where('licenca_distributer_cenaId', '=', $this->modelId)->first()){
+       if(LicencaNaplata::where('licenca_distributer_cenaId', '=', $this->modelId)->first()){
            //ima
            $this->delete_error_text = 'Licenca se ne može obrisati jer je vezana za jedan ili više terminala!';
            return false;
         }else{
-            // da li je osnovna licenca
-            $licenca = LicencaDistributerCena::select('licenca_tipId')->where('id', '=', $this->modelId)->first();
-            if($licenca->licenca_tipId == 1){
-                //jeste osnovna, da li ima jos licenci
-                if(LicencaDistributerCena::where('distributerId', '=', $this->distId)->where('licenca_tipId', '<>', 1)->first()){
-                    //ima jos licenci
-                    $this->delete_error_text = 'Da bi ste obrisali osnovnu licencu, prvo morate obrisati sve dodatne licence';
-                    return false;
-                }else{
-                    return true;
-                }
-            }else{
-                return true;
-            }
+            return true;
         }
     }
-
+    
     /**
-     * Shows the create modal
+     * The read function.
      *
      * @return void
      */
-    public function createShowModal()
+    public function read()
     {
-        $this->resetLic();
-        $this->isUpdate = false;
-        $this->resetValidation();
-        //check if it's first
-        $this->prva_licenca = (LicencaDistributerCena::OsnovnaLicencaDistributera($this->distId)[0] == 0) ? true : false; 
-        $this->modalFormVisible = true;
+        return LicencaDistributerCena::select('licenca_distributer_cenas.*', 'licenca_tips.licenca_naziv', 'licenca_tips.licenca_opis')
+                ->leftJoin('licenca_tips', 'licenca_tips.id', '=', 'licenca_distributer_cenas.licenca_tipId')
+                ->where('licenca_distributer_cenas.distributerId', '=', $this->distId)
+                ->paginate(Config::get('global.paginate'), ['*'], 'lokacije'); 
     }
-
-    /**
-     * Shows the form modal
-     * in update mode.
-     *
-     * @param  mixed $id
-     * @return void
-     */
-    public function updateShowModal($id, $naziv)
-    {
-        $this->resetLic();
-        $this->modelId = $id;
-        $this->loadModel();
-        $this->isUpdate = true;
-        $this->l_naziv = $naziv;
-        $this->resetValidation();
-        $this->modalFormVisible = true;
-       
-    }
-
-    /**
-     * Shows the delete confirmation modal.
-     *
-     * @param  mixed $id
-     * @return void
-     */
-    public function deleteShowModal($id, $naziv)
-    {
-        $this->resetLic();
-        $this->modelId = $id;
-        $this->l_naziv = $naziv;
-        $this->modalConfirmDeleteVisible = true;
-    }    
 
     public function render()
     {

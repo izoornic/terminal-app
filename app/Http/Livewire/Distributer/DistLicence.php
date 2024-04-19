@@ -12,7 +12,7 @@ use App\Models\DistributerUserIndex;
 use App\Models\LicencaDistributerTip;
 use App\Models\LicencaDistributerCena;
 use App\Models\LicencaParametarTerminal;
-use App\Models\LicencaDistributerTerminal;
+//use App\Models\LicencaDistributerTerminal;
 
 use App\Http\Helpers;
 
@@ -273,7 +273,7 @@ class DistLicence extends Component
      */
     public function prebrojLicenceDistributera()
     {
-        return LicencaDistributerTerminal::select()->where('distributerId', '=', $this->distId)->count();
+        return LicencaNaplata::select()->where('distributerId', '=', $this->distId)->where('aktivna','=', 1)->count();
     }
 
         /**
@@ -513,11 +513,12 @@ class DistLicence extends Component
      * @return [type]
      * 
      */
-    public function deleteLicencuShowModal($tre_loc_id, $ldtidd)
+    public function deleteLicencuShowModal($tre_loc_id, $lnid)
     {
         $this->licence_dodate_terminalu = $this->licenceDodateTerminalu();
         $this->modelId = $tre_loc_id;
-        $this->distrib_terminal_id = $ldtidd;
+        //$this->distrib_terminal_id = $ldtidd;
+        $this->licenca_naplata_id = $lnid;
         $this->licencaDeleteInfo = $this->licencaInfo();
         $this->canDelete = $this->canDeleteLcence();
         $this->modalConfirmDeleteVisible = true;
@@ -526,16 +527,26 @@ class DistLicence extends Component
     public function delteLicenca()
     {
         DB::transaction(function(){
-            $licenca_row = $this->licencaInfo();
-            $naplata_row = LicencaNaplata::where('licenca_dist_terminalId', '=', $this->distrib_terminal_id)->first();
-            LicencaDistributerTerminal::destroy($this->distrib_terminal_id);
-            LicencaParametarTerminal::where('licenca_distributer_terminalId', '=', $this->distrib_terminal_id)->delete();
-            LicenceZaTerminal::where('terminal_lokacijaId', '=', $licenca_row->terminal_lokacijaId)
-                        ->where('distributerId', '=', $licenca_row->distributerId)
-                        ->where('licenca_distributer_cenaId', '=', $licenca_row->licenca_distributer_cenaId)
+            $naplata_row = LicencaNaplata::where('id', '=', $this->licenca_naplata_id)->first();
+            
+            //LicencaDistributerTerminal::destroy($this->distrib_terminal_id);
+            LicencaParametarTerminal::where('terminal_lokacijaId', '=', $naplata_row->terminal_lokacijaId)
+                                        ->where('distributerId', '=', $naplata_row->distributerId)
+                                        ->where('licenca_distributer_cenaId', '=', $naplata_row->licenca_distributer_cenaId)
+                                        ->delete();
+            LicenceZaTerminal::where('terminal_lokacijaId', '=', $naplata_row->terminal_lokacijaId)
+                        ->where('distributerId', '=', $naplata_row->distributerId)
+                        ->where('licenca_distributer_cenaId', '=', $naplata_row->licenca_distributer_cenaId)
                         ->delete();
-            if(!isset($naplata_row->zaduzeno)) LicencaNaplata::where('licenca_dist_terminalId', '=', $this->distrib_terminal_id)->delete();
-            else LicencaNaplata::where('licenca_dist_terminalId', '=', $this->distrib_terminal_id)->update(['licenca_dist_terminalId' => NULL]);
+            //Licenca koja je regulare i istekla je
+           
+            if(isset($naplata_row->razduzeno)) LicencaNaplata::where('id', '=', $naplata_row->id)->update(['aktivna' => 0]);
+
+            //Licenca koja nije zaduzena od strane Zete
+            if(!isset($naplata_row->zaduzeno)) LicencaNaplata::where('id', '=', $naplata_row->id)->delete();
+            
+           /*  if(!isset($naplata_row->zaduzeno)) LicencaNaplata::where('licenca_dist_terminalId', '=', $this->distrib_terminal_id)->delete();
+            else LicencaNaplata::where('licenca_dist_terminalId', '=', $this->distrib_terminal_id)->update(['licenca_dist_terminalId' => NULL]); */
         });
         $this->modalConfirmDeleteVisible = false;
         $this->resetPage();
@@ -548,7 +559,7 @@ class DistLicence extends Component
             ->orderBy('id', 'desc')
             ->first();
         $expire = Helpers::monthDifference($licence_details->datum_kraj_licence);
-        //ako Zeta nije zaduzila i distributer nije naplatio ditributera moze da brise
+        //ako Zeta nije zaduzila i distributer nije naplatio od korisnika moze da brise
         if(!isset($licence_details->zaduzeno) && !isset($licence_details->dist_razduzeno)) return true;
         //ako je Zeta razduzila distributera i licenca je istekla moze da brise
         if(isset($licence_details->razduzeno) && $expire < 1) return true;
@@ -557,7 +568,7 @@ class DistLicence extends Component
     }
     private function licencaInfo()
     {
-        return LicencaNaplata::select('licenca_tips.licenca_naziv','licenca_naplatas.distributerId', 'licenca_naplatas.terminal_lokacijaId', 'licenca_naplatas.licenca_distributer_cenaId', 'licenca_distributer_cenas.licenca_tipId', 'licenca_distributer_cenas.id as ldcid')
+        return LicencaNaplata::select('licenca_naplatas.id','licenca_tips.licenca_naziv','licenca_naplatas.distributerId', 'licenca_naplatas.terminal_lokacijaId', 'licenca_naplatas.licenca_distributer_cenaId', 'licenca_distributer_cenas.licenca_tipId', 'licenca_distributer_cenas.id as ldcid')
             ->leftJoin('licenca_distributer_cenas', 'licenca_distributer_cenas.id', '=', 'licenca_naplatas.licenca_distributer_cenaId')
             ->leftJoin('licenca_tips', 'licenca_tips.id', '=', 'licenca_distributer_cenas.licenca_tipId')
             ->where('licenca_naplatas.id', '=', $this->licenca_naplata_id)
@@ -577,6 +588,7 @@ class DistLicence extends Component
     {
         //$this->resetTerm();
         $this->licenca_naplata_id = $licencaNaplatalid;
+        //dd($this->licenca_naplata_id);
         $lic_info = $this->licencaInfo();
         $this->pm_licenca_tip_id = $lic_info->licenca_tipId;
         $this->pm_licenca_naziv = $lic_info->licenca_naziv;
@@ -590,8 +602,8 @@ class DistLicence extends Component
                 $join->on('licenca_naplatas.distributerId', '=', 'licenca_parametar_terminals.distributerId');
                 $join->on('licenca_naplatas.licenca_distributer_cenaId', '=', 'licenca_parametar_terminals.licenca_distributer_cenaId');
             })
+            ->where('licenca_naplatas.id', '=', $this->licenca_naplata_id)
             ->pluck('licenca_parametar_terminals.licenca_parametarId')->all();
-       
         $this->licenca_tip_parametri = LicencaParametar::where('licenca_tipId', '=', $this->pm_licenca_tip_id)->pluck('id')->all();
         
         $this->parametriModalVisible = true;

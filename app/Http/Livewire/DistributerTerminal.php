@@ -74,7 +74,7 @@ class DistributerTerminal extends Component
         $this->broj_licenci = $ter_and_lic_info['br_licenci'];
         if($ter_and_lic_info['br_terminala'] != $this->broj_terminala){
             $this->broj_terminala = $ter_and_lic_info['br_terminala'];
-            LicencaDistributerTip::where('id', '=', $this->distId)->update(['broj_terminala' => $this->broj_terminala ]);
+            //LicencaDistributerTip::where('id', '=', $this->distId)->update(['broj_terminala' => $this->broj_terminala ]);
         }
     }
 

@@ -75,17 +75,10 @@
                 <x-jet-label for="licenca_tip_id" value="{{ __('Vrsta licence') }}" />
                 <select wire:model="licenca_tip_id" id="" class="block appearance-none w-full bg-gray-100 border border-gray-200 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
                     <option value=""> --- </option>
-                    @if($this->prva_licenca)
-                        @foreach (App\Models\LicencaDistributerCena::OstaleLicenceZaDistributera($distId) as $key => $value)
-                            @if($key == 1)    
-                            <option value="{{ $key }}">{{ $value }}</option>
-                            @endif
-                        @endforeach
-                    @else
-                        @foreach (App\Models\LicencaDistributerCena::OstaleLicenceZaDistributera($distId) as $key => $value)    
-                            <option value="{{ $key }}">{{ $value }}</option>
-                        @endforeach
-                    @endif
+                    @foreach (App\Models\LicencaDistributerCena::OstaleLicenceZaDistributera($distId) as $key => $value)    
+                        <option value="{{ $key }}">{{ $value }}</option>
+                    @endforeach
+                   
                 </select>
                 @error('licenca_tip_id') <span class="error">{{ $message }}</span> @enderror
             @endif

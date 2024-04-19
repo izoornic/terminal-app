@@ -7,7 +7,7 @@ use App\Models\LicencaNaplata;
 use App\Models\LicencaDistributerTip;
 use App\Models\LicencaDistributerCena;
 use App\Models\LicencaDistributerMesec;
-use App\Models\LicencaDistributerTerminal;
+//use App\Models\LicencaDistributerTerminal;
 
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -60,7 +60,7 @@ class ZaduzenjeDistributerMesec extends Component
 
         $this->distributer_info = LicencaDistributerTip::where('id', '=', $this->did)->first();
 
-        $this->prepareData();
+        //$this->prepareData();
     }
     
     /**
@@ -81,19 +81,6 @@ class ZaduzenjeDistributerMesec extends Component
     }
 
     /**
-     * Koliko terminala ima distributer function.
-     *
-     * @return object
-     */
-    public function prebrojTerminaleDistributera()
-    {
-        return LicencaDistributerTerminal::select()
-        ->where('distributerId', '=', $this->did)
-        ->distinct('terminal_lokacijaId')
-        ->count();
-    }
-
-    /**
      * Priprema podatke za prikaz.
      * Dodaje cene licenci u objekat ivuzen iz baze koristeci each metodu Laravel collection-a
      *
@@ -102,33 +89,33 @@ class ZaduzenjeDistributerMesec extends Component
     private function prepareData()
     {
         $this->ukupno_zaduzenje = 0;
-        $this->dataAll = LicencaDistributerTerminal::select(
+        $this->dataAll = LicencaNaplata::select(
                         'terminal_lokacijas.id', 
                         'terminals.sn', 
                         'lokacijas.l_naziv', 
                         'lokacijas.mesto', 
                         'lokacijas.adresa', 
-                        'licenca_distributer_terminals.id as ldtid', 
-                        'licenca_distributer_terminals.datum_pocetak', 
-                        'licenca_distributer_terminals.datum_kraj',
-                        'licenca_distributer_terminals.nenaplativ',
+                        'licenca_naplatas.id as lnid', 
+                        'licenca_naplatas.datum_pocetka_licence', 
+                        'licenca_naplatas.datum_kraj_licence',
+                        'licenca_naplatas.nenaplativ',
                         'licenca_tips.licenca_naziv', 
                         'licenca_tips.id as ltid',
-                        'licenca_distributer_terminals.licenca_broj_dana',
-                        'licenca_distributer_terminals.licenca_distributer_cenaId',
+                        //'licenca_distributer_terminals.licenca_broj_dana',
+                        'licenca_naplatas.licenca_distributer_cenaId',
                         'licenca_distributer_cenas.id as ldcid',
                         'licenca_naplatas.dist_zaduzeno'
                         )
-                ->leftJoin('licenca_naplatas', 'licenca_naplatas.licenca_dist_terminalId', '=', 'licenca_distributer_terminals.id')
-                ->leftJoin('terminal_lokacijas', 'licenca_distributer_terminals.terminal_lokacijaId', '=', 'terminal_lokacijas.id')
+                //->leftJoin('licenca_naplatas', 'licenca_naplatas.licenca_dist_terminalId', '=', 'licenca_distributer_terminals.id')
+                ->leftJoin('terminal_lokacijas', 'licenca_naplatas.terminal_lokacijaId', '=', 'terminal_lokacijas.id')
                 ->leftJoin('terminals', 'terminal_lokacijas.terminalId', '=', 'terminals.id')
                 ->leftJoin('lokacijas', 'terminal_lokacijas.lokacijaId', '=', 'lokacijas.id')
-                ->leftJoin('licenca_distributer_cenas', 'licenca_distributer_terminals.licenca_distributer_cenaId', '=', 'licenca_distributer_cenas.id')
+                ->leftJoin('licenca_distributer_cenas', 'licenca_naplatas.licenca_distributer_cenaId', '=', 'licenca_distributer_cenas.id')
                 ->leftJoin('licenca_tips', 'licenca_distributer_cenas.licenca_tipId', '=', 'licenca_tips.id')
                 ->whereNull('licenca_naplatas.zaduzeno')
-                ->where('licenca_distributer_terminals.distributerId', '=', $this->did)
-                ->where('licenca_distributer_terminals.nenaplativ', '<', 1)
-                ->whereNotNull('licenca_distributer_terminals.licenca_distributer_cenaId')
+                ->where('licenca_naplatas.distributerId', '=', $this->did)
+                ->where('licenca_naplatas.nenaplativ', '<', 1)
+                //->whereNotNull('licenca_distributer_terminals.licenca_distributer_cenaId')
                 ->orderBy('terminal_lokacijas.id')
                 ->orderBy('licenca_distributer_cenas.licenca_tipId')
                 ->get();
@@ -141,7 +128,7 @@ class ZaduzenjeDistributerMesec extends Component
             $item->iskljucen = false;
 
             //ISKJUCEN rucno
-            if(in_array($item->ldtid, $this->ne_zaduzuju_se)){
+            if(in_array($item->lnid, $this->ne_zaduzuju_se)){
                 $item->iskljucen = true;
                 $item->cenaLicence = 0;
             }else{
@@ -178,17 +165,17 @@ class ZaduzenjeDistributerMesec extends Component
         $this->prepareData();
 
         $this->dataAll->each(function ($item, $key)use($datum_zaduzenja){
-            if(!in_array($item->ldtid, $this->ne_zaduzuju_se) && $item->cenaLicence > 0){ 
+            if(!in_array($item->lnid, $this->ne_zaduzuju_se) && $item->cenaLicence > 0){ 
                 $model_data = [
                     'mesecId'           => $this->mid,
-                    'broj_dana'         => $item->licenca_broj_dana,
+                    //'broj_dana'         => $item->licenca_broj_dana,
                     'zaduzeno'          => $item->cenaLicence,
                     'datum_zaduzenja'   => $datum_zaduzenja
                 ];
-                LicencaNaplata::where('licenca_dist_terminalId', '=', $item->ldtid)->update($model_data);
-            }elseif(in_array($item->ldtid, $this->ne_zaduzuju_se)){
+                LicencaNaplata::where('id', '=', $item->lnid)->update($model_data);
+            }/* elseif(in_array($item->lnid, $this->ne_zaduzuju_se)){
                 LicencaDistributerTerminal::find($item->ldtid)->update(['nenaplativ' => 1]);
-            }
+            } */
 
         });
 
@@ -268,8 +255,7 @@ class ZaduzenjeDistributerMesec extends Component
     public function render()
     {
         return view('livewire.zaduzenje-distributer-mesec', [
-            'data' => $this->read(), 
-            'br_terminala' => $this->prebrojTerminaleDistributera(),
+            'data' => $this->read()
         ]);
     }
 }

@@ -21,6 +21,7 @@
                                 <th class="px-2 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Datum</th>
                                 <th class="px-2 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Razduženo</th>
                                 <th class="px-2 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Datum</th>
+                                <th class="px-2 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider"></th>
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
@@ -41,6 +42,7 @@
                                     </select>
                                 </td>
                                 <td> </td>
+                                <td></td>
                                 <td></td>
                                 <td></td>
                                 <td></td>
@@ -66,15 +68,15 @@
                                             @if($item->broj_zaduzenih_licenci && !$zaduzen )
                                                 <a class="flex border border-green-500 bg-green-100 hover:bg-green-600 text-green-700 hover:text-white font-bold rounded" href="{{ route( 'zaduzenje-kurs', ['id' => $item->id, 'mid' => $mid] ) }}" :active="request()->routeIs('zaduzenje-kurs', ['id' => $item->id, 'mid' => $mid])" title="Zaduži distributera">
                                                     <svg class="fill-current w-4 h-4 mx-2 mt-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><path d="M64 0C28.7 0 0 28.7 0 64V448c0 35.3 28.7 64 64 64H320c35.3 0 64-28.7 64-64V160H256c-17.7 0-32-14.3-32-32V0H64zM256 0V128H384L256 0zM64 80c0-8.8 7.2-16 16-16h64c8.8 0 16 7.2 16 16s-7.2 16-16 16H80c-8.8 0-16-7.2-16-16zm0 64c0-8.8 7.2-16 16-16h64c8.8 0 16 7.2 16 16s-7.2 16-16 16H80c-8.8 0-16-7.2-16-16zm128 72c8.8 0 16 7.2 16 16v17.3c8.5 1.2 16.7 3.1 24.1 5.1c8.5 2.3 13.6 11 11.3 19.6s-11 13.6-19.6 11.3c-11.1-3-22-5.2-32.1-5.3c-8.4-.1-17.4 1.8-23.6 5.5c-5.7 3.4-8.1 7.3-8.1 12.8c0 3.7 1.3 6.5 7.3 10.1c6.9 4.1 16.6 7.1 29.2 10.9l.5 .1 0 0 0 0c11.3 3.4 25.3 7.6 36.3 14.6c12.1 7.6 22.4 19.7 22.7 38.2c.3 19.3-9.6 33.3-22.9 41.6c-7.7 4.8-16.4 7.6-25.1 9.1V440c0 8.8-7.2 16-16 16s-16-7.2-16-16V422.2c-11.2-2.1-21.7-5.7-30.9-8.9l0 0c-2.1-.7-4.2-1.4-6.2-2.1c-8.4-2.8-12.9-11.9-10.1-20.2s11.9-12.9 20.2-10.1c2.5 .8 4.8 1.6 7.1 2.4l0 0 0 0 0 0c13.6 4.6 24.6 8.4 36.3 8.7c9.1 .3 17.9-1.7 23.7-5.3c5.1-3.2 7.9-7.3 7.8-14c-.1-4.6-1.8-7.8-7.7-11.6c-6.8-4.3-16.5-7.4-29-11.2l-1.6-.5 0 0c-11-3.3-24.3-7.3-34.8-13.7c-12-7.2-22.6-18.9-22.7-37.3c-.1-19.4 10.8-32.8 23.8-40.5c7.5-4.4 15.8-7.2 24.1-8.7V232c0-8.8 7.2-16 16-16z"/></svg>
-                                                    <span class="font-bold">Zaduži</span>
+                                                    <span class=" mr-2">Zaduži</span>
                                                 </a>
                                             @endif
                                         </td>                                         
                                         <td class="px-2 py-2">
                                             @if($zaduzen)
-                                                <a class="flex border border-blue-500 bg-blue-100 hover:bg-blue-600 text-blue-600 hover:text-white font-bold rounded" href="{{ route( 'zaduzenje-pregled', ['id' => $item->id, 'mid' => $mid] ) }}" :active="request()->routeIs('zaduzenje-pregled', ['id' => $item->id, 'mid' => $mid])" title="Zaduži distributera">
+                                                <a class="flex border border-blue-500 bg-blue-100 hover:bg-blue-600 text-blue-600 hover:text-white font-bold rounded" href="{{ route( 'zaduzenje-pregled', ['id' => $item->id, 'mid' => $mid] ) }}" :active="request()->routeIs('zaduzenje-pregled', ['id' => $item->id, 'mid' => $mid])" title="Pregled">
                                                 <svg class="fill-current w-4 h-4 mx-2 mt-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><path d="M288 80c-65.2 0-118.8 29.6-159.9 67.7C89.6 183.5 63 226 49.4 256c13.6 30 40.2 72.5 78.6 108.3C169.2 402.4 222.8 432 288 432s118.8-29.6 159.9-67.7C486.4 328.5 513 286 526.6 256c-13.6-30-40.2-72.5-78.6-108.3C406.8 109.6 353.2 80 288 80zM95.4 112.6C142.5 68.8 207.2 32 288 32s145.5 36.8 192.6 80.6c46.8 43.5 78.1 95.4 93 131.1c3.3 7.9 3.3 16.7 0 24.6c-14.9 35.7-46.2 87.7-93 131.1C433.5 443.2 368.8 480 288 480s-145.5-36.8-192.6-80.6C48.6 356 17.3 304 2.5 268.3c-3.3-7.9-3.3-16.7 0-24.6C17.3 208 48.6 156 95.4 112.6zM288 336c44.2 0 80-35.8 80-80s-35.8-80-80-80c-.7 0-1.3 0-2 0c1.3 5.1 2 10.5 2 16c0 35.3-28.7 64-64 64c-5.5 0-10.9-.7-16-2c0 .7 0 1.3 0 2c0 44.2 35.8 80 80 80zm0-208a128 128 0 1 1 0 256 128 128 0 1 1 0-256z"/></svg>
-                                                <span class="font-bold">Pregled</span>
+                                                <span class="mr-2">Pregled</span>
                                                 </a>
                                             @endif
                                         </td>
@@ -96,6 +98,13 @@
                                         <td class="px-2 py-2 text-sm"> 
                                             @if($zaduzen && $razduzen)
                                                 {{ App\Http\Helpers::datumFormatDan($item->datum_razaduzenja) }} 
+                                            @endif
+                                        </td>
+                                        <td>
+                                            @if($zaduzen && !$razduzen)
+                                                <x-jet-danger-button class="mx-2" wire:click="deleteZaduzenjeShowModal({{ $item->id }}, '{{ $mid }}')" title="Obriši zaduženje">
+                                                    <svg class="fill-current w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M135.2 17.69C140.6 6.848 151.7 0 163.8 0H284.2C296.3 0 307.4 6.848 312.8 17.69L320 32H416C433.7 32 448 46.33 448 64C448 81.67 433.7 96 416 96H32C14.33 96 0 81.67 0 64C0 46.33 14.33 32 32 32H128L135.2 17.69zM31.1 128H416V448C416 483.3 387.3 512 352 512H95.1C60.65 512 31.1 483.3 31.1 448V128zM111.1 208V432C111.1 440.8 119.2 448 127.1 448C136.8 448 143.1 440.8 143.1 432V208C143.1 199.2 136.8 192 127.1 192C119.2 192 111.1 199.2 111.1 208zM207.1 208V432C207.1 440.8 215.2 448 223.1 448C232.8 448 240 440.8 240 432V208C240 199.2 232.8 192 223.1 192C215.2 192 207.1 199.2 207.1 208zM304 208V432C304 440.8 311.2 448 320 448C328.8 448 336 440.8 336 432V208C336 199.2 328.8 192 320 192C311.2 192 304 199.2 304 208z"/></svg>
+                                                </x-jet-button>
                                             @endif
                                         </td>
                                     </tr>
@@ -147,7 +156,7 @@
             </x-jet-secondary-button>
 
             <x-jet-danger-button class="ml-2" wire:click="delete" wire:loading.attr="disabled">
-                {{ __('Obriši mesec') }}
+                {{ __('Obriši zaduženje') }}
             </x-jet-danger-button>
         </x-slot>
     </x-jet-dialog-modal>

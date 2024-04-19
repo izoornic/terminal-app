@@ -4,6 +4,7 @@ namespace App\Http\Livewire;
 
 use App\Models\Lokacija;
 use App\Models\TerminalLokacija;
+use App\Models\LicencaDistributerTip;
 use App\Models\DistributerLokacijaIndex;
 use App\Models\TerminalLokacijaHistory;
 
@@ -205,50 +206,33 @@ class LicencaTerminal extends Component
         $this->datum_premestanja_terminala.= ' '.Helpers::vremeKalendarNow();
 
         //da li se terminal dodaje Distributeru?
-        $distributer_tip_id = ($this->plokacijaTip == 4) ? DistributerLokacijaIndex::where('lokacijaId', '=', $this->plokacija)->first()->licenca_distributer_tipsId : NULL;
-        
+        $distributer_tip_id = ($this->plokacijaTip == 4) ? DistributerLokacijaIndex::where('lokacijaId', '=', $this->plokacija)->first()->licenca_distributer_tipsId : null;
+       
+        if(!$this->multiSelected) $this->selsectedTerminals[0] = $this->modelId;
+
         //Da li terminal ima aktivnu licencu
-        if($this->multiSelected){
-            foreach($this->selsectedTerminals as $item){
-                if(SelectedTerminalInfo::terminalImaLicencu($item)){
-                    $this->licencaError = 'multi';
-                    $this->modalErorLicencaVisible = true;
-                    $this->selsectedTerminals=[];
-                    $this->modalConfirmPremestiVisible = false;
-                    return;
-                }
-            }
-        }else{
-            if(SelectedTerminalInfo::terminalImaLicencu($this->modelId)){
-                $this->licencaError = 'single';
-                $this->modalErorLicencaVisible  = true;
+        foreach($this->selsectedTerminals as $item){
+            if(SelectedTerminalInfo::terminalImaLicencu($item)){
+                $this->licencaError = 'multi';
+                $this->modalErorLicencaVisible = true;
                 $this->selsectedTerminals=[];
                 $this->modalConfirmPremestiVisible = false;
                 return;
             }
         }
 
-        if($this->multiSelected){
-            foreach($this->selsectedTerminals as $item){
-                DB::transaction(function()use($item, $distributer_tip_id){
-                    $cuurent = TerminalLokacija::where('terminalId', $item) -> first();
-                    //insert to history table
-                    TerminalLokacijaHistory::create(['terminal_lokacijaId' => $cuurent['id'], 'terminalId' => $cuurent['terminalId'], 'lokacijaId' => $cuurent['lokacijaId'], 'terminal_statusId' => $cuurent['terminal_statusId'], 'korisnikId' => $cuurent['korisnikId'], 'korisnikIme' => $cuurent['korisnikIme'], 'created_at' => $cuurent['created_at'], 'updated_at' => $cuurent['updated_at'], 'blacklist' => $cuurent['blacklist'], 'distributerId' => $cuurent['distributerId']]);
-                    //update current
-                    TerminalLokacija::where('terminalId', $item)->update(['terminal_statusId'=> $this->modalStatusPremesti, 'lokacijaId' => $this->plokacija, 'korisnikId'=>auth()->user()->id, 'korisnikIme'=>auth()->user()->name, 'updated_at'=>$this->datum_premestanja_terminala, 'distributerId' => $distributer_tip_id ]);
-                });
-            }
-        }else{
-            //$this->validate();
-            DB::transaction(function()use($distributer_tip_id){
-                //terminal
-                $cuurent = TerminalLokacija::where('terminalId', $this->modelId) -> first();
-                //insert to history table
-                TerminalLokacijaHistory::create(['terminal_lokacijaId' => $cuurent['id'], 'terminalId' => $cuurent['terminalId'], 'lokacijaId' => $cuurent['lokacijaId'], 'terminal_statusId' => $cuurent['terminal_statusId'], 'korisnikId' => $cuurent['korisnikId'], 'korisnikIme' => $cuurent['korisnikIme'], 'created_at' => $cuurent['created_at'], 'updated_at' => $cuurent['updated_at'], 'blacklist' => $cuurent['blacklist'], 'distributerId' => $cuurent['distributerId']]);
-                //update current
-                TerminalLokacija::where('terminalId', $this->modelId)->update(['terminal_statusId'=> $this->modalStatusPremesti, 'lokacijaId' => $this->plokacija, 'korisnikId'=>auth()->user()->id, 'korisnikIme'=>auth()->user()->name, 'updated_at'=>$this->datum_premestanja_terminala, 'distributerId' => $distributer_tip_id ]);
-            });
+        //PREMESTI TERMINALE
+        $terminali_premesteni = TerminalLokacija::premestiTerminale($this->selsectedTerminals, $this->plokacija, $this->datum_premestanja_terminala, $this->modalStatusPremesti, $distributer_tip_id);
+       
+        if(!$terminali_premesteni){
+            $this->licencaError = 'db';
+            $this->modalErorLicencaVisible = true;
+            $this->selsectedTerminals=[];
+            $this->modalConfirmPremestiVisible = false;
+            return;
         }
+
+        
         $this->selsectedTerminals=[];
         $this->modalConfirmPremestiVisible = false;
     }

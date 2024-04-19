@@ -4,7 +4,7 @@ return [
 
 	'siteFooter' => '© 2022 Copyright: Zeta System EPOS',
 
-	'version' => 'V 0.5.1.2',
+	'version' => 'V 0.5.1.4',
 
 	'paginate' => 10,
 

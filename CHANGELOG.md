@@ -77,10 +77,13 @@ V 0.5.1.1 (27.2.2024.)
 V 0.5.1.2 (6.3.2024.)
     - Dodata provera email adrese kada se menja ili dodaje da setuje NULL ako je los format
 
-V 0.5.1.3 ()
+V 0.5.1.4 ()
     - Dodata funkcionalnost da Admin i Menager licenci ne mogu da premestaju terminale koji imaju dodatu licencu.
     - Dodata dva nova plja u tabelu "licenca_naplatas": 'aktivna', 'nenaplativ'
     
+    - Izbacena tabela 'licenca_distributer_terminals' iz baze
+
+
         UPDATE licenca_naplatas SET aktivna = 1 WHERE licenca_dist_terminalId > 0
 
         UPDATE licenca_naplatas ls, ( SELECT id, nenaplativ FROM licenca_distributer_terminals ) ldt
@@ -88,7 +91,9 @@ V 0.5.1.3 ()
         WHERE ls.licenca_dist_terminalId = ldt.id
         AND ldt.nenaplativ = 1;
 
-    - Dodato novo polje u tabelu "licenca_parametar_terminals" : 'licenca_naplataId'
+    - Dodata nova polja u tabelu "licenca_parametar_terminals" : 'terminal_lokacijaId', 'distributerId', 'licenca_distributer_cenaId'
+    - Refaktor prememestanja terminala u jednu funkciju u modelu TerminalLokacija
+    - Dodat update broja terminala za distributera prilikom premestanja terminala
 
 
 
