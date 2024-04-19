@@ -15,6 +15,7 @@ use Livewire\WithPagination;
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Collection;
 
 
 class ZaduzenjeDistributeri extends Component
@@ -26,6 +27,8 @@ class ZaduzenjeDistributeri extends Component
      */
     public $mid;
     public $mesec_info;
+
+    public $dataAll;
 
     //SEARCH
     public $searchDistName;
@@ -50,54 +53,79 @@ class ZaduzenjeDistributeri extends Component
         $this->mesec_info = LicencaMesec::find($this->mid)->first();
     }
 
-    //public function 
-    //->leftJoin('licenca_naplatas', 'licenca_naplatas.distributerId', '=','licenca_distributer_tips.id') COUNT(licenca_naplatas.distributerId) as distCount
-                //->where('licenca_naplatas.licenca_dist_terminalId', '>', 0)
-                                //->groupBy('licenca_naplatas.distributerId')
-
     public function read()
     {
-        $dataPage =  DB::select('SELECT licenca_distributer_tips.*, lic_naplata.broj_zaduzenih_licenci, ldm.sum_zaduzeno, ldm.datum_zaduzenja, ldm.sum_razaduzeno, ldm.datum_razaduzenja
+        $this->prepareData();
+        return PaginationHelper::paginate($this->displayData(), Config::get('global.paginate'));
+    }
+
+    public function prepareData()
+    {
+        $this->dataAll =  collect(DB::select('SELECT     licenca_distributer_tips.*, 
+                                            lic_naplata.broj_zaduzenih_licenci, 
+                                            ldm.sum_zaduzeno, 
+                                            ldm.datum_zaduzenja, 
+                                            ldm.sum_razaduzeno, 
+                                            ldm.datum_razaduzenja
                                 FROM licenca_distributer_tips 
                                 LEFT JOIN(SELECT distributerId, COUNT(id) as broj_zaduzenih_licenci 
                                     FROM licenca_naplatas WHERE zaduzeno IS NULL 
                                     GROUP BY distributerId) AS lic_naplata 
                                     ON licenca_distributer_tips.id = lic_naplata.distributerId
                                 LEFT JOIN licenca_distributer_mesecs AS ldm 
-                                    ON licenca_distributer_tips.id = ldm.distributerId AND ldm.mesecId ='. $this->mid);
+                                    ON licenca_distributer_tips.id = ldm.distributerId AND ldm.mesecId ='. $this->mid));
         
-        return PaginationHelper::paginateArray($dataPage, Config::get('global.paginate'));
+        //return PaginationHelper::paginateArray($dataPage, Config::get('global.paginate'));
     }
 
     /**
-     * The read function.
+     * Prikaz kolekcije sa filterima
      *
-     * @return void
+     * @return collection
+     * 
      */
-    public function read_()
+    public function displayData()
     {
-        return LicencaDistributerTip::select(
-                        'licenca_distributer_tips.*', 
-                        'licenca_distributer_mesecs.sum_zaduzeno', 
-                        'licenca_distributer_mesecs.datum_zaduzenja',
-                        'licenca_distributer_mesecs.sum_razaduzeno', 
-                        'licenca_distributer_mesecs.datum_razaduzenja',
-                        'licenca_distributer_mesecs.id as ldmid'
-                )
-                ->leftJoin('licenca_distributer_mesecs', function($join)
-                    {
-                        $join->on('licenca_distributer_tips.id', '=', 'licenca_distributer_mesecs.distributerId');
-                        $join->on('licenca_distributer_mesecs.mesecId', '=', DB::raw($this->mid));
-                    })
-                ->where('licenca_distributer_tips.distributer_naziv', 'like', '%'.$this->searchDistName.'%')
-                ->where('licenca_distributer_tips.distributer_mesto', 'like', '%'.$this->searchMesto.'%')
-                ->when($this->searchZaduzen == 1, function ($rtval){
-                    return $rtval->where('licenca_distributer_mesecs.sum_zaduzeno', '>', 0);
-                } )
-                ->when($this->searchZaduzen == 2, function ($rtval){
-                    return $rtval->whereNull('licenca_distributer_mesecs.sum_zaduzeno');
-                } )
-                ->paginate(Config::get('global.paginate'));
+        $retval = $this->dataAll->filter(function ($value, $key) {
+            return $this->filterFields($value->distributer_naziv, $value->distributer_mesto, $value->sum_zaduzeno);
+        });
+
+        return $retval;
+    }
+
+    /**
+     * Rucno napravljeni filteri na starnici
+     *
+     * @param mixed $sn
+     * @param mixed $mesto
+     * @param mixed $licenca
+     * 
+     * @return boolean
+     * 
+     */
+   
+    private function filterFields($naziv, $mesto, $zaduzeno)
+    {
+        $filter_naziv = ($this->searchDistName != '') ? true : false;
+        $filter_adresa = ($this->searchMesto != '') ? true : false;
+        $filter_zaduzeno = ($this->searchZaduzen > 0) ? true : false;
+
+        $naziv_retval = true;
+        $mest_retval = true;
+        $zaduzen_retval = true;
+        
+        if($filter_naziv){
+            $naziv_retval = preg_match("/".$this->searchDistName."/i", $naziv);
+        }
+        if($filter_adresa){
+            $mest_retval = preg_match("/".$this->searchMesto."/i", $mesto);
+        }
+        if($filter_zaduzeno){
+            $zaduzenje = (isset($zaduzeno)) ? true : false;
+            $zaduzen_retval = ($this->searchZaduzen == 1) ? $zaduzenje : !$zaduzenje;
+        }
+
+        return ($naziv_retval && $mest_retval &&  $zaduzen_retval) ? true : false;
     }
 
     private function distInfo($did)
@@ -105,30 +133,27 @@ class ZaduzenjeDistributeri extends Component
         return LicencaDistributerTip::where('id', '=', $did)->first();
     }
 
-    public function deleteShowModal($d_id, $lmdid)
+    public function deleteZaduzenjeShowModal($d_id, $mid)
     {
         $this->isError = false;
         $this->dist_id = $d_id;
-        $this->lmd_id = $lmdid;
+        $this->lmd_id = $mid;
         $this->dist_info = $this->distInfo($this->dist_id);
         $this->deleteModalVisible = true;
     }
 
     public function delete()
     {
-        $zaduzenje_row = LicencaDistributerMesec::where('id', '=', $this->lmd_id)->first();
-        //dd($zaduzenje_row);
-        if(!$this->lmd_id || $zaduzenje_row->sum_razaduzeno > 0){
-            $this->isError = true;
-            return;
-        }
         DB::transaction(function(){
-            LicencaDistributerMesec::destroy($this->lmd_id);
+            LicencaDistributerMesec::where('distributerId', '=', $this->dist_id)
+                                    ->where('mesecId', '=', $this->lmd_id)
+                                    ->delete();
             LicencaNaplata::where('distributerId', '=', $this->dist_id)
-                            ->where('mesecId', '=', $this->mid)
-                            ->delete();
+                        ->where('mesecId', '=', $this->lmd_id)
+                        ->whereNotNull('zaduzeno')
+                        ->update(['zaduzeno' => null, 'datum_zaduzenja' => null, 'mesecId' => null]);
         });
-
+        $this->deleteModalVisible = false;
     }
 
     public function render()

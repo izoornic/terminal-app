@@ -41,17 +41,16 @@ class LicenceController extends Controller
      */
     public function show($snn)
     {
-        /* 'licence_za_terminals.mesecId',
-        'licence_za_terminals.terminal_lokacijaId',
-        'licence_za_terminals.distributerId',
-        'licence_za_terminals.licenca_distributer_cenaId', */
+       // 'licence_za_terminals.mesecId',
+ 
         $this->terminal_data = [];
 
         $str_snn = strval( $snn );
 
         $termina_licence = LicenceZaTerminal::select(
-                            'licence_za_terminals.licenca_distributer_cenaId',
                             'licence_za_terminals.terminal_lokacijaId',
+                            'licence_za_terminals.distributerId',
+                            'licence_za_terminals.licenca_distributer_cenaId',
                             'licence_za_terminals.naziv_licence',
                             'licence_za_terminals.terminal_sn',
                             'licence_za_terminals.datum_kraj',
@@ -81,9 +80,18 @@ class LicenceController extends Controller
                 ];
                 
                 //$item->parametars = [];
-                //da li licenca ima parametre_
+                //da li licenca uopste ima parametre_
                 if(LicencaParametar::where('id', '=', $item->ltid)->first()) {
-                    $licenca_distibuter_terminal_row = LicencaDistributerTerminal::where('terminal_lokacijaId', '=', $item->terminal_lokacijaId)
+                    //da li licenca koju trazimo ima parametre
+                    $each_data['parametars'] = LicencaParametarTerminal::where('licenca_parametar_terminals.terminal_lokacijaId', '=', $item->terminal_lokacijaId)
+                        ->where('licenca_parametar_terminals.distributerId', '=', $item->distributerId)
+                        ->where('licenca_parametar_terminals.licenca_distributer_cenaId', '=', $item->licenca_distributer_cenaId)
+                        ->leftJoin('licenca_parametars', 'licenca_parametars.id', '=', 'licenca_parametar_terminals.licenca_parametarId')
+                        ->pluck('licenca_parametars.param_opis')
+                        ->all();
+
+
+                    /* $licenca_distibuter_terminal_row = LicencaDistributerTerminal::where('terminal_lokacijaId', '=', $item->terminal_lokacijaId)
                                                         ->where('licenca_distributer_cenaId', '=', $item->licenca_distributer_cenaId)
                                                         ->first();
                     if(isset($licenca_distibuter_terminal_row->id)){
@@ -91,7 +99,7 @@ class LicenceController extends Controller
                                                         ->leftJoin('licenca_parametars', 'licenca_parametars.id', '=', 'licenca_parametar_terminals.licenca_parametarId')
                                                         ->pluck('licenca_parametars.param_opis')
                                                         ->all();
-                    }
+                    } */
                 }           
 
                 array_push($this->terminal_data, $each_data);

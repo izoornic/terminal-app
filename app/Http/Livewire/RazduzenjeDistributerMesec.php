@@ -8,7 +8,7 @@ use App\Models\LicenceZaTerminal;
 use App\Models\LicencaDistributerTip;
 use App\Models\LicencaDistributerCena;
 use App\Models\LicencaDistributerMesec;
-use App\Models\LicencaDistributerTerminal;
+//use App\Models\LicencaDistributerTerminal;
 
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -83,6 +83,12 @@ class RazduzenjeDistributerMesec extends Component
     }
 
 
+    /**
+     * [Description for razduziDistributera]
+     *
+     * @return [type]
+     * 
+     */
     public function razduziDistributera()
     {
         $this->validate();
@@ -94,17 +100,17 @@ class RazduzenjeDistributerMesec extends Component
             if(in_array($item->id, $this->ne_razduzuju_se)){
                 DB::transaction(function()use($item){
                     LicencaNaplata::where('id', '=', $item->id)
-                            ->update(['razduzeno' => 0]);
-                    LicencaDistributerTerminal::where('distributerId', '=', $this->did)
+                            ->update(['razduzeno' => 0, 'datum_razduzenja' => $this->datumUplate, 'nenaplativ' => 1]);
+                    /* LicencaDistributerTerminal::where('distributerId', '=', $this->did)
                             ->where('terminal_lokacijaId', '=', $item->terminal_lokacijaId)
                             ->where('licenca_distributer_cenaId', '=', $item->licenca_distributer_cenaId)
-                            ->update(['nenaplativ' => 1]);
+                            ->update(['nenaplativ' => 1]); */
                 });
             }else{
                 //RAZDUZENJE
                 DB::transaction(function()use($item){
                     LicencaNaplata::where('id', '=', $item->id)
-                            ->update(['razduzeno' => $item->zaduzeno]);
+                            ->update(['razduzeno' => $item->zaduzeno , 'datum_razduzenja' => $this->datumUplate]);
                     
                     //update zapis u tabeli licenca_terminas 
                     $key_arr = [
@@ -134,86 +140,7 @@ class RazduzenjeDistributerMesec extends Component
         $this->razduzenjeModalVisible = false;
         return redirect('/razduzenje-pregled?id='.$this->did.'&mid='.$this->mid.'&acc=ras');
     }
-    public function razduziDistributera_()
-    {
-        $this->validate();
-        $update_model = [
-            'datum_pocetak' => Helpers::addMonthsToDate($this->mesecRow->mesec_datum, 1), 
-            'datum_kraj' => Helpers::addMonthsToDate($this->mesecRow->mesec_datum, 2),
-            'licenca_broj_dana' =>  Helpers::noOfDaysInMounth(Helpers::addMonthsToDate($this->mesecRow->mesec_datum, 1))
-        ];
-        $datum_prekoracenja = Helpers::addDaysToDate( $update_model['datum_kraj'], $this->distributer_info->dani_prekoracenja_licence);
-        $this->prepareData();
 
-        //FOREACH
-        $this->dataAll->each(function ($item, $key)use($update_model, $datum_prekoracenja){
-            //naziv licence
-            $item->nazivLicence = LicencaDistributerCena::nazivLicence($item->licenca_distributer_cenaId);
-
-            //LICENCE KOJE SE NE RAZDUZUJU
-            if(in_array($item->id, $this->ne_razduzuju_se)){
-                DB::transaction(function()use($item){
-                    LicencaNaplata::where('id', '=', $item->id)
-                            ->update(['razduzeno' => 0]);
-                    LicencaDistributerTerminal::where('distributerId', '=', $this->did)
-                            ->where('terminal_lokacijaId', '=', $item->terminal_lokacijaId)
-                            ->where('licenca_distributer_cenaId', '=', $item->licenca_distributer_cenaId)
-                            ->update(['nenaplativ' => 1]);
-                });
-            }else{
-                //RAZDUZENJE
-                DB::transaction(function()use($item, $update_model, $datum_prekoracenja){
-                    $pretplata = false;
-                    if(Helpers::dateGratherOrEqualThan($item->datum_kraj_licence , $update_model['datum_kraj'])){
-                        //LICENCA ZADUZENA U PREDPLATI ili ti PLACEN MESEC UNAPRED
-                        //pomeram datume za mesec unapred
-                        $pretplata = true;
-                        $p_pocetak_nove_licence = $item->datum_kraj_licence;
-                        $p_kraj_nove_licence = Helpers::addMonthsToDate($p_pocetak_nove_licence, 1);
-                        
-                        $p_update_model = [
-                            'datum_pocetak' => $p_pocetak_nove_licence,
-                            'datum_kraj' => $p_kraj_nove_licence, 
-                            'licenca_broj_dana' => Helpers::numberOfDaysBettwen($p_pocetak_nove_licence, $item->datum_kraj_licence)
-                        ];
-                        $p_datum_prekoracenja = Helpers::addDaysToDate(  $p_update_model['datum_kraj'], $this->distributer_info->dani_prekoracenja_licence);
-                    }
-
-                    LicencaNaplata::where('id', '=', $item->id)
-                            ->update(['razduzeno' => $item->zaduzeno]);
-                    LicencaDistributerTerminal::where('distributerId', '=', $this->did)
-                            ->where('terminal_lokacijaId', '=', $item->terminal_lokacijaId)
-                            ->where('licenca_distributer_cenaId', '=', $item->licenca_distributer_cenaId)
-                            ->update(($pretplata) ? $p_update_model : $update_model);
-                    
-                    //update or create zapis u tabeli licenca_terminas 
-                    $key_arr = [
-                        'terminal_lokacijaId' => $item->terminal_lokacijaId,
-                        'distributerId' => $this->did,
-                        'licenca_distributer_cenaId' => $item->licenca_distributer_cenaId,
-                    ];
-
-                    $vals_ins = [
-                        'mesecId'=> $this->mid,
-                        'terminal_sn' => $item->sn,
-                        'datum_pocetak' => ($pretplata) ? $p_update_model['datum_pocetak'] : $update_model['datum_pocetak'],
-                        'datum_kraj' => ($pretplata) ? $p_update_model['datum_kraj'] : $update_model['datum_kraj'],
-                        'datum_prekoracenja' =>($pretplata) ? $p_datum_prekoracenja : $datum_prekoracenja,
-                        'naziv_licence' => $item->nazivLicence
-                    ];
-
-                    $signature_cripted =  CryptoSign::criptSignature($vals_ins);
-                    $vals_ins['signature'] = $signature_cripted;
-
-                    LicenceZaTerminal::updateOrCreate( $key_arr, $vals_ins );
-
-                });
-            }
-        });
-        LicencaDistributerMesec::where('distributerId', '=', $this->did)->where('mesecId', '=', $this->mid)->update(['sum_razaduzeno' => $this->ukupno_zaduzenje, 'datum_razaduzenja' => $this->datumUplate]);
-        $this->razduzenjeModalVisible = false;
-        return redirect('/razduzenje-pregled?id='.$this->did.'&mid='.$this->mid.'&acc=ras');
-    }
 
     /**
      * Priprema podatke za prikaz.

@@ -11,7 +11,7 @@ use App\Models\LicencaNaplata;
 use App\Models\TerminalLokacija;
 use App\Models\LicencaDistributerTip;
 use App\Models\LicencaDistributerCena;
-//use App\Models\LicencaDistributerTerminal;
+use App\Models\LicencaDistributerTerminal;
 
 use PDF;
 use Response;
@@ -21,7 +21,7 @@ class DistPredracunControler extends Controller
 
     //
     public $terminal_lokacija_id;
-    public $licenca_naplata_id;
+    public $licenca_distributer_terminal_id;
     public $did;
     public $vrsta;
 
@@ -37,7 +37,7 @@ class DistPredracunControler extends Controller
     {
        
         //poziv stranice bez get varijabli
-        if(request()->query('lnid') == null || request()->query('tip') == null){
+        if(request()->query('ldtid') == null || request()->query('tip') == null){
             abort(403, 'Unauthorized action 203.');
         }
         if(!in_array(request()->query('tip'), ['p', 'r'])){
@@ -50,15 +50,15 @@ class DistPredracunControler extends Controller
         $distributerrow = LicencaDistributerTip::where('id', '=', $this->did)->first();
 
         
-        $this->licenca_naplata_id = request()->query('lnid');
-        $this->lic_naplata_row = LicencaNaplata::where('id', '=', $this->licenca_naplata_id)->first() ?? abort(403, 'Unauthorized action 205.');
+        $this->licenca_distributer_terminal_id = request()->query('ldtid');
+        $licenca_distributer_terminal_row = LicencaDistributerTerminal::where('id', '=', $this->licenca_distributer_terminal_id)->first();
 
-        $this->terminal_lokacija_id = $this->lic_naplata_row->terminal_lokacijaId;
+        $this->terminal_lokacija_id = $licenca_distributer_terminal_row->terminal_lokacijaId;
 
         //provera dali du get vars autenticne
-        /* $this->lic_naplata_row = LicencaNaplata::where('licenca_dist_terminalId', '=', $this->licenca_distributer_terminal_id)
+        $this->lic_naplata_row = LicencaNaplata::where('licenca_dist_terminalId', '=', $this->licenca_distributer_terminal_id)
                         ->where('distributerId', '=', $this->did)
-                        ->first(); */
+                        ->first();
         
         $this->lokacija_row = TerminalLokacija::select('lokacijas.*', 'terminals.sn')
                         ->leftJoin('lokacijas', 'lokacijas.id', '=','terminal_lokacijas.lokacijaId')

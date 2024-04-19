@@ -2,12 +2,14 @@
 
 namespace App\Http\Livewire;
 
+use App\Models\LicencaMesec;
 use App\Models\LicencaNaplata;
 use App\Models\LicencaDistributerTip;
-use App\Models\LicencaMesec;
 use App\Models\LicencaDistributerMesec;
+
 use Livewire\Component;
 use Livewire\WithPagination;
+
 use Illuminate\Support\Facades\Config;
 
 class RazduzenjePregled extends Component
@@ -45,41 +47,6 @@ class RazduzenjePregled extends Component
     }
 
     /**
-     * The validation rules
-     *
-     * @return void
-     */
-    public function rules()
-    {
-        return [            
-        ];
-    }
-
-    /**
-     * The delete function.
-     *
-     * @return void
-     */
-    public function delete()
-    {
-        //LicencaNaplata::destroy($this->modelId);
-        $this->modalConfirmDeleteVisible = false;
-        $this->resetPage();
-    }
-
-    /**
-     * Shows the delete confirmation modal.
-     *
-     * @param  mixed $id
-     * @return void
-     */
-    public function deleteShowModal($id)
-    {
-        //$this->modelId = $id;
-        $this->modalConfirmDeleteVisible = true;
-    }    
-
-    /**
      * The read function.
      *
      * @return void
@@ -98,11 +65,10 @@ class RazduzenjePregled extends Component
                         'licenca_naplatas.datum_kraj_licence', 
                         'licenca_naplatas.datum_isteka_prekoracenja', 
                         'licenca_naplatas.licenca_distributer_cenaId',
+                        'licenca_naplatas.nenaplativ',
                         'licenca_tips.licenca_naziv', 
                         'licenca_tips.id as ltid',
-                        'licenca_distributer_terminals.nenaplativ'
                         )
-                        ->leftJoin('licenca_distributer_terminals', 'licenca_distributer_terminals.id', '=', 'licenca_naplatas.licenca_dist_terminalId')
                         ->leftJoin('terminal_lokacijas', 'licenca_naplatas.terminal_lokacijaId', '=', 'terminal_lokacijas.id')
                         ->leftJoin('terminals', 'terminal_lokacijas.terminalId', '=', 'terminals.id')
                         ->leftJoin('lokacijas', 'terminal_lokacijas.lokacijaId', '=', 'lokacijas.id')

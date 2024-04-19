@@ -17,7 +17,7 @@
                                 <th class="px-2 py-2 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Početak</th>
                                 <th class="px-2 py-2 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Kraj</th>
                                 <th class="px-2 py-2 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider"></th>
-                                <th colspan=2 class="px-6 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Ukupno licenci: {{ $data->total() }}<br /> Ukupno terminala {{$br_terminala}}</th>
+                                <th colspan=2 class="px-6 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Ukupno licenci: {{ $data->total() }}</th>
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">  
@@ -80,22 +80,10 @@
                                             {{ $item->licenca_naziv }}
                                         </td>
                                         <td class="px-2 py-2">
-                                            {{ App\Http\Helpers::datumFormatDan($item->datum_pocetak) }}
-                                            <!-- @if($item->datum_pocetak != '')
-                                                @if($item->markPocetak == 'errGt' || $item->markPocetak == 'errLt')
-                                                    <svg class="float-left fill-red-400 w-4 h-4 mr-2 mt-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><path d="M569.517 440.013C587.975 472.007 564.806 512 527.94 512H48.054c-36.937 0-59.999-40.055-41.577-71.987L246.423 23.985c18.467-32.009 64.72-31.951 83.154 0l239.94 416.028zM288 354c-25.405 0-46 20.595-46 46s20.595 46 46 46 46-20.595 46-46-20.595-46-46-46zm-43.673-165.346l7.418 136c.347 6.364 5.609 11.346 11.982 11.346h48.546c6.373 0 11.635-4.982 11.982-11.346l7.418-136c.375-6.874-5.098-12.654-11.982-12.654h-63.383c-6.884 0-12.356 5.78-11.981 12.654z"/></svg>
-                                                @endif
-                                                 
-                                            @endif -->
+                                            {{ App\Http\Helpers::datumFormatDan($item->datum_pocetka_licence) }}
                                         </td>
                                         <td class="px-2 py-2">
-                                            {{ App\Http\Helpers::datumFormatDan($item->datum_kraj) }}
-                                           <!--  @if($item->datum_kraj != '') 
-                                                @if($item->markKraj == 'errGt' || $item->markKraj == 'errLt')
-                                                    <svg class="float-left fill-red-400 w-4 h-4 mr-2 mt-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><path d="M569.517 440.013C587.975 472.007 564.806 512 527.94 512H48.054c-36.937 0-59.999-40.055-41.577-71.987L246.423 23.985c18.467-32.009 64.72-31.951 83.154 0l239.94 416.028zM288 354c-25.405 0-46 20.595-46 46s20.595 46 46 46 46-20.595 46-46-20.595-46-46-46zm-43.673-165.346l7.418 136c.347 6.364 5.609 11.346 11.982 11.346h48.546c6.373 0 11.635-4.982 11.982-11.346l7.418-136c.375-6.874-5.098-12.654-11.982-12.654h-63.383c-6.884 0-12.356 5.78-11.981 12.654z"/></svg>
-                                                @endif
-                                                 
-                                            @endif -->
+                                            {{ App\Http\Helpers::datumFormatDan($item->datum_kraj_licence) }}
                                         </td> 
                                         <td class="text-right">
                                             <span class="mr-2">@money($item->cenaLicenceEur) EUR</span>
@@ -107,7 +95,7 @@
                                             <span class="font-bold">@money($item->cenaLicence) </span>RSD
                                         </td>
                                         <td class="px-2 py-2">
-                                            <input type="checkbox" value="{{ $item->ldtid }}" wire:model="ne_zaduzuju_se"> 
+                                            <input type="checkbox" value="{{ $item->lnid }}" wire:model="ne_zaduzuju_se"> 
                                         </td>
                                     </tr>
                                     @php

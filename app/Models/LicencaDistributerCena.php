@@ -68,7 +68,7 @@ class LicencaDistributerCena extends Model
        * @param integer $did
        * 
     */
-    public static function OsnovnaLicencaDistributera($did)
+    /* public static function OsnovnaLicencaDistributera($did)
     {
         $licid = LicencaDistributerCena::select('licenca_distributer_cenas.id', 'licenca_tips.licenca_naziv')
                                         ->leftJoin('licenca_tips', 'licenca_distributer_cenas.licenca_tipId', '=', 'licenca_tips.id')
@@ -76,7 +76,7 @@ class LicencaDistributerCena extends Model
                                         ->where('licenca_distributer_cenas.distributerId', '=', $did)
                                         ->first();                                                         
         return (isset($licid->id)) ? [$licid->id, $licid->licenca_naziv] : [0, 0];
-    }
+    } */
 
      /**
        * 

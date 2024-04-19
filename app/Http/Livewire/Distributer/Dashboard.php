@@ -4,11 +4,12 @@ namespace App\Http\Livewire\Distributer;
 
 use Livewire\Component;
 
+use App\Models\LicencaNaplata;
 use App\Models\TerminalLokacija;
 use App\Models\DistributerUserIndex;
 use App\Models\LicencaDistributerTip;
 use App\Models\LicencaDistributerCena;
-use App\Models\LicencaDistributerTerminal;
+//use App\Models\LicencaDistributerTerminal;
 
 use Illuminate\Support\Facades\Config;
 
@@ -192,7 +193,7 @@ class Dashboard extends Component
     private function prebrojLicenceITerminaleDistributera()
     {
         return [
-            'br_licenci' => LicencaDistributerTerminal::select()->where('distributerId', '=', $this->distId)->count(),
+            'br_licenci' => LicencaNaplata::select()->where('distributerId', '=', $this->distId)->where('aktivna', '=', 1)->count(),
             'br_terminala' => TerminalLokacija::select()->where('distributerId', '=', $this->distId)->count()
         ];
     }

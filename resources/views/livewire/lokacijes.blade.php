@@ -136,8 +136,38 @@
     <div class="mt-5">
     {{ $data->links() }}
     </div>
+    
+    {{-- ERROR LICENCA #########################################--}}
+    <x-jet-dialog-modal wire:model="modalErorLicencaVisible">
+        <x-slot name="title">
+            GREŠKA
+        </x-slot>
+        <x-slot name="content"> 
+            <div class="bg-red-50 border border-red-500 text-red-500 px-4 py-3 rounded relative my-4 " role="alert">
+                <p class="">Greška!<br />
+                <span class="font-bold block sm:inline">
+                    @if($licencaError == 'multi')
+                        Jedan ili više izabranih terminala imaju licencu! <br />
+                        Samo terminali bez licenci mogu da se premeštaju.
+                    @elseif($licencaError == 'db')
+                        Došlo je do greške! <br />
+                        Pokušajte kasnije.
+                    @endif
+                </span>
+                <span class="absolute top-0 bottom-0 right-0 px-4 py-3">
+                    <svg class="fill-red-500 h-6 w-6 " xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M506.3 417l-213.3-364c-16.33-28-57.54-28-73.98 0l-213.2 364C-10.59 444.9 9.849 480 42.74 480h426.6C502.1 480 522.6 445 506.3 417zM232 168c0-13.25 10.75-24 24-24S280 154.8 280 168v128c0 13.25-10.75 24-23.1 24S232 309.3 232 296V168zM256 416c-17.36 0-31.44-14.08-31.44-31.44c0-17.36 14.07-31.44 31.44-31.44s31.44 14.08 31.44 31.44C287.4 401.9 273.4 416 256 416z"/></svg>
+                </span>
+                </p>
+            </div>
+        </x-slot>
+        <x-slot name="footer">
+            <x-jet-secondary-button wire:click="$toggle('modalErorLicencaVisible')" wire:loading.attr="disabled">
+                {{ __('Otkaži') }}
+            </x-jet-secondary-button>
+        </x-slot>
+    </x-jet-dialog-modal>
 
-    {{-- Nova/Izmeni Lokacija Modal Form --}}
+    {{-- NOVA / IZMENI LOKACIJU MODAL ############################################### --}}
     <x-jet-dialog-modal wire:model="modalFormVisible">
         <x-slot name="title">
             @if ($isUpdate) {{ __('Izmeni podatke - ') }}{{ $l_naziv }}
@@ -355,7 +385,7 @@
     </x-jet-dialog-modal>
 
 
-    {{-- Add Terminal Modal --}}
+    {{-- ADD TERMINAL MODAL ########################################################### --}}
     <x-jet-dialog-modal wire:model="modalAddTerminalVisible" id="adTer">
         <x-slot name="title">
           Dodaj / premesti terminal
@@ -597,7 +627,7 @@
         </x-slot>
      </x-jet-dialog-modal>
 
-     {{-- KONTAKT OSOBA MODAL --}}
+     {{-- KONTAKT OSOBA MODAL ##########################################################--}}
      <x-jet-dialog-modal wire:model="kontaktOsobaVisible">
         <x-slot name="title">
         <svg class="float-left fill-gray-500 w-6 h-6 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 448"><defs><style>.a{fill:#fff;}</style></defs><path d="M512,0H64A64,64,0,0,0,0,64V384a64,64,0,0,0,64,64H512a64,64,0,0,0,64-64V64A64,64,0,0,0,512,0Z"/><circle class="a" cx="186.65" cy="137.79" r="86.21"/><path class="a" d="M382.28,317.58h133a25,25,0,0,0,24.94-24.94V76.51a25,25,0,0,0-24.94-24.94h-133a24.94,24.94,0,0,0-24.93,24.94V292.64A24.94,24.94,0,0,0,382.28,317.58Zm83.13-24.94H431.69c-4.1,0-7.84-3.74-7.84-8.31a8.34,8.34,0,0,1,8.31-8.32h33.25c4.57,0,8.31,3.74,8.31,7.85A8.45,8.45,0,0,1,465.41,292.64ZM390.6,84.82H507V251.08H390.6Z"/><path class="a" d="M57.33,396.43H316a21.61,21.61,0,0,0,21.55-21.55A107.77,107.77,0,0,0,229.76,267.11H143.54A107.76,107.76,0,0,0,35.77,374.88,21.59,21.59,0,0,0,57.33,396.43Z"/></svg>

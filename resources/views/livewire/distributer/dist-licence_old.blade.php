@@ -25,7 +25,7 @@
                                     <x-jet-input wire:model="searchTerminalSn" id="" class="block bg-orange-50 w-44" type="text" placeholder="Serijski broj" />
                                 </td>
                                 <td>
-                                    <x-jet-input wire:model="searchMesto" id="" class="block bg-orange-50 w-48" type="text" placeholder="Pretraži naziv" />
+                                    <x-jet-input wire:model="searchMesto" id="" class="block bg-orange-50 w-48" type="text" placeholder="Pretraži mesto" />
                                 </td>
                                 <td>
                                     <select wire:model="searchTipLicence" id="" class="block appearance-none bg-orange-50 w-full border border-0 text-gray-700 py-3 px-4 pr-8 round leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
@@ -60,7 +60,7 @@
                                     @endif
 
                                     @php
-                                        $item->month_diff = App\Http\Helpers::monthDifference($item->datum_kraj_licence);
+                                        $item->month_diff = App\Http\Helpers::monthDifference($item->datum_kraj);
                                     @endphp
 
                                     <tr>
@@ -96,7 +96,7 @@
                                             @endif
                                             {{ $item->licenca_naziv }} 
                                         </td>  
-                                        <td class="px-2 py-2">@if($item->datum_pocetka_licence != '') {{ App\Http\Helpers::datumFormatDan($item->datum_pocetka_licence) }} @endif</td>
+                                        <td class="px-2 py-2">@if($item->datum_pocetak != '') {{ App\Http\Helpers::datumFormatDan($item->datum_pocetak) }} @endif</td>
                                         <td>
                                             @if($item->month_diff !='')
                                                 @if($item->month_diff == 0)
@@ -106,14 +106,14 @@
                                                 @endif
                                             @endif
                                         </td>
-                                        <td class="px-2 py-2">@if($item->datum_kraj_licence != '') {{ App\Http\Helpers::datumFormatDan($item->datum_kraj_licence) }} @endif</td>                                       
+                                        <td class="px-2 py-2">@if($item->datum_kraj != '') {{ App\Http\Helpers::datumFormatDan($item->datum_kraj) }} @endif</td>                                       
                                         <td class="px-1 py-1">
                                             @if($item->licenca_naziv != '')
-                                                <a class="p-1 cursor-pointer flex border border-stone-500 bg-stone-50 hover:bg-stone-500 text-stone-700 hover:text-white rounded" title="Pregled licence" wire:click="pregledLicenceShovModal('{{$item->tmlokId}}', '{{$item->lnid}}', {{$item->month_diff}})">
+                                                <a class="p-1 cursor-pointer flex border border-stone-500 bg-stone-50 hover:bg-stone-500 text-stone-700 hover:text-white rounded" title="Pregled licence" wire:click="pregledLicenceShovModal('{{$item->tmlokId}}', '{{$item->ldtid}}', {{$item->month_diff}})">
                                                     <svg class="fill-current w-6 h-8 pl-1 mx-1 my-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><path d="M373.1,134.6L253.4,15.3C243.5,5.5,230.2,0,216.3,0H59C26.5,0,0,26.5,0,59v394c0,32.5,26.5,59,59,59h266 c32.5,0,59-26.5,59-59V160.9C384,151.1,380.1,141.6,373.1,134.6z M354.9,151.8h-61.5c-35.8,0-65-29.2-65-65v-59 c2.7,1.3,5.1,3.1,7.3,5.2L354.9,151.8z M359,453c0,9-3.6,17.5-10,24c-6.5,6.5-15,10-24,10H59c-9,0-17.5-3.6-24-10 c-6.5-6.5-10-15-10-24V59c0-9,3.6-17.5,10-24c6.5-6.5,15-10,24-10h144.4v61.8c0,49.6,40.4,90,90,90H359V453z"/><g><path d="M159.9,391.1h111.3v26.3h-141V197.8h29.7V391.1z"/></g></svg>
                                                 </a>
                                             @else
-                                                <a class="p-1 cursor-pointer flex border border-stone-500 bg-stone-50 hover:bg-stone-500 text-stone-700 hover:text-white rounded" title="Dodaj licencu" wire:click="dodajLicencaShowModal('{{$item->tmlokId}}')">
+                                                <a class="p-1 cursor-pointer flex border border-stone-500 bg-stone-50 hover:bg-stone-500 text-stone-700 hover:text-white rounded" title="Dodaj licencu" wire:click="dodajLicencaShowModal('{{$item->tmlokId}}', '{{$item->ldtid}}')">
                                                     <svg class="fill-current w-6 h-8 pl-1 mx-1 my-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" enable-background="new 0 0 384 512"><g id="Layer_1_1_" display="none"><path display="inline" d="M320,464c8.8,0,16-7.2,16-16V160h-80c-17.7,0-32-14.3-32-32V48H64c-8.8,0-16,7.2-16,16v384c0,8.8,7.2,16,16,16H320z M0,64C0,28.7,28.7,0,64,0h165.5c17,0,33.3,6.7,45.3,18.7l90.5,90.5c12,12,18.7,28.3,18.7,45.3V448c0,35.3-28.7,64-64,64H64c-35.3,0-64-28.7-64-64V64z"/></g><g><path d="M373.1,134.6L253.4,15.3C243.5,5.5,230.2,0,216.3,0H59C26.5,0,0,26.5,0,59v394c0,32.5,26.5,59,59,59h266c32.5,0,59-26.5,59-59V160.9C384,151,380.1,141.5,373.1,134.6z M228.4,27.8c2.7,1.3,5.1,3,7.3,5.2l119.1,118.7h-61.4c-35.8,0-65-29.2-65-65V27.8z M359,453c0,9-3.6,17.5-10,24c-6.5,6.5-15,10-24,10H59c-9,0-17.5-3.6-24-10c-6.5-6.5-10-15-10-24V59c0-9,3.6-17.5,10-24c6.5-6.5,15-10,24-10h144.4v61.8c0,49.6,40.4,90,90,90H359V453z"/><polygon points="207,208.3 177,208.3 177,284.8 100.5,284.8 100.5,314.8 177,314.8 177,391.3 207,391.3 207,314.8 283.5,314.8 283.5,284.8 207,284.8"/></g></svg>
                                                 </a>
                                             @endif
@@ -132,13 +132,13 @@
                                             @if(isset($item->dist_zaduzeno))
                                                 @if($item->dist_razduzeno)
                                                 <!-- RACUN -->
-                                                    <a href="/dist-pdf-predracun?tip=r&lnid={{$item->lnid}}" target="_blank" class="flex border border-green-500 bg-green-100 hover:bg-green-600 text-stone-700 hover:text-white font-bold uppercase px-1 mr-2 rounded" title="Račun PDF">
+                                                    <a href="/dist-pdf-predracun?tip=r&ldtid={{$item->ldtid}}" target="_blank" class="flex border border-green-500 bg-green-100 hover:bg-green-600 text-stone-700 hover:text-white font-bold uppercase px-1 mr-2 rounded" title="Račun PDF">
                                                         <svg class="fill-current w-4 h-4 mr-1 mt-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Pro 6.4.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. --><path d="M64 464H96v48H64c-35.3 0-64-28.7-64-64V64C0 28.7 28.7 0 64 0H229.5c17 0 33.3 6.7 45.3 18.7l90.5 90.5c12 12 18.7 28.3 18.7 45.3V288H336V160H256c-17.7 0-32-14.3-32-32V48H64c-8.8 0-16 7.2-16 16V448c0 8.8 7.2 16 16 16zM176 352h32c30.9 0 56 25.1 56 56s-25.1 56-56 56H192v32c0 8.8-7.2 16-16 16s-16-7.2-16-16V448 368c0-8.8 7.2-16 16-16zm32 80c13.3 0 24-10.7 24-24s-10.7-24-24-24H192v48h16zm96-80h32c26.5 0 48 21.5 48 48v64c0 26.5-21.5 48-48 48H304c-8.8 0-16-7.2-16-16V368c0-8.8 7.2-16 16-16zm32 128c8.8 0 16-7.2 16-16V400c0-8.8-7.2-16-16-16H320v96h16zm80-112c0-8.8 7.2-16 16-16h48c8.8 0 16 7.2 16 16s-7.2 16-16 16H448v32h32c8.8 0 16 7.2 16 16s-7.2 16-16 16H448v48c0 8.8-7.2 16-16 16s-16-7.2-16-16V432 368z"/></svg>
                                                         R
                                                     </a>
                                                 @else
                                                 <!-- PREDRACUN -->
-                                                    <a href="/dist-pdf-predracun?tip=p&lnid={{$item->lnid}}" target="_blank" class="flex border border-orange-600 bg-orange-100 hover:bg-orange-600 text-stone-700 hover:text-white font-bold uppercase px-1 mr-2 rounded" title="Predračun PDF">
+                                                    <a href="/dist-pdf-predracun?tip=p&ldtid={{$item->ldtid}}" target="_blank" class="flex border border-orange-600 bg-orange-100 hover:bg-orange-600 text-stone-700 hover:text-white font-bold uppercase px-1 mr-2 rounded" title="Predračun PDF">
                                                         <svg class="fill-current w-4 h-4 mr-1 mt-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Pro 6.4.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. --><path d="M64 464H96v48H64c-35.3 0-64-28.7-64-64V64C0 28.7 28.7 0 64 0H229.5c17 0 33.3 6.7 45.3 18.7l90.5 90.5c12 12 18.7 28.3 18.7 45.3V288H336V160H256c-17.7 0-32-14.3-32-32V48H64c-8.8 0-16 7.2-16 16V448c0 8.8 7.2 16 16 16zM176 352h32c30.9 0 56 25.1 56 56s-25.1 56-56 56H192v32c0 8.8-7.2 16-16 16s-16-7.2-16-16V448 368c0-8.8 7.2-16 16-16zm32 80c13.3 0 24-10.7 24-24s-10.7-24-24-24H192v48h16zm96-80h32c26.5 0 48 21.5 48 48v64c0 26.5-21.5 48-48 48H304c-8.8 0-16-7.2-16-16V368c0-8.8 7.2-16 16-16zm32 128c8.8 0 16-7.2 16-16V400c0-8.8-7.2-16-16-16H320v96h16zm80-112c0-8.8 7.2-16 16-16h48c8.8 0 16 7.2 16 16s-7.2 16-16 16H448v32h32c8.8 0 16 7.2 16 16s-7.2 16-16 16H448v48c0 8.8-7.2 16-16 16s-16-7.2-16-16V432 368z"/></svg>
                                                         P
                                                     </a>
@@ -166,7 +166,7 @@
         {{ $data->links() }}
     </div>
 
-    {{--  DODAJ LICENCU Modal ###############################################  --}}
+    {{--  Dodaj licencu Modal --}}
     <x-jet-dialog-modal wire:model="dodajLicencuModalVisible">
         <x-slot name="title">
             {{ __('Dodaj licence terminalu') }}
@@ -315,7 +315,7 @@
         </x-slot>
     </x-jet-dialog-modal>
 
-    {{-- OBRISI LICENCU Modal ######################################################### --}}
+    {{-- The Delete LICENCU Modal --}}
     <x-jet-dialog-modal wire:model="modalConfirmDeleteVisible">
         <x-slot name="title">
             {{ __('Brisanje licence') }}
@@ -353,7 +353,7 @@
         </x-slot>
     </x-jet-dialog-modal>
         
-    {{-- PARAMETRI MODAL #################################################### --}}
+    {{-- The Parametri Modal --}}
     <x-jet-dialog-modal wire:model="parametriModalVisible">
         <x-slot name="title">
             <svg class="float-left fill-red-500 w-5 h-5 mr-2 mt-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><g id="Layer_1_1_" display="none"><path display="inline" d="M320,464c8.8,0,16-7.2,16-16V160h-80c-17.7,0-32-14.3-32-32V48H64c-8.8,0-16,7.2-16,16v384 c0,8.8,7.2,16,16,16H320z M0,64C0,28.7,28.7,0,64,0h165.5c17,0,33.3,6.7,45.3,18.7l90.5,90.5c12,12,18.7,28.3,18.7,45.3V448 c0,35.3-28.7,64-64,64H64c-35.3,0-64-28.7-64-64V64z"/></g><g><path d="M373.1,134.6L253.4,15.3C243.5,5.5,230.2,0,216.3,0H59C26.5,0,0,26.5,0,59v394c0,32.5,26.5,59,59,59h266 c32.5,0,59-26.5,59-59V160.9C384,151,380.1,141.5,373.1,134.6z M228.4,27.8c2.7,1.3,5.1,3,7.3,5.2l119.1,118.7h-61.4 c-35.8,0-65-29.2-65-65V27.8z M359,453c0,9-3.6,17.5-10,24c-6.5,6.5-15,10-24,10H59c-9,0-17.5-3.6-24-10c-6.5-6.5-10-15-10-24V59 c0-9,3.6-17.5,10-24c6.5-6.5,15-10,24-10h144.4v61.8c0,21.2,7.4,40.8,19.8,56.2h-61.1v64h64v-60.5c8.6,9.7,19.2,17.5,31.2,22.8V207 h64v-30.2H359V453z"/><rect x="62.7" y="143" width="64" height="64"/><rect x="62.7" y="256" width="64" height="64"/><rect x="162.1" y="256" width="64" height="64"/><rect x="257.3" y="256" width="64" height="64"/><rect x="62.7" y="369" width="64" height="64"/><rect x="162.1" y="369" width="64" height="64"/><rect x="257.3" y="369" width="64" height="64"/></g></svg>
@@ -384,7 +384,7 @@
         </x-slot>
     </x-jet-dialog-modal>
 
-    {{-- PREGLED LICENCE MODAL #########################################  --}}
+    {{-- Pregled licence modal --}}
     <x-jet-dialog-modal wire:model="pregledLicencaShowModal">
         <x-slot name="title">
             <svg class="float-left fill-current w-5 h-5 mr-2 mt-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><path d="M373.1,134.6L253.4,15.3C243.5,5.5,230.2,0,216.3,0H59C26.5,0,0,26.5,0,59v394c0,32.5,26.5,59,59,59h266 c32.5,0,59-26.5,59-59V160.9C384,151.1,380.1,141.6,373.1,134.6z M354.9,151.8h-61.5c-35.8,0-65-29.2-65-65v-59 c2.7,1.3,5.1,3.1,7.3,5.2L354.9,151.8z M359,453c0,9-3.6,17.5-10,24c-6.5,6.5-15,10-24,10H59c-9,0-17.5-3.6-24-10 c-6.5-6.5-10-15-10-24V59c0-9,3.6-17.5,10-24c6.5-6.5,15-10,24-10h144.4v61.8c0,49.6,40.4,90,90,90H359V453z"/><g><path d="M159.9,391.1h111.3v26.3h-141V197.8h29.7V391.1z"/></g></svg>
@@ -520,7 +520,7 @@
                 @if($naplata_podaci_licence->razduzeno && !$lic_nenaplativa)
                 <div class="my-4 border-y py-2 bg-gray-50">
                     <div class="flex mx-4">
-                        <a class="cursor-pointer flex border border-green-500 bg-green-50 hover:bg-green-500 text-green-700 hover:text-white font-bold rounded w-min" wire:click="produziLicencuShovModal('{{$modelId}}', '{{$licenca_naplata_id}}')" title="Produži licencu">
+                        <a class="cursor-pointer flex border border-green-500 bg-green-50 hover:bg-green-500 text-green-700 hover:text-white font-bold rounded w-min" wire:click="produziLicencuShovModal('{{$modelId}}', '{{$distrib_terminal_id}}')" title="Produži licencu">
                             <svg class="fill-current w-8 h-8 px-1 py-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><path d="M0 64C0 28.7 28.7 0 64 0H224V128c0 17.7 14.3 32 32 32H384V288H216c-13.3 0-24 10.7-24 24s10.7 24 24 24H384V448c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V64zM384 336V288H494.1l-39-39c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l80 80c9.4 9.4 9.4 24.6 0 33.9l-80 80c-9.4 9.4-24.6 9.4-33.9 0s-9.4-24.6 0-33.9l39-39H384zm0-208H256V0L384 128z"/></svg>
                         </a>
                         <p class="flex-1 mt-2 ml-2 font-bold">Produži licencu</p>
@@ -529,7 +529,7 @@
                 @endif
                 <div class="my-4 border-y py-2 bg-gray-50">
                     <div class="flex mx-4">
-                        <a class="cursor-pointer flex border border-stone-500 bg-stone-50 hover:bg-stone-500 text-stone-700 hover:text-white font-bold rounded w-min" wire:click="dodajIzPregledaLicenceShovModal('{{$modelId}}')" title="Dodaj licencu">
+                        <a class="cursor-pointer flex border border-stone-500 bg-stone-50 hover:bg-stone-500 text-stone-700 hover:text-white font-bold rounded w-min" wire:click="dodajIzPregledaLicenceShovModal('{{$modelId}}', '{{$distrib_terminal_id}}')" title="Dodaj licencu">
                             <svg class="fill-current w-8 h-8 px-1 py-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" enable-background="new 0 0 384 512"><g id="Layer_1_1_" display="none"><path display="inline" d="M320,464c8.8,0,16-7.2,16-16V160h-80c-17.7,0-32-14.3-32-32V48H64c-8.8,0-16,7.2-16,16v384c0,8.8,7.2,16,16,16H320z M0,64C0,28.7,28.7,0,64,0h165.5c17,0,33.3,6.7,45.3,18.7l90.5,90.5c12,12,18.7,28.3,18.7,45.3V448c0,35.3-28.7,64-64,64H64c-35.3,0-64-28.7-64-64V64z"/></g><g><path d="M373.1,134.6L253.4,15.3C243.5,5.5,230.2,0,216.3,0H59C26.5,0,0,26.5,0,59v394c0,32.5,26.5,59,59,59h266c32.5,0,59-26.5,59-59V160.9C384,151,380.1,141.5,373.1,134.6z M228.4,27.8c2.7,1.3,5.1,3,7.3,5.2l119.1,118.7h-61.4c-35.8,0-65-29.2-65-65V27.8z M359,453c0,9-3.6,17.5-10,24c-6.5,6.5-15,10-24,10H59c-9,0-17.5-3.6-24-10c-6.5-6.5-10-15-10-24V59c0-9,3.6-17.5,10-24c6.5-6.5,15-10,24-10h144.4v61.8c0,49.6,40.4,90,90,90H359V453z"/><polygon points="207,208.3 177,208.3 177,284.8 100.5,284.8 100.5,314.8 177,314.8 177,391.3 207,391.3 207,314.8 283.5,314.8 283.5,284.8 207,284.8"/></g></svg>
                         </a>
                         <p class="flex-1 mt-2 ml-2 font-bold">Dodaj licence terminalu</p>
@@ -538,7 +538,7 @@
                 @if($licenca_ima_parametre)
                     <div class="my-4 border-y py-2 bg-gray-50">
                         <div class="flex mx-4">
-                             <a class="cursor-pointer flex border border-sky-500 text-sky-500 bg-stone-50 hover:bg-sky-500 hover:text-white font-bold rounded w-min" wire:click="parametriIzPregledaLicenceShovModal('{{$licenca_naplata_id}}')" title="Parametri licence">
+                             <a class="cursor-pointer flex border border-sky-500 text-sky-500 bg-stone-50 hover:bg-sky-500 hover:text-white font-bold rounded w-min" wire:click="parametriIzPregledaLicenceShovModal('{{$distrib_terminal_id}}')" title="Parametri licence">
                                 <svg class="fill-current w-8 h-8 px-1 py-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><g id="Layer_1_1_" display="none"><path display="inline" d="M320,464c8.8,0,16-7.2,16-16V160h-80c-17.7,0-32-14.3-32-32V48H64c-8.8,0-16,7.2-16,16v384 c0,8.8,7.2,16,16,16H320z M0,64C0,28.7,28.7,0,64,0h165.5c17,0,33.3,6.7,45.3,18.7l90.5,90.5c12,12,18.7,28.3,18.7,45.3V448 c0,35.3-28.7,64-64,64H64c-35.3,0-64-28.7-64-64V64z"/></g><g><path d="M373.1,134.6L253.4,15.3C243.5,5.5,230.2,0,216.3,0H59C26.5,0,0,26.5,0,59v394c0,32.5,26.5,59,59,59h266 c32.5,0,59-26.5,59-59V160.9C384,151,380.1,141.5,373.1,134.6z M228.4,27.8c2.7,1.3,5.1,3,7.3,5.2l119.1,118.7h-61.4 c-35.8,0-65-29.2-65-65V27.8z M359,453c0,9-3.6,17.5-10,24c-6.5,6.5-15,10-24,10H59c-9,0-17.5-3.6-24-10c-6.5-6.5-10-15-10-24V59 c0-9,3.6-17.5,10-24c6.5-6.5,15-10,24-10h144.4v61.8c0,21.2,7.4,40.8,19.8,56.2h-61.1v64h64v-60.5c8.6,9.7,19.2,17.5,31.2,22.8V207 h64v-30.2H359V453z"/><rect x="62.7" y="143" width="64" height="64"/><rect x="62.7" y="256" width="64" height="64"/><rect x="162.1" y="256" width="64" height="64"/><rect x="257.3" y="256" width="64" height="64"/><rect x="62.7" y="369" width="64" height="64"/><rect x="162.1" y="369" width="64" height="64"/><rect x="257.3" y="369" width="64" height="64"/></g></svg>
                             </a>
                             <p class="flex-1 mt-2 ml-2 font-bold">Parametri licence</p>
@@ -548,7 +548,7 @@
                 @if($licenca_moze_da_se_brise && !$lic_nenaplativa)
                     <div class="my-4 border-y py-2 bg-gray-50">
                         <div class="flex mx-4">
-                            <a class="cursor-pointer flex border border-red-500 text-red-500 bg-stone-50 hover:bg-red-500 hover:text-white font-bold uppercase rounded w-min" wire:click="deleteIzPregledaLicencuShowModal('{{$modelId}}', '{{$licenca_naplata_id}}')" title="Obriši licencu">
+                            <a class="cursor-pointer flex border border-red-500 text-red-500 bg-stone-50 hover:bg-red-500 hover:text-white font-bold uppercase rounded w-min" wire:click="deleteIzPregledaLicencuShowModal('{{$modelId}}', '{{$distrib_terminal_id}}')" title="Obriši licencu">
                                 <svg class="fill-current w-8 h-8 px-1 py-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><g display="none"><path display="inline" d="M320,464c8.8,0,16-7.2,16-16V160h-80c-17.7,0-32-14.3-32-32V48H64c-8.8,0-16,7.2-16,16v384 c0,8.8,7.2,16,16,16H320z M0,64C0,28.7,28.7,0,64,0h165.5c17,0,33.3,6.7,45.3,18.7l90.5,90.5c12,12,18.7,28.3,18.7,45.3V448 c0,35.3-28.7,64-64,64H64c-35.3,0-64-28.7-64-64V64z"/></g><path d="M373.1,134.6L253.4,15.3C243.5,5.5,230.2,0,216.3,0H59C26.5,0,0,26.5,0,59v394c0,32.5,26.5,59,59,59h266 c32.5,0,59-26.5,59-59V160.9C384,151,380.1,141.5,373.1,134.6z M354.8,151.7h-61.4c-35.8,0-65-29.2-65-65V27.8 c2.7,1.3,5.1,3,7.3,5.2L354.8,151.7z M359,453c0,9-3.6,17.5-10,24c-6.5,6.5-15,10-24,10H59c-9,0-17.5-3.6-24-10 c-6.5-6.5-10-15-10-24V59c0-9,3.6-17.5,10-24c6.5-6.5,15-10,24-10h144.4v61.8c0,49.6,40.4,90,90,90H359V453z"/><path d="M210.2,319l71.6-104c4.7-6.8,3-16.2-3.8-20.9c-6.8-4.7-16.2-3-20.9,3.8L192,292.6L126.9,198c-4.7-6.8-14-8.5-20.9-3.8 c-6.8,4.7-8.5,14-3.8,20.9l71.6,104l-71.6,104c-4.7,6.8-3,16.2,3.8,20.9c2.6,1.8,5.6,2.6,8.5,2.6c4.8,0,9.5-2.3,12.4-6.5l65.1-94.6 l65.1,94.6c2.9,4.2,7.6,6.5,12.4,6.5c2.9,0,5.9-0.9,8.5-2.6c6.8-4.7,8.5-14,3.8-20.9L210.2,319z"/></svg>
                             </a>
                             <p class="flex-1 mt-2 ml-2 font-bold">Obriši licencu</p>
@@ -564,7 +564,7 @@
         </x-slot>
     </x-jet-dialog-modal>
 
-    {{-- PRODUZI LICENCU MODAL ######################################################### --}}
+    {{-- Produzi Licencu Modal --}}
     <x-jet-dialog-modal wire:model="produziLicModalVisible">
         <x-slot name="title">
             <svg class="float-left fill-green-500 w-5 h-5 mr-2 mt-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><path d="M0 64C0 28.7 28.7 0 64 0H224V128c0 17.7 14.3 32 32 32H384V288H216c-13.3 0-24 10.7-24 24s10.7 24 24 24H384V448c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V64zM384 336V288H494.1l-39-39c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l80 80c9.4 9.4 9.4 24.6 0 33.9l-80 80c-9.4 9.4-24.6 9.4-33.9 0s-9.4-24.6 0-33.9l39-39H384zm0-208H256V0L384 128z"/></svg>

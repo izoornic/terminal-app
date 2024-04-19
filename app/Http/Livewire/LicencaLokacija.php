@@ -3,21 +3,21 @@
 namespace App\Http\Livewire;
 
 use Auth;
-use App\Models\Lokacija;
 use App\Models\User;
+use App\Models\Lokacija;
 use App\Models\TerminalLokacija;
-use App\Models\TerminalLokacijaHistory;
 use App\Models\LokacijaKontaktOsoba;
+use App\Models\TerminalLokacijaHistory;
 
 use Livewire\Component;
 use Livewire\WithPagination;
 
-use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Config;
 
-use App\Ivan\SelectedTerminalInfo;
 use App\Ivan\TerminalBacklist;
+use App\Ivan\SelectedTerminalInfo;
 
 use App\Http\Helpers;
 

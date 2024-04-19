@@ -26,6 +26,8 @@ class LicencaNaplata extends Model
         'dist_zaduzeno',
         'dist_datum_zaduzenja',
         'dist_razduzeno',
-        'dist_datum_razduzenja'
+        'dist_datum_razduzenja',
+        'aktivna',
+        'nenaplativ'
     ];
 }
