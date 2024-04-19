@@ -77,6 +77,10 @@ V 0.5.1.1 (27.2.2024.)
 V 0.5.1.2 (6.3.2024.)
     - Dodata provera email adrese kada se menja ili dodaje da setuje NULL ako je los format
 
+V 0.5.1.3 (86.4.2024.)
+    - Ispravljen bug sa editom lokacije koja ima dodatu email adresu. Stranice "Lokacije" i "Dist-Lokacije"
+
+
 V 0.5.1.4 ()
     - Dodata funkcionalnost da Admin i Menager licenci ne mogu da premestaju terminale koji imaju dodatu licencu.
     - Dodata dva nova plja u tabelu "licenca_naplatas": 'aktivna', 'nenaplativ'
@@ -94,21 +98,6 @@ V 0.5.1.4 ()
     - Dodata nova polja u tabelu "licenca_parametar_terminals" : 'terminal_lokacijaId', 'distributerId', 'licenca_distributer_cenaId'
     - Refaktor prememestanja terminala u jednu funkciju u modelu TerminalLokacija
     - Dodat update broja terminala za distributera prilikom premestanja terminala
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
   UPDATE terminal_lokacijas SET distributerId = '5' WHERE terminal_lokacijas.terminalId = ( SELECT id FROM terminals WHERE sn LIKE 'A26-12RB-1K12746');  
