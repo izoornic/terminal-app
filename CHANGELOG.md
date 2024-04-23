@@ -77,18 +77,15 @@ V 0.5.1.1 (27.2.2024.)
 V 0.5.1.2 (6.3.2024.)
     - Dodata provera email adrese kada se menja ili dodaje da setuje NULL ako je los format
 
-V 0.5.1.3 (86.4.2024.)
+V 0.5.1.3 (6.4.2024.)
     - Ispravljen bug sa editom lokacije koja ima dodatu email adresu. Stranice "Lokacije" i "Dist-Lokacije"
 
 
-V 0.5.1.4 ()
+V 0.5.1.4 (23.4.2024.)
     - Dodata funkcionalnost da Admin i Menager licenci ne mogu da premestaju terminale koji imaju dodatu licencu.
     - Dodata dva nova plja u tabelu "licenca_naplatas": 'aktivna', 'nenaplativ'
     
     - Izbacena tabela 'licenca_distributer_terminals' iz baze
-
-
-        UPDATE licenca_naplatas SET aktivna = 1 WHERE licenca_dist_terminalId > 0
 
         UPDATE licenca_naplatas ls, ( SELECT id, nenaplativ FROM licenca_distributer_terminals ) ldt
         SET ls.nenaplativ = 1
@@ -100,9 +97,29 @@ V 0.5.1.4 ()
     - Dodat update broja terminala za distributera prilikom premestanja terminala
 
 
-  UPDATE terminal_lokacijas SET distributerId = '5' WHERE terminal_lokacijas.terminalId = ( SELECT id FROM terminals WHERE sn LIKE 'A26-12RB-1K12746');  
+    PROBLEMATICNA LICENCA (stock dodta kao duga na terminal)
+    -- Ima je u tabeli 'licenca_naplatas' a nema je u tabeli 'licence_za_terminals'
+    terminal_lokacijaID = 15335
+    distributerId = 1       (Zeta Test)
+    licenca_distributer_cenaId = 2 (stock)
+    SN = 0310639000225881 
+         0310639000225881
 
-INFO o TerminalLokacija IDju
+         08. 02. '24. 		01. 02. '25. 
+
+
+
+    //==== Upit za proveru slicnosti tabela 'licenca_naplatas' i 'licenca_distributer_terminals' ====//
+    SELECT ln.licenca_dist_terminalId, ldt.id, ln.* FROM licenca_naplatas ln
+    LEFT JOIN licenca_distributer_terminals ldt ON ln.licenca_dist_terminalId = ldt.id
+    WHERE ln.aktivna > 0
+    ORDER BY ln.licenca_dist_terminalId;
+
+    // licenca koja postoji u tabeli 'licenca_naplatas' a ne postoji u tabeli 'licence_za_terminals'
+    SELECT * FROM licenca_naplatas ln WHERE (ln.terminal_lokacijaId, ln.distributerId, ln.licenca_distributer_cenaId) NOT IN (SELECT lzt.terminal_lokacijaId, lzt.distributerId, lzt.licenca_distributer_cenaId FROM licence_za_terminals lzt) AND ln.aktivna = 1 ORDER BY `distributerId` ASC 
+
+
+    // INFO o TerminalLokacija IDju
     SELECT * FROM terminal_lokacijas tl WHERE tl.terminalId = (SELECT id FROM terminals WHERE sn LIKE '0500422040186607'); 
     
     
