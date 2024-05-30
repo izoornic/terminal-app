@@ -97,6 +97,7 @@ V 0.5.1.4 (23.4.2024.)
     - Dodat update broja terminala za distributera prilikom premestanja terminala
 
 
+    --
     PROBLEMATICNA LICENCA (stock dodta kao duga na terminal)
     -- Ima je u tabeli 'licenca_naplatas' a nema je u tabeli 'licence_za_terminals'
     terminal_lokacijaID = 15335
