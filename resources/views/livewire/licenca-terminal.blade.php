@@ -181,7 +181,6 @@
                                 @endif
                                 <p class="text-sm pt-2">Datum isteka: <span class="font-bold text-red-700">{{ App\Http\Helpers::datumFormatDanFullYear($licenca->datum_kraj_licence) }}</span></p>
                                 <p class="text-sm pt-2">Datum prekoračenja: <span class="font-bold text-red-700">{{ App\Http\Helpers::datumFormatDanFullYear($licenca->datum_isteka_prekoracenja) }}</span></p>
-                                <p>Razduz: {{$licenca->dist_razduzeno}}</p>
                             </div>
                         </div>
                     </div>
