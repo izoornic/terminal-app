@@ -96,7 +96,7 @@ V 0.5.1.4 (23.4.2024.)
     - Refaktor prememestanja terminala u jednu funkciju u modelu TerminalLokacija
     - Dodat update broja terminala za distributera prilikom premestanja terminala
 
-V 0.5.1.5 (2.5.2024.)
+V 0.5.1.5 (2.6.2024.)
     - Dodat novi modal "Pregled licenci" na stranici 'Terminali' za uloge 'admin' i 'menadzer licenci'
 
     --
