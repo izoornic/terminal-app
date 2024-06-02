@@ -167,7 +167,7 @@
                             <div class="w-full">
                                 <p class="font-bold my-2">{{ $licenca->naziv_licence }}</p>
                                 @php
-                                    $trajna = ($licenca->razduzeno) ? 1 : 0;
+                                    $trajna = (isset($licenca->razduzeno)) ? 1 : 0;
                                 @endphp
                                 @if($trajna)
                                 <div class="bg-red-100 p-2 w-full">
