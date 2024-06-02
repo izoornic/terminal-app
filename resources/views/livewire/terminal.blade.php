@@ -160,9 +160,9 @@
                             <div class="w-full">
                                 <p class="font-bold my-2">{{ $licenca->naziv_licence }}</p>
                                 @php
-                                    $trajna = (isset($licenca->razduzeno)) ? 1 : 0;
+                                    $privremena = (isset($licenca->razduzeno)) ? 0 : 1;
                                 @endphp
-                                @if($trajna)
+                                @if($privremena)
                                 <div class="bg-red-100 p-2 w-full">
                                     <p class="text-sm pt-2">Status:  <span class="font-bold text-red-700"> Privremena </span> </p>
                                     <p class="text-sm pt-2">Datum isteka: <span class="font-bold text-red-700">{{ App\Http\Helpers::datumFormatDanFullYear($licenca->datum_kraj) }}</span></p>

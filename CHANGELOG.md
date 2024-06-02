@@ -99,10 +99,10 @@ V 0.5.1.4 (23.4.2024.)
 V 0.5.1.5 (2.6.2024.)
     - Dodat novi modal "Pregled licenci" na stranici 'Terminali' za uloge 'admin' i 'menadzer licenci'
 
-V 0.5.2.0 (2.6.2024.)
+V 0.5.2.1 (2.6.2024.)
     - Ispravljen bug u blade fajlovima 'Terminali' za uloge 'admin' i 'menadzer licenci'
 
-    
+
     --
     PROBLEMATICNA LICENCA (stock dodta kao duga na terminal)
     -- Ima je u tabeli 'licenca_naplatas' a nema je u tabeli 'licence_za_terminals'
