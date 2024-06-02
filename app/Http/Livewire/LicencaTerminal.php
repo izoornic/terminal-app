@@ -4,6 +4,7 @@ namespace App\Http\Livewire;
 
 use App\Models\Lokacija;
 use App\Models\TerminalLokacija;
+use App\Models\LicenceZaTerminal;
 use App\Models\LicencaDistributerTip;
 use App\Models\DistributerLokacijaIndex;
 use App\Models\TerminalLokacijaHistory;
@@ -71,6 +72,10 @@ class LicencaTerminal extends Component
     //terminal HISTORY
     public $terminalHistoryVisible;
     public $historyData;
+
+    //licence modal
+    public $licencaModalVisible;
+    public $licencaData;
    
     /**
      * [Description for mount]
@@ -137,9 +142,14 @@ class LicencaTerminal extends Component
         } )
         ->paginate(Config::get('global.terminal_paginate'), ['*'], 'terminali');
 
-        foreach($terms as $terminal){
+        $terms->each(function ($item, $key){
+            $item->tzlid = (LicenceZaTerminal::where('terminal_lokacijaId', '=', $item->tlid)->first()) ? 1 : 0;
+            array_push($this->allInPage,  $item->tid);
+        });
+
+        /* foreach($terms as $terminal){
             array_push($this->allInPage,  $terminal->tid);
-        }
+        } */
 
         return $terms;
     }
@@ -337,6 +347,23 @@ class LicencaTerminal extends Component
         $this->historyData = TerminalHistory::terminalHistoryData($this->modelId);
 
         $this->terminalHistoryVisible = true;
+    }
+
+     /**
+     * Prikaz aktivnih licenci
+     *
+     * @param mixed $tlid
+     * 
+     * @return [type]
+     * 
+     */
+    public function licencaShowModal($id)
+    {
+        $this->modelId = $id; //ovo je id terminal lokacija tabele
+        $this->selectedTerminal = SelectedTerminalInfo::selectedTerminalInfoTerminalLokacijaId($this->modelId);
+        $this->licencaData = LicenceZaTerminal::sveAktivneLicenceTerminala($id);
+        //dd($this->licencaData);
+        $this->licencaModalVisible = true;
     }
 
     /**
